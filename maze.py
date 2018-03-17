@@ -144,10 +144,13 @@ def introduction():
     time.sleep(1)
     print("Go!")
 
+#<<<<<<< HEAD
 def new_direction():
     window.onkey(player.left(90), "Left")
     window.onkey(player.right(90), "Right")
 
+#=======
+#>>>>>>> 9ed9070b17f469d63808283a8b2555fc3c4afdb2
 introduction()
 
 window = turtle.Screen()
@@ -172,10 +175,13 @@ finished = True
 
 while finished == True:
     start_up()
+#<<<<<<< HEAD
     """
     player.forward(5)
     new_direction()
     """
+#=======
+#>>>>>>> 9ed9070b17f469d63808283a8b2555fc3c4afdb2
     if goal_detect():
         target.color('green')
         print("You've won the game!")
