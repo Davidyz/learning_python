@@ -1,0 +1,125 @@
+"""
+This is a custom module of functions that is created in order to practice algorithm and solve mathematics and statistics problems.
+"""
+def factorial(n):
+    """
+    return n!.
+    """
+    if n == 1:
+        return 1
+    elif n > 1:
+        return n * factorial(n - 1)
+
+
+def prime(n, factor=3):
+    """
+    determine whether a number is prime or not.
+    """
+    if n == 2:
+        return True
+    if n % 2 == 0:
+        return False
+    if n % factor == 0:
+        return False
+    if factor < n ** 0.5 and n % factor != 0:    
+        return prime(n, factor + 2)
+    return True
+
+def choose(n, r):
+    """
+    the formula used in combination.
+    """
+    res = factorial(n) / (factorial(r) * factorial(n - r))
+    if int(res) == res:
+        return int(res)
+    else:
+        return
+
+def febonacci(n):
+    """
+    return the list of the first n numbers in the febonacci sequence.
+    """
+    res = [1, 1]
+    for i in range(n - 2):
+        res.append(res[-1] + res[-2])
+    return res
+
+def febonacci_r(n, res = [1, 1]):
+    """
+    the recursive version of the febonacci function.
+    """
+    if n == 1:
+        return 1
+    elif n == 2:
+        return res       
+    elif n > 2:
+        res.append(res[-1] + res[-2])
+        return febonacci_r(n - 1, res)
+
+def triangle(n):
+    def triangle_helper(n, result = [1, [1, 1]]):
+        if n == 2:
+            return result
+        elif n == 1:
+            return 1
+        else:
+            temp = [1, 1]
+            for i in range(len(result[-1]) - 1):
+                temp.insert(-1, result[-1][i] + result[-1][i + 1])
+            result.append(temp)
+            return triangle_helper(n - 1, result)
+    return triangle_helper(n)
+
+def binomial(total, prob, suc):
+    """
+    prob = probability.
+    suc = number of successful event.
+    calculate the probability for binomial distribution.
+    """
+    return choose(total, suc) * (prob ** suc) * ((1 - prob) ** (total - suc))
+
+def root(n, lower = None, upper = None, deci = 4, power = 2):
+    """
+    try to find the nth root for n using binary search.
+    square root by default.
+    correct to 4 decimal place by default.
+    """
+    if lower == None:
+        lower = n
+
+    if upper == None:
+        upper = n
+
+    if abs(lower - upper) <= 1 / (10 ** (deci * 2)):
+        if lower ** power <= n:
+            if upper ** 2 >= n:
+                return (lower + upper) / 2
+
+    if n < 0:
+        return None
+
+    mid = (lower + upper) / 2
+
+    def decimal(x):
+        return len(str(x).split('.')[1])
+
+    def accu(x):
+        if '.' in str(x):
+            return 1 / (10 ** decimal(x))
+        else:
+            return 10 ** (len(str(x)) - 1)
+
+    if upper ** power < n:
+        return root(n, lower, upper + n / 8, deci, power)
+
+    elif lower ** power > n:
+        return root(n, lower - n / 8, upper, deci, power)
+
+    elif abs(mid ** power - n) <= 1 / (10 ** deci):
+        return round(mid, deci)
+
+    elif mid ** power > n:
+        return root(n, lower, mid - accu(mid), deci, power)
+
+    elif mid ** power < n:
+        return root(n, mid + accu(mid), upper, deci, power)
