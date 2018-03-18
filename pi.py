@@ -4,7 +4,7 @@ import random, time
 
 #all_points = 0
 out_of_circle = 0
-number = int(input())
+number = int(input("Please enter the number of random tuple you want.\nTheoriotically the greater the number is, the more accurate the result is.\n"))
 
 def not_in_circle(x, y):
     return not x ** 2 + y ** 2 < 1
