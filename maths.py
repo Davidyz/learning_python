@@ -37,25 +37,9 @@ def choose(n, r):
 
 def febonacci(n):
     """
-    return the list of the first n numbers in the febonacci sequence.
+    Return the list of the first n numbers in the febonacci sequence.
     """
-    res = [1, 1]
-    for i in range(n - 2):
-        res.append(res[-1] + res[-2])
-    return res
-
-def febonacci_r(n, res = [1, 1]):
-    """
-    the recursive version of the febonacci function.
-    """
-    if n == 1:
-        return 1
-    elif n == 2:
-        return res       
-    elif n > 2:
-        res.append(res[-1] + res[-2])
-        return febonacci_r(n - 1, res)
-
+    
 def triangle(n):
     def triangle_helper(n, result = [1, [1, 1]]):
         if n == 2:
@@ -74,15 +58,15 @@ def binomial(total, prob, suc):
     """
     prob = probability.
     suc = number of successful event.
-    calculate the probability for binomial distribution.
+    Calculate the probability for binomial distribution.
     """
     return choose(total, suc) * (prob ** suc) * ((1 - prob) ** (total - suc))
 
 def root(n, lower = None, upper = None, deci = 4, power = 2):
     """
-    try to find the nth root for n using binary search.
-    square root by default.
-    correct to 4 decimal place by default.
+    Try to find the nth root for n using binary search.
+    Square root by default.
+    Correct to 4 decimal place by default.
     """
     if lower == None:
         lower = n

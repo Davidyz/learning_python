@@ -1,2 +1,2 @@
 # learning_python
-record of my progress of learning python.
+A record of my progress of learning python.
