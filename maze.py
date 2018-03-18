@@ -22,7 +22,6 @@ layout = ["wwwwwwwwwwwwwwwwwwww",
           "wwwwwwwwwwwwwwwwwwww"]
 
 def item(x,y,category,fake = False):
-    #global target
     global coins
     t = "n" + str(x) + str(y)
     t = turtle.Turtle()
@@ -35,13 +34,7 @@ def item(x,y,category,fake = False):
         t.color("brown")
         if not fake:
             walls.append(t)
-    """
-    if category == "target":
-        target.shape("circle")
-        target.color("red")
-        target.setheading(90)
-        target.shapesize(1,1)
-    """
+
     if category == "coin":
         t.shape("circle")
         t.shapesize(1,1)
@@ -144,13 +137,10 @@ def introduction():
     time.sleep(1)
     print("Go!")
 
-#<<<<<<< HEAD
 def new_direction():
     window.onkey(player.left(90), "Left")
     window.onkey(player.right(90), "Right")
 
-#=======
-#>>>>>>> 9ed9070b17f469d63808283a8b2555fc3c4afdb2
 introduction()
 
 window = turtle.Screen()
@@ -175,13 +165,6 @@ finished = True
 
 while finished == True:
     start_up()
-#<<<<<<< HEAD
-    """
-    player.forward(5)
-    new_direction()
-    """
-#=======
-#>>>>>>> 9ed9070b17f469d63808283a8b2555fc3c4afdb2
     if goal_detect():
         target.color('green')
         print("You've won the game!")
