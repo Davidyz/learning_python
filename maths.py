@@ -39,7 +39,8 @@ def febonacci(n):
     """
     Return the list of the first n numbers in the febonacci sequence.
     """
-    
+    return
+
 def triangle(n):
     def triangle_helper(n, result = [1, [1, 1]]):
         if n == 2:
