@@ -108,3 +108,25 @@ def root(n, lower = None, upper = None, deci = 4, power = 2):
 
     elif mid ** power < n:
         return root(n, mid + accu(mid), upper, deci, power)
+
+def differentiate(f, x):
+    """
+    Find the gradient of the curve f at the point (x, f(x))
+    """
+    step = 0.0000000001
+    return (f(x + step) - f(x)) / step
+
+def newton_method(n):
+    """
+    Find square roots for n using Newton's method.
+    """
+    def f(x):
+        #global n
+        print(n)
+        return x ** 2 - n
+    
+    y = 1
+    while y > 0.01:
+        n = n - f(n) / differentiate(f, n)
+        y = f(n)
+    return n
