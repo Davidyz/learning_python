@@ -33,3 +33,19 @@ def bubblesort(array):
     switch(array)
 
     return bubblesort(array[:-1]) + [array[-1]]
+
+def insertsort(array, index = 1):
+    # NOT FINISHED!!!
+    if index == len(array):
+        return array
+
+    else:
+        for i in range(index - 1, -1, -1):
+
+            if i == 0:
+                array.insert(0, array.pop(index))
+
+            elif array[i] <= array[index]:
+                array.insert(i + 1, array.pop(index))
+
+    return insertsort(array, index + 1)
