@@ -22,7 +22,7 @@ def bubblesort(array):
         return array
 
     def switch(ls, index = 0):
-        if index >= len(ls) - 2:
+        if index >= len(ls) - 1:
             return ls
 
         elif ls[index] > ls[index + 1]:
@@ -40,12 +40,12 @@ def insertsort(array, index = 1):
         return array
 
     else:
-        for i in range(index - 1, -1, -1):
+        for i in range(1, len(array)):
+            key = array.pop(i)
+            j = i
+            while j >= 0 and array[j - 1] > key:
+                j -= 1
+            array.insert(j, key)
+            print(array, i, j)
 
-            if i == 0:
-                array.insert(0, array.pop(index))
-
-            elif array[i] <= array[index]:
-                array.insert(i + 1, array.pop(index))
-
-    return insertsort(array, index + 1)
+    return array
