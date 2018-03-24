@@ -35,17 +35,12 @@ def bubblesort(array):
     return bubblesort(array[:-1]) + [array[-1]]
 
 def insertsort(array, index = 1):
-    # NOT FINISHED!!!
-    if index == len(array):
-        return array
-
-    else:
-        for i in range(1, len(array)):
-            key = array.pop(i)
-            j = i
-            while j >= 0 and array[j - 1] > key:
-                j -= 1
-            array.insert(j, key)
-            print(array, i, j)
+    for i in range(1, len(array)):
+        key = array.pop(i)
+        j = i
+        while j > 0 and array[j - 1] > key:
+            j -= 1
+        array.insert(j, key)
+        print(array, i, j)
 
     return array
