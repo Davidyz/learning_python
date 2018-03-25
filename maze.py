@@ -23,6 +23,9 @@ layout = ["wwwwwwwwwwwwwwwwwwww",
           "wwwwwwwwwwwwwwwwwwww"]
 
 def item(x,y,category,fake = False):
+    """
+    Move the items to the corresponding place.
+    """
     global coins
     t = "n" + str(x) + str(y)
     t = turtle.Turtle()
@@ -47,14 +50,16 @@ walls = []
 coins = []
 
 def map_generator(layout):
+    """
+    Convert the layout list to the graphical UI.
+    """
     global target_cor
     for row in range(0, len(layout)):
         for column in range(0,len(layout[row])):
             
             if layout[row][column] == "w":
                 item(row, column, "block")
-                #walls.append([row,column])
-            
+
             if layout[row][column] == "p":
                 player.goto(-285 + column * 30, 285 - row * 30)
             
@@ -63,16 +68,13 @@ def map_generator(layout):
 
             if layout[row][column] == "c":
                 item(row, column, "coin")
-                #coins.append([row,column])
 
             if layout[row][column] == "t":
                 target.goto(-285 + column * 30, 285 - row * 30)
-                #target_cor = [row,column]
 
 def return_cor(item):
     """
-    convert the list of coordinates of an object into
-    the coordinates in pixels.
+    Convert the list of coordinates of an object into the coordinates in pixels.
     """
     return [-285 + item[1] * 30, 285 - item[0] - 30]
 
@@ -102,25 +104,23 @@ def start_up():
 
 def catch(turtle):
     """
-    return the distance between player and target.
+    Return the distance between player and target.
     """
     return ((player.xcor() - turtle.xcor()) ** 2 + (player.ycor() - turtle.ycor()) ** 2) ** 0.5
 
 def goal_detect():
     """
-    return True if player has touched the target.
-    require the 'catch()' function.
+    Return True if player has touched the target.
+    Require the 'catch()' function.
     """
-    if catch(target) < 15:
+    if catch(target) < 10:
         return True
 
 def distance(item):
     """
-    return the distance between player and an item whose coordinates are represented in terms
-    of a list.
-    require the 'return_cor()' function.
-    eg, walls,
-        coins.
+    Return the distance between player and an item whose coordinates are represented in terms of a list.
+    Require the 'return_cor()' function.
+    Eg, walls, coins.
     """
     return ((player.xcor() - return_cor(item)[0]) ** 2 + (player.ycor() - return_cor(item)[1]) ** 2) ** 0.5
 
@@ -178,4 +178,3 @@ while not finished:
     for i in walls:
         if catch(i) < 20:
             player.backward(5)
-    # window.update()
