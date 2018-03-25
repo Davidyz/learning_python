@@ -162,15 +162,15 @@ target.speed(0)
 target.penup()
 map_generator(layout)
 
-finished = True
+finished = False
 
-while finished == True:
+while not finished:
     start_up()
     if goal_detect():
         target.color('green')
         print("You've won the game!")
         time.sleep(5)
-        finished = False
+        finished = True
     for i in coins:
         if catch(i) < 15:
             print("you got a coin!")
@@ -178,5 +178,4 @@ while finished == True:
     for i in walls:
         if catch(i) < 20:
             player.backward(5)
-    window.update()
-
+    # window.update()
