@@ -41,6 +41,4 @@ def insertsort(array, index = 1):
         while j > 0 and array[j - 1] > key:
             j -= 1
         array.insert(j, key)
-        print(array, i, j)
-
     return array
