@@ -113,20 +113,19 @@ def differentiate(f, x):
     """
     Find the gradient of the curve f at the point (x, f(x))
     """
-    step = 0.0000000001
+    step = 1 / 0.00001
     return (f(x + step) - f(x)) / step
 
-def newton_method(n):
+def newton_method(f, accu = 3):
     """
-    Find square roots for n using Newton's method.
+    Find one of the roots of equation f using Newton's method.
+    f is the function of the equation.
     """
-    def f(x):
-        #global n
-        print(n)
-        return x ** 2 - n
-    
+    x = 10
     y = 1
-    while y > 0.01:
-        n = n - f(n) / differentiate(f, n)
-        y = f(n)
-    return n
+    while y > 1 / 10 ** (accu):
+        y = f(x)
+        m = differentiate(f, x)
+        x = x - y / m
+        print('x = {}, y = {}, gradient = {}'.format(x, y, m))
+    return round(x, accu)
