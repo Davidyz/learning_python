@@ -1,3 +1,5 @@
 #!/usr/bin/python3
 from module.maths import *
-print(newton_method(5, 100))
+def g(x):
+    return (x - 3) ** 2
+print(newton_method(f = g))
