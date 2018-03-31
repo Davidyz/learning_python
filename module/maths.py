@@ -114,22 +114,25 @@ def root(n, lower = None, upper = None, deci = 4, power = 2):
     elif mid ** power < n:
         return root(n, mid + accu(mid), upper, deci, power)
 
-def differentiate(f, x):
+def differentiate(f, x, accu = 3):
     """
     Find the gradient of the curve f at the point (x, f(x))
     """
-    step = 0.0000000001
+    step = 10 ** (-accu)
     return (f(x + step) - f(x)) / step
 
-def newton_method(f, x = 1, accu = 3):
+def newton_method(f, x=1):
     """
     Find one of the roots of equation f using Newton's method.
     f is the function of the equation.
+    Correct to the 8th decimal place.
     """
-    y = 1
-    while y > 1 / 10 ** (accu + 5):
-        y = f(x)
-        m = differentiate(f, x)
+    y = f(x)
+    while abs(y) >= 10 ** (-15):
+        m = differentiate(f, x, 15)
         x = x - y / m
-        print('x = {}, y = {}, gradient = {}'.format(x, y, m))
-    return round(x, accu)
+        y1 = y
+        y = f(x)
+        if y1 == y:
+            break
+    return round(x, 8)
