@@ -29,6 +29,11 @@ def choose(n, r):
     """
     the formula used in combination.
     """
+    if n == r:
+        return 1
+    elif r == 0:
+        return 1
+    
     res = factorial(n) / (factorial(r) * factorial(n - r))
     if int(res) == res:
         return int(res)
