@@ -43,8 +43,9 @@ def insertsort(array, index = 1):
         array.insert(j, key)
     return array
 
-def mergesort(array):
-    if len(array) = 1:
+def mergesort(array, sub = 2):
+    if sub == len(array):
         return array
-    for i in range(len(array) - 1, 2):
-        
+
+    
+    return mergesort(temp, sub)
