@@ -1,0 +1,3 @@
+SUBSYSTEM=="usb",ATTR(idVendor)=="1d6b", MODE="0003", GROUP="plugdev"
+SUBSYSTEM=="usb",ATTR(idVendor)=="1d6b", MODE="0002", GROUP="plugdev"
+SUBSYSTEM=="usb",ATTR(idVendor)=="04e8", MODE="6860", GROUP="plugdev"
