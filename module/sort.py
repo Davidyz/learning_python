@@ -43,9 +43,29 @@ def insertsort(array, index = 1):
         array.insert(j, key)
     return array
 
-def mergesort(array, sub = 2):
-    if sub == len(array):
+def mergesort(array):
+    if len(array) <= 1:
         return array
+   
+    middle = len(array) // 2
+    left = mergesort(array[:middle])
+    right = mergesort(array[middle:])
+    result = []
 
-    
-    return mergesort(temp, sub)
+    total_len = len(left) + len(right)
+    while total_len > 0:
+        if len(left) != 0:
+            if len(right) != 0:
+                if left[0] > right[0]:
+                    result.append(right.pop(0))
+                else:
+                    result.append(left.pop(0))
+            elif len(right) == 0:
+                for i in range(len(left)):
+                    result.append(left[i])
+        elif len(left) == 0:
+            for i in range(len(right)):
+                result.append(right[i])
+        total_len -= 1
+    result = result[:len(array)]
+    return result
