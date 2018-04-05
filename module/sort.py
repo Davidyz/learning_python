@@ -53,7 +53,7 @@ def mergesort(array):
     result = []
 
     total_len = len(left) + len(right)
-    while total_len > 0:
+    while len(result) < len(array):
         if len(left) != 0:
             if len(right) != 0:
                 if left[0] > right[0]:
@@ -67,5 +67,5 @@ def mergesort(array):
             for i in range(len(right)):
                 result.append(right[i])
         total_len -= 1
-    result = result[:len(array)]
+
     return result

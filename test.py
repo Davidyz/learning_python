@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-from module.maths import *
-def g(x):
-    return x ** 3 + 5 * (x ** 2)
-print(newton_method(g, x = 1))
+from module.sort import *
+i = [6,5,4,3,2,1]
+print(mergesort(i))
