@@ -142,6 +142,10 @@ def new_direction():
     window.onkey(player.left(90), "Left")
     window.onkey(player.right(90), "Right")
 
+def coin_caught(t):
+    t.goto(-380, 100 * len(coins))
+    coins.pop(coins.index(t))
+
 introduction()
 
 window = turtle.Screen()
@@ -174,7 +178,7 @@ while not finished:
     for i in coins:
         if catch(i) < 15:
             print("you got a coin!")
-            i.goto(100000,0)
+            coin_caught(i)
     for i in walls:
         if catch(i) < 20:
             player.backward(5)
