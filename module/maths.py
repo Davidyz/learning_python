@@ -128,11 +128,11 @@ def newton_method(f, x=1):
     Correct to the 8th decimal place.
     """
     y = f(x)
-    while abs(y) >= 10 ** (-15):
-        m = differentiate(f, x, 15)
-        x = x - y / m
+    while abs(y) >= 10 ** (-14):
+        m = differentiate(f, x)
+        x = float(x) - y / m
         y1 = y
         y = f(x)
-        if y1 == y:
+        if abs(y - y1) <= 10 ** (-14):
             break
     return round(x, 8)
