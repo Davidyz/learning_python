@@ -27,7 +27,7 @@ def bubblesort(array):
 
         elif ls[index] > ls[index + 1]:
             ls[index], ls[index + 1] = ls[index + 1], ls[index]
-            
+
         return switch(ls, index + 1)
     
     switch(array)
@@ -51,21 +51,27 @@ def mergesort(array):
     left = mergesort(array[:middle])
     right = mergesort(array[middle:])
     result = []
-
     total_len = len(left) + len(right)
+    
     while len(result) < len(array):
         if len(left) != 0:
+            
             if len(right) != 0:
+                
                 if left[0] > right[0]:
                     result.append(right.pop(0))
+                
                 else:
                     result.append(left.pop(0))
+            
             elif len(right) == 0:
                 for i in range(len(left)):
                     result.append(left[i])
+        
         elif len(left) == 0:
             for i in range(len(right)):
                 result.append(right[i])
+        
         total_len -= 1
 
     return result
