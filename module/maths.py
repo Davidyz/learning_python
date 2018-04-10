@@ -40,11 +40,18 @@ def choose(n, r):
     else:
         return
 
-def febonacci(n):
+def fibonacci(n):
     """
-    Return the list of the first n numbers in the febonacci sequence.
+    Return the nth number in the fibonacci sequence.
+    Starting from 0, 1
     """
-    return
+    if n <= 1:
+        return 0
+    if n == 2:
+        return 1
+    else:
+        result = fibonacci(n - 1) + fibonacci(n - 2)
+    return result
 
 def triangle(n):
     def triangle_helper(n, result = [1, [1, 1]]):
@@ -121,18 +128,22 @@ def differentiate(f, x, accu = 3):
     step = 10 ** (-accu)
     return (f(x + step) - f(x)) / step
 
-def newton_method(f, x=1):
+def newton_method(function, x=1):
     """
     Find one of the roots of equation f using Newton's method.
     f is the function of the equation.
     Correct to the 8th decimal place.
+    Return False if can't find a root around the given value of x.
     """
+    f = lambda x : eval(function)
     y = f(x)
     while abs(y) >= 10 ** (-14):
         m = differentiate(f, x)
         x = float(x) - y / m
         y1 = y
         y = f(x)
+        if m == 0 and y > 10 ** (-14):
+            return False
         if abs(y - y1) <= 10 ** (-14):
             break
     return round(x, 8)
