@@ -1,5 +1,5 @@
 """
-A custom module contaaining some sorting algorithms.
+A custom module containing some sorting algorithms.
 Recursion is widely used.
 """
 def quicksort(array):
@@ -34,7 +34,7 @@ def bubblesort(array):
 
     return bubblesort(array[:-1]) + [array[-1]]
 
-def insertsort(array, index = 1):
+def insertionsort(array, index = 1):
     for i in range(1, len(array)):
         key = array.pop(i)
         j = i
