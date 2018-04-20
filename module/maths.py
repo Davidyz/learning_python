@@ -67,13 +67,19 @@ def triangle(n):
             return triangle_helper(n - 1, result)
     return triangle_helper(n)
 
-def binomial(total, prob, suc):
+def binomial(n, p, start, end = None):
     """
     prob = probability.
     suc = number of successful event.
     Calculate the probability for binomial distribution.
     """
-    return choose(total, suc) * (prob ** suc) * ((1 - prob) ** (total - suc))
+    if end == None:
+        end = start
+    result = 0
+    while end >= start:
+        result += choose(n, end) * (p ** end) * ((1 - p) ** (n - end))
+        end -= 1
+    return round(result, 10)
 
 def root(n, lower = None, upper = None, deci = 4, power = 2):
     """
