@@ -81,6 +81,40 @@ def binomial(n, p, start, end = None):
         end -= 1
     return round(result, 10)
 
+def integral(f, start, end):
+    """
+    Using trapezoidal rule of integration to find the total area under a curve.
+    """
+    total_area = 0
+    r = end - start
+    num = int(r * 10000)
+    width = r / num   # the width of trapezoidal.
+    def y(n):
+        """
+        Return the list of y-cordinates.
+        """
+        result = []
+        for i in range(n + 1):
+            result.append(f(start + i * width))
+        
+        return result
+    
+    ycor = y(num)       
+    for i in range(0, len(y(num)) - 1):
+        a = (ycor[i] + ycor[i + 1]) * width / 2
+        total_area += a
+    return total_area
+
+def normal(mean, sd, start = None, end = None):
+    from math import pi, e
+    f = lambda x: 1 / ((2 * pi * (sd ** 2)) ** 0.5) * e ** (-((x - mean) ** 2) / (2 * (sd ** 2)))
+    
+    if start == None:
+        start = mean - 5 * sd
+    if end == None:
+        end = mean + 5 * sd
+    return integral(f, start, end)
+
 def root(n, lower = None, upper = None, deci = 4, power = 2):
     """
     Try to find the nth root for n using binary search.
