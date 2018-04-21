@@ -4,22 +4,22 @@ import turtle, time
 layout = ["wwwwwwwwwwwwwwwwwwww",
           "wp wwwwwwwwwwwww   w",
           "ww               w w",
-          "wwwwfwwwwwwwwwwwww w",
-          "wwww wwwww   ww    w",
-          "wwww w   www ww wwww",
-          "wwww   w www ww wwww",
-          "wwwwwwww www       w",
-          "www   c  wwwwwwwww w",
-          "www wwwwwwwwwfcfww w",
-          "wwwfwwwwwwwwwfwfww w",
-          "w                w w",
-          "wwwwwwwwwwwwwwww w w",
-          "wwwwwwwwwwwwwwww w w",
-          "wwww             w w",
-          "wwwwfwww wwwwwwwww w",
-          "wwww www           w",
-          "wwww wwwwwwwwwwwwwww",
-          "wwww              tw",
+          "ww w wwwwwwwwwwwww w",
+          "ww w wwwww   ww    w",
+          "ww w w   www ww wwww",
+          "w  w   w w w ww wwww",
+          "w wwwwww www       w",
+          "w w   c   wwwwwwww w",
+          "w w wwwww   w c ww w",
+          "www wwwwwwwww w ww w",
+          "w             w  w w",
+          "w wwwwwwwwwwwwww w w",
+          "w wwwwwwwwwwwwww w w",
+          "w ww             w w",
+          "w ww wwwwwwwwwwwww w",
+          "w ww w             w",
+          "w ww wwwwwwwwwwwwwww",
+          "w ww              tw",
           "wwwwwwwwwwwwwwwwwwww"]
 
 def item(x,y,category,fake = False):
@@ -113,7 +113,7 @@ def goal_detect():
     Return True if player has touched the target.
     Require the 'catch()' function.
     """
-    if catch(target) < 10:
+    if catch(target) < 15:
         return True
 
 def distance(item):
@@ -132,20 +132,21 @@ def introduction():
     time.sleep(2)
     print("Your target is the red circle at the corner.")
     time.sleep(2)
-    print("Tips:\nif you want to win,\nyou will have to find the hiden ways to go through the wall.")
-    time.sleep(2)
     print("Ready?")
     time.sleep(1)
     print("Go!")
+    time.sleep(0.5)
 
 def new_direction():
     window.onkey(player.left(90), "Left")
     window.onkey(player.right(90), "Right")
 
 def coin_caught(t):
+    t.speed(1)
     t.goto(-380, 100 * len(coins))
+    t.speed(0)
     coins.pop(coins.index(t))
-
+    
 introduction()
 
 window = turtle.Screen()
