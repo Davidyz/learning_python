@@ -188,3 +188,27 @@ def newton_method(function, x=1):
         if abs(y - y1) <= 10 ** (-14):
             break
     return round(x, 8)
+
+def mean(array):
+    """
+    Calculate an estimated mean from mid-class values and thei frequencies.
+    Input file should be an array containing sub arrays, and each subarray should have the value as the first item and its frequency as the second.
+    """
+    tx = 0
+    tf = 0
+    for i in array:
+        tx += i[0] * i[1]
+        tf += i[1]
+    return tx / tf
+
+def sd(array):
+    """
+    Calculate an estimated standard deviation from mid-class values and their frequencies.
+    The input should has the same format as mean().
+    """
+    tx2f = 0
+    tf = 0
+    for i in array:
+        tx2f += (i[0] ** 2) * i[1]
+        tf += i[1]
+    return (tx2f / tf - mean(array) ** 2) ** 0.5
