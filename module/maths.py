@@ -105,15 +105,16 @@ def integral(f, start, end):
         total_area += a
     return total_area
 
-def normal(mean, sd, start = None, end = None):
+def normal(mean, var, start = None, end = None):
     from math import pi, e
+    sd = var ** 0.5
     f = lambda x: 1 / ((2 * pi * (sd ** 2)) ** 0.5) * e ** (-((x - mean) ** 2) / (2 * (sd ** 2)))
     
     if start == None:
         start = mean - 5 * sd
     if end == None:
         end = mean + 5 * sd
-    return integral(f, start, end)
+    return round(integral(f, start, end), 5)
 
 def root(n, lower = None, upper = None, deci = 4, power = 2):
     """
