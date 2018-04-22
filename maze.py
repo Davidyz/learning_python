@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 import turtle, time
 
-layout = ["wwwwwwwwwwwwwwwwwwww",
+layout1 = ["wwwwwwwwwwwwwwwwwwww",
           "wp wwwwwwwwwwwww   w",
           "ww               w w",
           "ww w wwwwwwwwwwwww w",
@@ -165,7 +165,7 @@ target.color("red")
 target.setheading(0)
 target.speed(0)
 target.penup()
-map_generator(layout)
+map_generator(layout1)
 
 finished = False
 
