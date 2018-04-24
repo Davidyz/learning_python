@@ -17,6 +17,13 @@ def quicksort(array):
 
     return quicksort(less) + [mid] + quicksort(more)
 
+def quicksort_s(array):
+    if len(array) < 2:
+        return array
+    mid = array[-1]
+    for i in array[:-1]:
+        
+
 def bubblesort(array):
     if len(array) < 2:
         return array

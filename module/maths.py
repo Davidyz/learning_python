@@ -10,7 +10,6 @@ def factorial(n):
     elif n > 1:
         return n * factorial(n - 1)
 
-
 def prime(n, factor=3):
     """
     determine whether a number is prime or not.
