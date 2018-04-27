@@ -18,11 +18,25 @@ def quicksort(array):
     return quicksort(less) + [mid] + quicksort(more)
 
 def quicksort_s(array):
+    """
+    Quicksort without creating lists other than the original one.
+    """
     if len(array) < 2:
         return array
-    mid = array[-1]
-    for i in array[:-1]:
-        
+    index = len(array) - 1
+    pivot = array.pop(index)
+    for i in range(len(array)):
+        if array[i] > pivot:
+            array.append(array.pop(i))
+            index -= 1
+        elif i < pivot:
+            if i < pivot:
+                pass
+            else:
+                array.insert(0, array.pop(i))
+                index += 1
+    array.insert(index, pivot)
+    return quicksort_s(array[0:index]) + [pivot] + quicksort_s(array[index + 1:])
 
 def bubblesort(array):
     if len(array) < 2:
