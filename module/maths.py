@@ -3,7 +3,7 @@ This is a custom module of functions that is created in order to practice algori
 """
 def factorial(n):
     """
-    return n!.
+    Return n!.
     """
     if n == 1:
         return 1
@@ -12,7 +12,7 @@ def factorial(n):
 
 def prime(n, factor=3):
     """
-    determine whether a number is prime or not.
+    Determine whether a number is prime or not.
     """
     if n == 2:
         return True
@@ -26,7 +26,7 @@ def prime(n, factor=3):
 
 def choose(n, r):
     """
-    the formula used in combination.
+    The formula used in combination.
     """
     if n == r:
         return 1
