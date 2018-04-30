@@ -28,11 +28,11 @@ def quicksort_s(array):
     while i < j:
         if array[i] > array[0]:
             array.append(array.pop(i))
-            i += 1
-        elif array[j] <= array[0]:
+        i += 1
+        if array[j] <= array[0]:
             array.insert(1, array.pop(j))
-            j -= 1
-    return quicksort_s(array[1:i + 1]) + array[0] + quicksort_s(array[i + 1:])
+        j -= 1
+    return quicksort_s(array[1:i + 1]) + [array[0]] + quicksort_s(array[i + 1:])
 
 def bubblesort(array):
     if len(array) < 2:
