@@ -109,10 +109,9 @@ def normal(mean, var, start = None, end = None):
     sd = var ** 0.5
     f = lambda x: 1 / ((2 * pi * (sd ** 2)) ** 0.5) * e ** (-((x - mean) ** 2) / (2 * (sd ** 2)))
     
-    if start == None:
-        start = mean - 5 * sd
     if end == None:
-        end = mean + 5 * sd
+        end = start
+        start = mean - 5 * sd
     return round(integral(f, start, end), 5)
 
 def root(n, lower = None, upper = None, deci = 4, power = 2):
