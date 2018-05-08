@@ -1,7 +1,11 @@
+#!/usr/bin/python3
 from math import *
-
+"""
+Changes have been applied so that the program runs to calculate pi.
+If general numerical integration is needed, fix line 7, 65 and 67.
+"""
 def f(x):
-    return x ** 2
+    return sqrt(1 - x ** 2)
 
 num = int(input("Enter the number of rectangle: "))
 start_point = float(input("Enter the x cordinate of the start point: "))
@@ -59,8 +63,8 @@ def trapezoidal():
 def main():
     choose = int(input("which rule do you want to choose?\nMid-point(0) rule or trapezoidal(1) rule?: "))
     if choose == 0:
-        print(mid_point())
+        print(4 * mid_point())
     elif choose == 1:
-        print(trapezoidal())
+        print(4 * trapezoidal())
 
 main()
