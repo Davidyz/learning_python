@@ -14,7 +14,7 @@ def g(x):
     global radius, y_cor
     return (-sqrt(radius ** 2 - x ** 2) + y_cor) ** 2
 
-num = 1000000 
+num = int(radius) * 100000 
 start_point = -radius
 end_point = radius
 r = radius * 2            # range between the start and end point.

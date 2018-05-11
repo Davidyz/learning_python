@@ -2,7 +2,6 @@
 
 import random, time
 
-#all_points = 0
 out_of_circle = 0
 number = int(input("Please enter the number of random tuple you want.\nTheoriotically the greater the number is, the more accurate the result is.\n"))
 
@@ -24,13 +23,17 @@ def time_unit(s):
 
 n = number
 
-start = time.time()
+if __name__ == '__main__':
+    start = time.time()
 
-while number >= 0:
-    drop()
-    number -= 1
+    while number >= 0:
+        drop()
+        number -= 1
 
-end = time.time()
-t = end - start
+    end = time.time()
+    t = end - start
 
-print('The result is {res}, computed in {hour}h {minute}min {sec}sec.'.format(res = round(4 - out_of_circle / float(n) * 4, 10), hour = time_unit(t)[0], minute = time_unit(t)[1], sec = time_unit(t)[2]))
+    print('The result is {res}, computed in {hour}h {minute}min {sec}sec.'.format(res = round(4 - out_of_circle / float(n) * 4, 10),
+                                                                                  hour = time_unit(t)[0],
+                                                                                  minute = time_unit(t)[1],
+                                                                                  sec = time_unit(t)[2]))
