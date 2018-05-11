@@ -1,7 +1,10 @@
 #!/usr/bin/python3
 import turtle, time
 
-layout1 = ["wwwwwwwwwwwwwwwwwwww",
+'''
+My first maze game!
+'''
+layout = ["wwwwwwwwwwwwwwwwwwww",
           "wp wwwwwwwwwwwww   w",
           "ww               w w",
           "ww w wwwwwwwwwwwww w",
@@ -36,8 +39,7 @@ def item(x,y,category,fake = False):
     if category == "block":
         t.shape("square")
         t.color("brown")
-        if not fake:
-            walls.append(t)
+        walls['n' + str(x)].append(t)
 
     if category == "coin":
         t.shape("circle")
@@ -45,9 +47,6 @@ def item(x,y,category,fake = False):
         t.color("yellow")
         coins.append(t)
     t.goto(-285 + y * 30, 285 - x * 30)
-
-walls = []
-coins = []
 
 def map_generator(layout):
     """
@@ -68,7 +67,7 @@ def map_generator(layout):
 
             if layout[row][column] == "c":
                 item(row, column, "coin")
-
+                
             if layout[row][column] == "t":
                 target.goto(-285 + column * 30, 285 - row * 30)
 
@@ -146,40 +145,56 @@ def coin_caught(t):
     t.goto(-380, 100 * len(coins))
     t.speed(0)
     coins.pop(coins.index(t))
+
+def current_row():
+    '''
+    Return the numbers of rows that the player is in (current one, above one and beneath one), so that when detecting collision with the wall, time consumption can be reduced.
+    According to my test, cpu usage will not be improved.
+    '''
+    y = player.ycor()
+    current =  int((300 - y) // 30)
+    return ('n' + str(current - 1), 'n' + str(current), 'n' + str(current + 1))
+
+if __name__ == '__main__':
+    introduction()
+
+    window = turtle.Screen()
+
+    player = turtle.Turtle()
+    player.speed(0)
+    player.shapesize(1,1)
+    player.penup()
+
+    walls = {}
+    coins = []
+
+    for i in range(20):
+        walls['n' + str(i)] = []
     
-introduction()
+    window.tracer(0)
+    target = turtle.Turtle()
+    target.shape("circle")
+    target.shapesize(1,1)
+    target.color("red")
+    target.setheading(0)
+    target.speed(0)
+    target.penup()
+    map_generator(layout)
 
-window = turtle.Screen()
-
-player = turtle.Turtle()
-player.speed(0)
-player.shapesize(1,1)
-player.penup()
-
-window.tracer(0)
-
-target = turtle.Turtle()
-target.shape("circle")
-target.shapesize(1,1)
-target.color("red")
-target.setheading(0)
-target.speed(0)
-target.penup()
-map_generator(layout1)
-
-finished = False
-
-while not finished:
-    start_up()
-    if goal_detect():
-        target.color('green')
-        print("You've won the game!")
-        time.sleep(5)
-        finished = True
-    for i in coins:
-        if catch(i) < 15:
-            print("you got a coin!")
-            coin_caught(i)
-    for i in walls:
-        if catch(i) < 20:
-            player.backward(5)
+    finished = False
+    
+    while not finished:
+        start_up()
+        if goal_detect():
+            target.color('green')
+            print("You've won the game!")
+            time.sleep(3)
+            finished = True
+        for i in coins:
+            if catch(i) < 15:
+                print("you got a coin!")
+                coin_caught(i)
+        for i in current_row(): # The rows to be scanned is specified so that the time consumption can be reduced.
+            for j in walls[i]:
+                if catch(j) < 20:
+                    player.backward(5)
