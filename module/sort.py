@@ -27,15 +27,25 @@ def quicksort_s(array):
     pivot = array.pop(0)
     i = 0
     j = len(array) - 1
-    print(pivot)
-    while i < j:
-        while array[i] < pivot:
+
+    while i <= j:
+        if array[i] <= pivot:
             i += 1
-        while array[j] > pivot:
+        elif array[i] > pivot:
+            array.append(array.pop(i))
             j -= 1
-        array[i], array[j] = array[j], array[i]
-    
-    return quicksort_s(array[:i]) + [pivot] + quicksort_s(array[i:])
+            continue
+
+        if array[j] >= pivot:
+            j -= 1
+        elif array[j] < pivot:
+            array.insert(0, array.pop(j))
+            i += 1
+            continue
+        if i > j:
+            i -= 1
+            break
+    return quicksort_s(array[:i + 1]) + [pivot] + quicksort_s(array[i + 1:])
 
 def bubblesort(array):
     if len(array) < 2:
