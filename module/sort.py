@@ -5,24 +5,6 @@ Recursion is widely used.
 def quicksort(array):
     if len(array) < 2:
         return array
-
-    mid = array[0]
-    more = []
-    less = []
-    for i in array[1:]:
-        if i >= mid:
-            more.append(i)
-        elif i < mid:
-            less.append(i)
-
-    return quicksort(less) + [mid] + quicksort(more)
-
-def quicksort_s(array):
-    """
-    Quicksort without creating lists other than the original one.
-    """
-    if len(array) < 2:
-        return array
     
     pivot = array[-1]
     i = 0
@@ -32,10 +14,9 @@ def quicksort_s(array):
         if array[i] <= pivot:
             i += 1
         elif array[i] > pivot:
-            array.insert(j - 1, array.pop(i))
+            array.insert(-1, array.pop(i))
             j -= 1
-        print(i, j)
-    return quicksort_s(array[:i+1]) + [pivot] + quicksort_s(array[i+1:len(array) - 1])
+    return quicksort(array[:j]) + [pivot] + quicksort(array[j:len(array) - 1])
 
 def bubblesort(array):
     if len(array) < 2:
