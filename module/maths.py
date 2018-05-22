@@ -1,6 +1,8 @@
 """
 This is a custom module of functions that is created in order to practice algorithm and solve mathematics and statistics problems.
 """
+from module import integral
+
 def factorial(n):
     """
     Return n!.
@@ -80,6 +82,7 @@ def binomial(n, p, start, end = None):
         end -= 1
     return round(result, 10)
 
+'''
 def integral(f, start, end):
     """
     Using trapezoidal rule of integration to find the total area under a curve.
@@ -103,6 +106,7 @@ def integral(f, start, end):
         a = (ycor[i] + ycor[i + 1]) * width / 2
         total_area += a
     return total_area
+'''
 
 def normal(mean, var, start = None, end = None):
     from math import pi, e
@@ -112,7 +116,7 @@ def normal(mean, var, start = None, end = None):
     if end == None:
         end = start
         start = mean - 5 * sd
-    return round(integral(f, start, end), 5)
+    return round(integral.simpson(f, start, end, 1000000), 5)
 
 def root(n, lower = None, upper = None, deci = 4, power = 2):
     """
