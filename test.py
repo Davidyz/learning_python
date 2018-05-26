@@ -7,4 +7,4 @@ for i in range(10):
 shuffle(l)    
 print(l)
 print('=' * 30)
-print(quicksort_s(l))
+print(mergesort(l))
