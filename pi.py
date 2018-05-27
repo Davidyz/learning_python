@@ -37,3 +37,4 @@ if __name__ == '__main__':
                                                                                   hour = time_unit(t)[0],
                                                                                   minute = time_unit(t)[1],
                                                                                   sec = time_unit(t)[2]))
+    time.sleep(3)
