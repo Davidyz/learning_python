@@ -168,7 +168,7 @@ if __name__ == '__main__':
     walls = {}
     coins = []
 
-    for i in range(20):
+    for i in range(21):
         walls['n' + str(i)] = []
     
     window.tracer(0)
