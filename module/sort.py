@@ -66,7 +66,7 @@ def merge(a, b):
     return output
 
 def mergesort(array):
-    if len(array) <= 1:
+    if len(array) < 2:
         return array
     middle = int((len(array) - 1) / 2)
     return merge(mergesort(array[:middle]) + mergesort(array[middle:]))
