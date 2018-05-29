@@ -1,7 +1,7 @@
 """
 This is a custom module of functions that is created in order to practice algorithm and solve mathematics and statistics problems.
 """
-from module import integral
+from module import integration
 
 def factorial(n):
     """
