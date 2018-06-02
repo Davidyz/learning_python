@@ -15,12 +15,12 @@ colors = ['red','blue','green','yellow','orange','black','purple',
           'lightblue','pink']
 
 balls = [] #store ball objects as dictionary
-print(type(balls))
 
 starting_posns = []
 
 class Ball(turtle.Turtle):
     def __init__(self, color, v_x, v_y):
+        #global balls
         turtle.Turtle.__init__(self)
         self.penup()
         self.color(color)
@@ -35,7 +35,7 @@ class Ball(turtle.Turtle):
         self.radius = 9
         self.hit_boundary = False
         self.collided = False
-        self.distance = math.sqrt((self.xcor() + 300) ** 2 + (self.ycor() + 200) ** 2)
+        self.distance = math.sqrt((self.xcor() + 300) ** 2 + (self.ycor() + 200) ** 2) #(-300, -200) is the imagined origin for checking collision.
 
     def calculate_new_coordinates(self):
         # normalise velocity component then mult by SPEED
@@ -92,7 +92,7 @@ def check_ball_collision(ball1, ball2):
     #dx = (ball2.xcor() - ball1.xcor())
     #dy = (ball2.ycor() - ball1.ycor())
     distance = math.sqrt(dx**2 + dy**2)
-    R = ball1.radius + ball2.radius +3 ###
+    R = ball1.radius + ball2.radius + 3 ###
     u1x = ball1.velocity[0]
     u1y = ball1.velocity[1]
     u2x = ball2.velocity[0]
@@ -109,8 +109,8 @@ def check_ball_collision(ball1, ball2):
 
 def check_distance(a,b):
     '''Distances between two coordinates a and b'''
-    dx = abs(a[0]-b[0])
-    dy = abs(a[1]-b[1])
+    dx = a[0]-b[0]
+    dy = a[1]-b[1]
     return math.sqrt(dx**2 + dy**2)
 
        
@@ -150,11 +150,13 @@ def generate_n_balls(n):
             if distances_ok == True:
                 starting_posns.append([x,y])
                 unique = True
-                
                      
         i.setposition(x,y)
         
 def quicksort(array):
+    '''
+    Sort the balls in the order of their distance to the imagined origin.
+    '''
     if len(array) < 2:
         return array
 
@@ -184,18 +186,29 @@ def check_initial_positions():
     return min_d
 
 
-
 # generate N balls
 generate_n_balls(N)
 
-print(check_initial_positions())
+#print(check_initial_positions())
 
 while True:
+    balls = quicksort(balls)
+
     for ball in balls:
         ball.calculate_new_coordinates()
         checkboundary(ball)
+    
+    for i in range(0, len(balls) - 1):
+        if balls[i + 1].distance() - balls[i].distance() < 18:
+            check_ball_collision(balls[i], balls[i + 1])
+        else:
+            pass
 
-    balls = quicksort(balls)
+    for i in balls:
+        i.move_ball()
+    
+    window.update()
+    time.sleep(1/120)
 """
 while True:
     for ball in balls:
