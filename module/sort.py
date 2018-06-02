@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """
 A custom module containing some sorting algorithms.
 Recursion is widely used.
@@ -68,5 +69,13 @@ def merge(a, b):
 def mergesort(array):
     if len(array) < 2:
         return array
-    middle = int((len(array) - 1) / 2)
-    return merge(mergesort(array[:middle]) + mergesort(array[middle:]))
+    middle = int(len(array) / 2)
+    return merge(mergesort(array[:middle]), mergesort(array[middle:]))
+
+if __name__ == '__main__':
+    import random
+    l = list(x for x in range(100))
+    random.shuffle(l)
+    print(l)
+    print('=' * 50)
+    print(mergesort(l))
