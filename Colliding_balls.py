@@ -3,7 +3,7 @@
 ### try divide into 4 horizontal sections s
 import turtle, time, math, random, itertools
 
-N = 50 #number of balls
+N = 200 #number of balls
 
 window = turtle.Screen()
 window.tracer(0,0)
@@ -70,6 +70,10 @@ for i in range(2):
 
 #check boundary
 def checkboundary(ball):
+    '''
+    Check the collision between a ball and boundaries.
+    If there is a collision, move the ball to corresponding direction according to physical laws.
+    '''
     ball.hit_boundary = False
     ball.calculate_new_coordinates()
     x = ball.new_coordinates[0]  #save writing this again
@@ -86,6 +90,10 @@ def checkboundary(ball):
         ball.hit_boundary = True
 
 def check_ball_collision(ball1, ball2):
+    '''
+    Check the collision between two balls.
+    If there is a collision, move the two balls to corresponding directions according to physical laws.
+    '''
     global balls
     dx = (ball2.new_coordinates[0] - ball1.new_coordinates[0])
     dy = (ball2.new_coordinates[1] - ball1.new_coordinates[1])
@@ -117,8 +125,21 @@ def check_distance(a,b):
 def gen_random_start():
     x = random.randint(-(width/2)+10, (width/2)-10)
     y = random.randint(-(height/2)+10, (height/2)-10)
-    return x,y
-    
+    '''
+    for i in starting_posns:
+        if check_distance((x, y), i) < 25:
+            gen_random_start()
+    else:
+        starting_posns.append([x, y])
+        return [x, y]
+    '''
+    for i in starting_posns:
+        if check_distance((x, y), i) > 25:
+            starting_posns.append([x, y])
+        else:
+            x = random.randint(-(width / 2) + 10, (width / 2) - 10)
+            y = random.randint(-(height / 2) + 10, (width / 2) - 10)
+"""
 def generate_n_balls(n):
     '''generates n balls, stores in dictionary'''
     global balls, starting_posns
@@ -152,7 +173,22 @@ def generate_n_balls(n):
                 unique = True
                      
         i.setposition(x,y)
-        
+"""
+def generating_balls(n):
+    while len(balls) < n:
+        vx = random.randint(-5, 5)
+        vy = random.randint(-5, 5)
+        color = colors[random.randint(0, len(colors) - 1)]
+        name = 'b' + str(len(balls) + 1)
+        name = Ball(color, vx, vy)
+        balls.append(name)
+
+    while len(starting_posns) < n:
+        starting_posns.append(gen_random_start())
+
+    for i in range(len(balls)):
+        balls[i].setposition(starting_posns[i])
+
 def quicksort(array):
     '''
     Sort the balls in the order of their distance to the imagined origin.
@@ -160,14 +196,14 @@ def quicksort(array):
     if len(array) < 2:
         return array
 
-    pivot = array[-1].distance()
+    pivot = array[-1]
     i = 0
     j = len(array) - 1
 
     while i < j:
-        if array[i].distance() <= pivot:
+        if array[i].distance <= pivot.distance:
             i += 1
-        elif array[i].distance() > pivot:
+        elif array[i].distance > pivot.distance:
             array.insert(-1, array.pop(i))
             j -= 1
     return quicksort(array[:j]) + [pivot] + quicksort(array[j:len(array) - 1])
@@ -185,10 +221,8 @@ def check_initial_positions():
             min_d = r
     return min_d
 
-
 # generate N balls
-generate_n_balls(N)
-
+generating_balls(N)
 #print(check_initial_positions())
 
 while True:
@@ -199,7 +233,7 @@ while True:
         checkboundary(ball)
     
     for i in range(0, len(balls) - 1):
-        if balls[i + 1].distance() - balls[i].distance() < 18:
+        if balls[i + 1].distance - balls[i].distance < 18:
             check_ball_collision(balls[i], balls[i + 1])
         else:
             pass
@@ -208,7 +242,7 @@ while True:
         i.move_ball()
     
     window.update()
-    time.sleep(1/120)
+    #time.sleep(1/120)
 """
 while True:
     for ball in balls:
