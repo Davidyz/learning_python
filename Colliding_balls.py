@@ -35,7 +35,9 @@ class Ball(turtle.Turtle):
         self.radius = 9
         self.hit_boundary = False
         self.collided = False
-        self.distance = math.sqrt((self.xcor() + 300) ** 2 + (self.ycor() + 200) ** 2) #(-300, -200) is the imagined origin for checking collision.
+    
+    def distance(self):
+        return math.sqrt((self.xcor() + 300) ** 2 + (self.ycor() + 200) ** 2)
 
     def calculate_new_coordinates(self):
         # normalise velocity component then mult by SPEED
@@ -94,13 +96,13 @@ def check_ball_collision(ball1, ball2):
     Check the collision between two balls.
     If there is a collision, move the two balls to corresponding directions according to physical laws.
     '''
-    global balls
+    #global balls
     dx = (ball2.new_coordinates[0] - ball1.new_coordinates[0])
     dy = (ball2.new_coordinates[1] - ball1.new_coordinates[1])
     #dx = (ball2.xcor() - ball1.xcor())
     #dy = (ball2.ycor() - ball1.ycor())
     distance = math.sqrt(dx**2 + dy**2)
-    R = ball1.radius + ball2.radius + 3 ###
+    R = ball1.radius + ball2.radius ###
     u1x = ball1.velocity[0]
     u1y = ball1.velocity[1]
     u2x = ball2.velocity[0]
@@ -125,20 +127,8 @@ def check_distance(a,b):
 def gen_random_start():
     x = random.randint(-(width/2)+10, (width/2)-10)
     y = random.randint(-(height/2)+10, (height/2)-10)
-    '''
-    for i in starting_posns:
-        if check_distance((x, y), i) < 25:
-            gen_random_start()
-    else:
-        starting_posns.append([x, y])
-        return [x, y]
-    '''
-    for i in starting_posns:
-        if check_distance((x, y), i) > 25:
-            starting_posns.append([x, y])
-        else:
-            x = random.randint(-(width / 2) + 10, (width / 2) - 10)
-            y = random.randint(-(height / 2) + 10, (width / 2) - 10)
+    return [x, y]
+
 """
 def generate_n_balls(n):
     '''generates n balls, stores in dictionary'''
@@ -174,6 +164,7 @@ def generate_n_balls(n):
                      
         i.setposition(x,y)
 """
+
 def generating_balls(n):
     while len(balls) < n:
         vx = random.randint(-5, 5)
@@ -184,7 +175,14 @@ def generating_balls(n):
         balls.append(name)
 
     while len(starting_posns) < n:
-        starting_posns.append(gen_random_start())
+        unique = True
+        coordinates = gen_random_start()
+        for i in starting_posns:
+            if check_distance(i, coordinates) < 25:
+                unique = False
+                continue
+        if unique == True:
+            starting_posns.append(coordinates)
 
     for i in range(len(balls)):
         balls[i].setposition(starting_posns[i])
@@ -201,9 +199,9 @@ def quicksort(array):
     j = len(array) - 1
 
     while i < j:
-        if array[i].distance <= pivot.distance:
+        if array[i].distance() <= pivot.distance():
             i += 1
-        elif array[i].distance > pivot.distance:
+        elif array[i].distance() > pivot.distance():
             array.insert(-1, array.pop(i))
             j -= 1
     return quicksort(array[:j]) + [pivot] + quicksort(array[j:len(array) - 1])
@@ -233,7 +231,7 @@ while True:
         checkboundary(ball)
     
     for i in range(0, len(balls) - 1):
-        if balls[i + 1].distance - balls[i].distance < 18:
+        if balls[i + 1].distance() - balls[i].distance() < 50:#balls[i + 1].radius + balls[i].radius:
             check_ball_collision(balls[i], balls[i + 1])
         else:
             pass
