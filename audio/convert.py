@@ -68,13 +68,26 @@ def convert_into_flac(list_of_songs):
             name = title(list_of_songs[i])
             print('Converting {}'.format(name))
             os.system(command.format(origin=list_of_songs[i], output=name + '.flac'))
-            list_of_songs.pop(i)
-            #os.system('rm {}'.format(list_of_songs.pop(i)))
+            #list_of_songs.pop(i)
+            os.system('rm {}'.format(list_of_songs.pop(i)))
             list_of_songs.insert(i, name + '.flac')
+
+def add_tags(list_of_songs):
+    '''
+    Add tags for songs.
+    '''
+    for i in list_of_songs:
+        info = i.split('/')
+        name = title(info[-1])
+        if len(info) > 6:
+            artist = info[5]
+        if len(info) > 7:
+            album = info[6]
 
 if __name__ == '__main__':
     set_singers()
     set_albums()
     gen_song_list()
+    print(len(all_songs))
     convert_into_flac(all_songs)
-    print(list_of_songs)
+    print(len(all_songs))
