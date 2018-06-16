@@ -77,17 +77,25 @@ def add_tags(list_of_songs):
     Add tags for songs.
     '''
     for i in list_of_songs:
+        print(i)
+        command = '''tracktag "{song}" --name={name} '''.format(song=i,
+                                                                name=title(i.split('/')[-1]))
+
         info = i.split('/')
         name = title(info[-1])
+        print(info)
         if len(info) > 6:
-            artist = info[5]
+            #artist = info[5]
+            command += "--artist='{}' ".format(info[6])
         if len(info) > 7:
-            album = info[6]
+            #album = info[6]
+            command += "--album='{}'".format(info[7])
+        
+        os.system(command)
 
 if __name__ == '__main__':
     set_singers()
     set_albums()
     gen_song_list()
-    print(len(all_songs))
     convert_into_flac(all_songs)
-    print(len(all_songs))
+    add_tags(all_songs)
