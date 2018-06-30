@@ -2,7 +2,7 @@
 #coding=utf-8
 import os
 command = '''ffmpeg -i "{origin}" "{output}"'''
-rootdir = '/mnt/c/Users/30813/Music/'
+rootdir = '/home/david/Music/'
 to_be_converted = ['wav', 'ape']
 music_files = ['wav', 'ape', 'flac', 'mp3', 'm4a', 'dsf', 'dff']
 covers = ['cover.jpg', 'cover.png']
