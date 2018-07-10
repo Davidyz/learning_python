@@ -1,0 +1,80 @@
+Two things that are needed to perform computational problem solving:
+    A representation;
+    An algorithm.
+
+Abstraction in computing:
+    Intrinsic to computing and computational problem solving.
+
+    The concepts of '1s' and '0s' in digital computing is an abstraction (representing high or low voltage levels, etc)
+
+    Programming language is an abstraction.
+
+    The problems being solved is an abstraction.
+
+Brute force approach:
+    Trying all possible solution.
+    It is important that only those information that are necessary to the problem solving should be collected.
+
+The importance of algorithm:
+    Once an algorithm for a given problem is found, an important problem is: 'Can the Algorithm solve the problem in a reasonable time?'
+    (Traveling Salesman problem: it would take 77000 years for only 20 cities if brute force approach is used)
+
+Algorithm:
+    An algorithm is a fi nite number of clearly described, unambiguous “doable” steps that can be systematically followed to produce a desired result for given input in a fi nite amount of time.
+    It should solve general problems, not specific ones.
+    It provides step-by-step methods that a machine can carry out >> Computers are perfect for running algorithms.
+
+Computer hardware:
+    Input:
+        keyboard, mouse
+
+    Output:
+        screen, speaker
+
+    Processor:
+        CPU, GPU
+            Designed to interpret and execute a specific set of instructions in binary form.
+        
+    Memory:
+        RAM
+    
+    Buses:
+        Transfer data between components within a computer.
+
+    In electronic computing, digital values are represented by discrete voltage levels.
+
+    Information theory (Claude Shannon):
+        All information can be represented by only two symbols, eg. 0 and 1.
+
+    The transistor;
+        An electronic switching component developed in 1947, using semi-conductor (usually silicon).
+
+    Integrated Circuits:
+        The building blocks of computer hardware, comprised of millions or even billions of transistors.
+
+    Moore's Law:
+        The number of transistors we can put inside a CPU will double per year.
+
+Programming languages:
+    Syntax:
+        A set of characters and the acceptable sequences of those characters.
+
+        Syntax errors:
+            The translators cannot understand wrong syntax, so the translation will stop when meeting them.
+
+    Semantics:
+        The meaning associated with each syntactically correct sequence of characters.
+        
+        Logic errors:
+            Errors occur in program logics. It will cause the program to return false result.
+
+    Two types of programming languages:
+        Compiler:
+            Softwares that translate programs into machine codes to be executed by the CPU.
+
+        Interpreter:
+            Softwares that execute programs in place of the CPU.
+
+    Object-oreinted programming:
+    
+    Procedural programming:
