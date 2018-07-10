@@ -1,0 +1,42 @@
+1.1:
+    1:
+        Computational Engineering
+        Computational Linguistics
+    2:
+        Hardware design
+        Scientific computation
+    3:
+        a:
+            both wolf and goat on the west/east side.
+            both goat and cabbage on the west/east side.
+        b:
+            1, man and goat -> west
+            2, man -> east
+            3, man and wolf -> west
+            4, man and goat -> east
+            5, man and cabbage -> west
+            6, man -> esat
+            7, man and goat -> west
+        c:
+            [e, e, e, e]
+            [w, e, w, e]
+            [e, e, w, e]
+            [w, e, w, w]
+            [e, e, e, w]
+            [w, w, e, w]
+            [e, w, e, w]
+            [w, w, w, w]
+        d:
+            {m, c, g, w}
+            {c, w}
+            {m, c, w}
+            {c}
+            {m, c, g}
+            {g}
+            {m, g}
+            {}
+        e:
+            2
+    4:
+
+1.2:
