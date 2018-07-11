@@ -40,3 +40,108 @@
     4:
 
 1.2:
+    5:
+        century_digits = 20
+        year_digits = 18
+        value = year_digits + floor(year_digits / 4)
+        value += 6
+        value += 1
+        value = (value + 24) % 7
+        value = 4 # Wednesday
+    6:
+        century_digits = 19
+        year_digits = 99
+        value = year_digits + floor(year_digits / 4) = 123
+        value += 6
+        value = (value + day) % 7 = 2 # Monday
+    7:
+        init values:
+            century_digits = 20
+            value = 6
+    8:
+        def addition(array):
+            sum = 0
+            while len(array):
+                sum += array[0]
+                array.pop(0)
+            return sum
+1.3:
+    9:
+        8 * 8 = 64
+    10:
+        a:
+            1 * 8 + 1 * 2 = 10
+        b:
+            1 * 8 + 1 * 2 + 1 * 1 = 11
+        c:
+            1 * 8 = 8
+        d:
+            1 * 8 + 1 * 4 + 1 * 2 + 1 * 1 = 15
+    11:
+        a:
+            5 % 2 = 1
+            (5 - 1) % 2 = 0
+            2 % 2 = 0
+            100
+        b:
+            111
+        c:
+            10000
+        d:
+            1111
+        e: 
+            100000
+        f:
+            100001
+        g:
+            1000000
+        h:
+            111111
+        i:
+            10000000
+        j:
+            1111111
+    12:
+        a:
+            even
+        b:
+            odd
+        c:
+            nth power of 2 (n is the number of '0')
+        d:
+            nth power of 2 - 1 (n is the number of '1')
+    13:
+        2 ** 4 = 16
+1.4:
+    14:
+        Web
+        Android Application
+    15:
+        a:
+            valid
+        b:
+            syntax
+        c:
+            semantic
+    16:
+        a:
+            syntax
+        b:
+            semantic
+        c:
+            valid
+        d:
+            valid
+    17:
+        compiler:
+            faster to execute the compiled code.
+        interpreter:
+            the code can be executed on various devices.
+1.5:
+    18:
+        ~
+    19:
+        syntax error
+    20:
+        a:
+            
