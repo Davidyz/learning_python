@@ -1,0 +1,64 @@
+Drake Equation:
+    An equation calculating the number of civilizations that may exist in our galaxy and can communicate with us.
+    
+    Factors:
+        R: average rate of star creation peryear
+        p: percentage of those stars that have planets
+        n: average number of planets that can potentially support life
+        f: the percentage of those planets that actually go on to develop life
+        i: the percentage of those planets that go on to develop intelligent life
+        c: the percentage of those that have the technology to communicate with us
+        L: the expected lifetime of civilizations
+    
+    Equation:
+        N = R * p * n * f * i * c * L
+
+Program testing:
+    Test case:
+        A set of input and expected output of a given program.
+
+    Test plan:
+        A number of test cases to verify that a program meets all requirements.
+
+    A good strategy is to include 'average', as well as 'extreme' or 'special' cases in a test plan.
+
+Data and Expressions:
+    Motivation:
+        The generation, collection, and analysis of data is a driving force in today's world.
+
+    
+    Literals:
+        A sequence of one of more characters that stands for it self.
+
+        Numeric literals:
+            Numbers including integer and float.
+            1e2 means 10 ** 2 (100)
+
+            No commas in numeric literals.
+        
+            There are limits in both range and precision in float numbers in python from 1e(-308) to 1e308, with 16 to 17 digits of precision.
+            If the result of calculation is beyond the limit, there is an arithmetic overflow.
+            If the result is too small there is an underflow.
+
+            Built-in format function:
+                >>> format(5/7, '.2f')
+                    '0.71'
+                >>> format(2 ** 100, '.6e)
+                    '1.267651e+30'
+                >>> format(13402.25, ',.2f')
+                    '13,042.25'
+        
+        String literals:
+            A sequence of characters.
+            It can contains:
+                letters
+                numbers
+                special characters
+                blank
+                spaces
+            
+            Converting between a character and its encoding:
+                >>> ord('A')
+                    65
+                >>> chr(65)
+                    'A'
