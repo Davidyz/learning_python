@@ -1,5 +1,5 @@
-def GreatestCommonDenominator(m, n):
+def greatest_common_denominator(m, n):
     if n % (m % n) == 0:
         return m % n
     else:
-        return GreatestCommonDenominator(n, m%n)
+        return greatest_common_denominator(n, m%n)

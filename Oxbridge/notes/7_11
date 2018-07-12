@@ -36,9 +36,9 @@ Data and Expressions:
 
             No commas in numeric literals.
         
-            There are limits in both range and precision in float numbers in python from 1e(-308) to 1e308, with 16 to 17 digits of precision.
+            There are limits in both range and precision in float numbers in python from 1e-308 to 1e308, with 16 to 17 digits of precision.
             If the result of calculation is beyond the limit, there is an arithmetic overflow.
-            If the result is too small there is an underflow.
+            If the result is too small, there is an underflow.
 
             Built-in format function:
                 >>> format(5/7, '.2f')
@@ -62,3 +62,26 @@ Data and Expressions:
                     65
                 >>> chr(65)
                     'A'
+        
+        Control letters:
+            \n:
+                new line
+            \t:
+                tab (specific number of spaces)
+        
+        String formatting:
+            >>> format('hello', '< 20')    # '20' == '< 20'
+                'hello               '
+            >>> format('hello', '> 20')
+                '               hello'
+            >>> format('hello', '^20')
+                '       hello        '
+    Variables:
+        A name (identifier) that is associated with a value. It can be assigned different (various) type of data.
+
+        Type converting functions:
+            str()
+            int()
+            float()
+            list()
+            dict()
