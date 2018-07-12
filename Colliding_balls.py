@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 #ball collisions using class
 #try to optomise the collision detecting algorithm
 ### try divide into 4 horizontal sections s
