@@ -25,6 +25,29 @@ layout = ["wwwwwwwwwwwwwwwwwwww",
           "w ww              tw",
           "wwwwwwwwwwwwwwwwwwww"]
 
+layout1 = ['wwwwwwwwwwwwwwwwwwww',
+           'wpwwww    c        w',
+           'w      wwwwwwwwwww w',
+           'www wwwwwwwwwwww w w',
+           'www ww      wwww w w',
+           'www    wwww wwww w w',
+           'wwwwwwwwwww  www   w',
+           'wwwwwwwwwwww wwwwwww',
+           'w            ww wwww',
+           'w w wwwwwwwwwww   ww',
+           'w w wwwwwwwwwww wwww',
+           'w w         c      w',
+           'w ww wwwwwwwwwwww ww',
+           'w ww           ww ww',
+           'w wwwwwwwwwwww ww ww',
+           'w            w ww ww',
+           'wwwwwwwwwwww w ww ww',
+           'wwwwwwwwwwww w    ww',
+           'wt           wwwwwww',
+           'wwwwwwwwwwwwwwwwwwww']
+
+list_of_layout = [layout, layout1]
+
 def item(x,y,category,fake = False):
     """
     Move the items to the corresponding place.
@@ -157,45 +180,52 @@ def current_row():
 
 if __name__ == '__main__':
     introduction()
+    proceed = True
+    level = 0
+    while proceed == True:
+        window = turtle.Screen()
+        player = turtle.Turtle()
+        player.speed(0)
+        player.shapesize(1,1)
+        player.penup()
+        walls = {}
+        coins = []
 
-    window = turtle.Screen()
-
-    player = turtle.Turtle()
-    player.speed(0)
-    player.shapesize(1,1)
-    player.penup()
-
-    walls = {}
-    coins = []
-
-    for i in range(21):
-        walls['n' + str(i)] = []
+        for i in range(21):
+            walls['n' + str(i)] = []
     
-    window.tracer(0)
-    target = turtle.Turtle()
-    target.shape("circle")
-    target.shapesize(1,1)
-    target.color("red")
-    target.setheading(0)
-    target.speed(0)
-    target.penup()
-    map_generator(layout)
-
-    finished = False
+        window.tracer(0)
+        target = turtle.Turtle()
+        target.shape("circle")
+        target.shapesize(1,1)
+        target.color("red")
+        target.setheading(0)
+        target.speed(0)
+        target.penup()
+        map_generator(list_of_layout[level])
+        finished = False
     
-    while not finished:
-        start_up()
-        if player.ycor() < -240:
-            if goal_detect():
-                target.color('green')
-                print("You've won the game!")
-                time.sleep(3)
-                finished = True
-        for i in coins:
-            if catch(i) < 15:
-                print("you got a coin!")
-                coin_caught(i)
-        for i in current_row(): # The rows to be scanned is specified so that the time consumption can be reduced.
-            for j in walls[i]:
-                if catch(j) < 20:
-                    player.backward(5)
+        while not finished:
+            start_up()
+            if player.ycor() < -240:
+                if goal_detect():
+                    target.color('green')
+                    print("You've won the game!")
+                    time.sleep(3)
+                    finished = True
+            for i in coins:
+                if catch(i) < 15:
+                    print("you got a coin!")
+                    coin_caught(i)
+            for i in current_row(): # The rows to be scanned is specified so that the time consumption can be reduced.
+                for j in walls[i]:
+                    if catch(j) < 20:
+                        player.backward(5)
+        window.bye()
+
+        if input('Do you want to try the next level?(y/n): ') == 'n':
+            proceed = False
+        else:
+            level += 1
+            if level > len(list_of_layout) - 1:
+                proceed = False
