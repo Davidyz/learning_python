@@ -185,11 +185,12 @@ if __name__ == '__main__':
     
     while not finished:
         start_up()
-        if goal_detect():
-            target.color('green')
-            print("You've won the game!")
-            time.sleep(3)
-            finished = True
+        if player.ycor() < -240:
+            if goal_detect():
+                target.color('green')
+                print("You've won the game!")
+                time.sleep(3)
+                finished = True
         for i in coins:
             if catch(i) < 15:
                 print("you got a coin!")
