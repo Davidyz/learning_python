@@ -123,7 +123,11 @@ def root(n, lower = None, upper = None, deci = 4, power = 2):
     Try to find the nth root for n using binary search.
     Square root by default.
     Correct to 4 decimal place by default.
+    Return -1 if a negative number is passed.
     """
+    if n < 0 and power % 2 == 0:
+        return -1
+
     if lower == None:
         lower = n
 
