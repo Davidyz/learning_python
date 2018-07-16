@@ -134,7 +134,7 @@ def print_the_max():
 
 def main():
     global KEY_PRESSED
-    source = open('scores', 'r')
+    source = open('FlappyBird/scores', 'r')
     records = source.readlines()
     source.close()
     SCORE = 0
