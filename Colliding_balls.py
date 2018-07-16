@@ -124,8 +124,8 @@ def check_distance(a,b):
 
        
 def gen_random_start():
-    x = random.randint(-(width/2)+10, (width/2)-10)
-    y = random.randint(-(height/2)+10, (height/2)-10)
+    x = random.randint(-(width/2)+15, (width/2)-15)
+    y = random.randint(-(height/2)+15, (height/2)-15)
     return [x, y]
 
 def generating_balls(n):
