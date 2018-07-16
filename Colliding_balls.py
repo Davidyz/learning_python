@@ -1,11 +1,10 @@
-#!/usr/bin/python3
 #ball collisions using class
 #try to optomise the collision detecting algorithm
 ### try divide into 4 horizontal sections s
 
 import turtle, time, math, random, itertools
 
-N = 200 #number of balls
+N = int(input('Number of balls: '))
 
 window = turtle.Screen()
 window.tracer(0,0)
@@ -129,42 +128,6 @@ def gen_random_start():
     y = random.randint(-(height/2)+10, (height/2)-10)
     return [x, y]
 
-"""
-def generate_n_balls(n):
-    '''generates n balls, stores in dictionary'''
-    global balls, starting_posns
-    for i in balls:
-        #choose random color and velocities
-        color = colors[random.randint(0,len(colors)-1)]
-        vx = random.randint(-5,5)
-        vy = random.randint(-5,5)
-        i = Ball(color, vx, vy)
-        i.SPEED = random.random() + random.randint(0,2) ###
-        #balls[i].change_size()
-
-        #set random position
-        unique = False
-        while unique == False:
-            distances_ok = True
-            x,y = gen_random_start()
-            if len(starting_posns) == 0:
-                starting_posns.append([x,y])
-                unique = True
-                break
-
-            else:
-                for b in starting_posns:
-                    if check_distance([x,y],b) < 25:
-                        distances_ok = False
-                        break
-
-            if distances_ok == True:
-                starting_posns.append([x,y])
-                unique = True
-                     
-        i.setposition(x,y)
-"""
-
 def generating_balls(n):
     while len(balls) < n:
         vx = random.randint(-5, 5)
@@ -205,9 +168,7 @@ def quicksort(array):
             array.insert(-1, array.pop(i))
             j -= 1
     return quicksort(array[:j]) + [pivot] + quicksort(array[j:len(array) - 1])
-'''
-It just turns out that even two balls are not next to each other in the sorted list, it is still possible for them to collide. An additional iteration is therefore required to check all balls after one ball until the distance (to the origin) difference is beyond the sum of their radius.
-'''
+
 ###check initial posns
 min_d = 100
 def check_initial_positions():
@@ -221,8 +182,16 @@ def check_initial_positions():
 
 # generate N balls
 generating_balls(N)
-#print(check_initial_positions())
 
+def iterative_checking(ball):
+    index = balls.index(ball)
+    i = index + 1
+    while balls[i].distance() - ball.distance() <= ball.radius + balls[i].radius:
+        check_ball_collision(ball, balls[i])
+        if i + 1 < len(balls):
+            i += 1
+        else:
+            break
 while True:
     balls = quicksort(balls)
 
@@ -232,7 +201,9 @@ while True:
     
     for i in range(0, len(balls) - 1):
         if balls[i + 1].distance() - balls[i].distance() < 50:#balls[i + 1].radius + balls[i].radius:
-            check_ball_collision(balls[i], balls[i + 1])
+            #check_ball_collision(balls[i], balls[i + 1])
+            iterative_checking(balls[i])
+
         else:
             pass
 
@@ -240,24 +211,3 @@ while True:
         i.move_ball()
     
     window.update()
-    #time.sleep(1/120)
-"""
-while True:
-    for ball in balls:
-        balls[ball].calculate_new_coordinates()
-        checkboundary(balls[ball])
-        
-    #check for collisions
-    for c in combinations:
-        check_ball_collision(balls[c[0]],balls[c[1]])
-
-
-    #move balls
-    for ball in balls:
-        balls[ball].move_ball()
-
-
-    window.update()
-
-    #time.sleep(1/120)
-"""
