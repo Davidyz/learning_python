@@ -2,6 +2,7 @@
 #ball collisions using class
 #try to optomise the collision detecting algorithm
 ### try divide into 4 horizontal sections s
+
 import turtle, time, math, random, itertools
 
 N = 200 #number of balls
@@ -33,7 +34,7 @@ class Ball(turtle.Turtle):
         self.SPEED = 1 #choose values later
         #perhaps will use later, keep default for now
         self.mass = 1
-        self.radius = 9
+        self.radius = 10
         self.hit_boundary = False
         self.collided = False
     
@@ -110,8 +111,6 @@ def check_ball_collision(ball1, ball2):
     u2y = ball2.velocity[1]
 
     if distance <= R:
-        if ball1.hit_boundary == True or ball2.hit_boundary == True:
-            print("Hit boundary and collided")
         ball1.SPEED, ball2.SPEED = ball2.SPEED, ball1.SPEED
         ball1.velocity = [u2x, u2y]
         ball2.velocity = [u1x, u1y]
@@ -182,7 +181,7 @@ def generating_balls(n):
             if check_distance(i, coordinates) < 25:
                 unique = False
                 continue
-        if unique == True:
+        if unique:
             starting_posns.append(coordinates)
 
     for i in range(len(balls)):
@@ -206,9 +205,9 @@ def quicksort(array):
             array.insert(-1, array.pop(i))
             j -= 1
     return quicksort(array[:j]) + [pivot] + quicksort(array[j:len(array) - 1])
-
-#combinations = list(itertools.combinations([x for x in range(1,N+1)],2))
-
+'''
+It just turns out that even two balls are not next to each other in the sorted list, it is still possible for them to collide. An additional iteration is therefore required to check all balls after one ball until the distance (to the origin) difference is beyond the sum of their radius.
+'''
 ###check initial posns
 min_d = 100
 def check_initial_positions():
