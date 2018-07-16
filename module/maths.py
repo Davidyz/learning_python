@@ -1,5 +1,6 @@
 """
 This is a custom module of functions that is created in order to practice algorithm and solve mathematics and statistics problems.
+Currently support python3 only.
 """
 from module import integration
 
