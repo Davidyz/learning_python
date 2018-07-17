@@ -1,6 +1,5 @@
 #ball collisions using class
-#try to optomise the collision detecting algorithm
-### try divide into 4 horizontal sections s
+#try to optimise the collision detecting algorithm
 
 import turtle, time, math, random, itertools
 
@@ -9,8 +8,8 @@ N = int(input('Number of balls: '))
 window = turtle.Screen()
 window.tracer(0,0)
 
-width = 600
-height = 400
+width = 1800
+height = 1000
 
 colors = ['red','blue','green','yellow','orange','black','purple',
           'lightblue','pink']
@@ -26,7 +25,6 @@ class Ball(turtle.Turtle):
         self.penup()
         self.color(color)
         self.shape("circle")
-        self.speed(0)
 
         self.velocity = [v_x, v_y]
         self.new_coordinates = [0,0]
@@ -38,7 +36,8 @@ class Ball(turtle.Turtle):
         self.collided = False
     
     def distance(self):
-        return math.sqrt((self.xcor() + 300) ** 2 + (self.ycor() + 200) ** 2)
+        global width, height
+        return math.sqrt((self.xcor() + width / 2) ** 2 + (self.ycor() + height / 2) ** 2)
 
     def calculate_new_coordinates(self):
         # normalise velocity component then mult by SPEED
@@ -192,6 +191,7 @@ def iterative_checking(ball):
             i += 1
         else:
             break
+
 while True:
     balls = quicksort(balls)
 
