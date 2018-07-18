@@ -72,6 +72,17 @@ def mergesort(array):
     middle = int(len(array) / 2)
     return merge(mergesort(array[:middle]), mergesort(array[middle:]))
 
+def is_sorted(array):
+    for i in range(len(array) - 1):
+        if array[i + 1] < array[i]:
+            return False
+    return True
+
+def reversed(array):
+    result = []
+    for i in array:
+        result.insert(0, i)
+    return result
 if __name__ == '__main__':
     import random
     l = list(x for x in range(100))
