@@ -35,6 +35,18 @@ class Ball(turtle.Turtle):
         self.hit_boundary = False
         self.collided = False
     
+    '''
+    Methods for momentum are added because I think it might me useful to adjust the directions after the balls have collided.
+    '''
+    def total_momentum(self):
+        return self.mass * ((self.v_x ** 2 + self.v_y ** 2) ** 0.5)
+
+    def x_momentum(self):
+        return self.mass * self.v_x
+
+    def y_momentum(self):
+        return self.mass * self.v_y
+
     def distance(self):
         global width, height
         return math.sqrt((self.xcor() + width / 2) ** 2 + (self.ycor() + height / 2) ** 2)
@@ -211,3 +223,4 @@ while True:
         i.move_ball()
     
     window.update()
+    time.sleep(1 / 60)
