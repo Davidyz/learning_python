@@ -1,5 +1,9 @@
 #!/usr/bin/python3
 #coding=utf-8
+'''
+This is a script that can help you add tags to music files in batch, given that your music are stored in the following way: .../artist/album/song.*
+Artist and album are not necessary, but if you want to add, they must be in a format like this.
+'''
 import os
 command = '''ffmpeg -i "{origin}" "{output}"'''
 rootdir = '/mnt/c/Users/30813/Music/'
