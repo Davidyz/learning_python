@@ -2,7 +2,7 @@
 #coding=utf-8
 import os
 command = '''ffmpeg -i "{origin}" "{output}"'''
-rootdir = '/home/david/Music/'
+rootdir = '/mnt/c/Users/30813/Music/'
 to_be_converted = ['wav', 'ape']
 music_files = ['wav', 'ape', 'flac', 'mp3', 'm4a', 'dsf', 'dff']
 covers = ['cover.jpg', 'cover.png']
@@ -88,10 +88,11 @@ def add_tags(list_of_songs):
             album = ""
         if len(info) == 7:
             artist, album = "", ""
-        command = '''tracktag "{song}" --name={name} --artist={artist} --album={album}'''.format(song=i,
-                                                                                                 name=title(i.split('/')[-1]),
-                                                                                                 artist=artist,
-                                                                                                 album=album)
+        command = '''tracktag "{song}" --name="{name}" --artist="{artist}" --album="{album}"'''.format(song=i,
+                                                                                                       name=title(i.split('/')[-1]),
+                                                                                                       artist=artist,
+                                                                                                       album=album)
+        print(name)
         os.system(command)
 
 if __name__ == '__main__':
