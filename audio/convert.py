@@ -1,8 +1,7 @@
 #!/usr/bin/python3
 #coding=utf-8
-import os
+import os, sys
 command = '''ffmpeg -i "{origin}" "{output}"'''
-rootdir = '/mnt/c/Users/30813/Music/'
 to_be_converted = ['wav', 'ape']
 music_files = ['wav', 'ape', 'flac', 'mp3', 'm4a', 'dsf', 'dff']
 covers = ['cover.jpg', 'cover.png']
@@ -96,6 +95,13 @@ def add_tags(list_of_songs):
         os.system(command)
 
 if __name__ == '__main__':
+    if len(sys.argv) == 2:
+        rootdir = sys.argv[1]
+    
+    else:
+        print('Fail to pass the root directory of your music library as an argument!\nProgress may fail!')
+        rootdir = '/mnt/c/Users/30813/Music/'
+    
     set_singers()
     set_albums()
     gen_song_list()
