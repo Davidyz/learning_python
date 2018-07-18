@@ -1,7 +1,7 @@
 #ball collisions using class
 #try to optimise the collision detecting algorithm
 
-import turtle, time, math, random, itertools
+import turtle, time, math, random
 
 N = int(input('Number of balls: '))
 
