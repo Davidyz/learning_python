@@ -31,6 +31,8 @@ def choose(n, r):
     """
     The formula used in combination.
     """
+    if r > n:
+        return -1
     if n == r:
         return 1
     elif r == 0:
