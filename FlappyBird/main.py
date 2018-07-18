@@ -118,19 +118,21 @@ def write_list(array, target):
     while '\n' in array:
         array.remove('\n')
     for i in array:
-        #target.write('{}\n'.format(str(i)))
         target.write(str(i))
         target.write('\n')
 
 def print_the_max():
-    scores = open('scores')
+    scores = open('FlappyBird/scores')
     temp = scores.readlines()
     while '\n' in temp:
         temp.remove('\n')
     for i in temp:
         i = int(i.split('\\')[0])
     scores.close()
-    print('Your highest score ever is {}.'.format(max(temp)))
+    try:
+        print('Your highest score ever is {}.'.format(max(temp)))
+    except Exception:
+        pass
 
 def main():
     global KEY_PRESSED
@@ -221,7 +223,7 @@ def main():
             print("GAME OVER")
             print("SCORE:", SCORE)
             records.append(SCORE)
-            source = open('scores', 'w')
+            source = open('FlappyBird/scores', 'w')
             write_list(records, source)
             source.close()
             return
