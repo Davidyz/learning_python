@@ -1,3 +1,4 @@
+#!/usr/bin/python
 #ball collisions using class
 #try to optimise the collision detecting algorithm
 
@@ -141,8 +142,10 @@ def gen_random_start():
 
 def generating_balls(n):
     while len(balls) < n:
-        vx = random.randint(-5, 5)
-        vy = random.randint(-5, 5)
+        vx, vy = 0, 0
+        while vx * vy == 0:
+            vx = random.randint(-5, 5)
+            vy = random.randint(-5, 5)
         color = colors[random.randint(0, len(colors) - 1)]
         name = 'b' + str(len(balls) + 1)
         name = Ball(color, vx, vy)
@@ -180,6 +183,19 @@ def quicksort(array):
             j -= 1
     return quicksort(array[:j]) + [pivot] + quicksort(array[j:len(array) - 1])
 
+def insertsort(array):
+    '''
+    Another way to sort.
+    It may have better performance than quicksort().
+    '''
+    for i in range(1, len(array)):
+        key = array.pop(i)
+        j = i
+        while j > 0 and array[j - 1].distance() > key.distance():
+            j -= 1
+        array.insert(j, key)
+    return array
+
 ###check initial posns
 min_d = 100
 def check_initial_positions():
@@ -205,7 +221,7 @@ def iterative_checking(ball):
             break
 
 while True:
-    balls = quicksort(balls)
+    balls = insertsort(balls)
 
     for ball in balls:
         ball.calculate_new_coordinates()
@@ -213,7 +229,6 @@ while True:
     
     for i in range(0, len(balls) - 1):
         if balls[i + 1].distance() - balls[i].distance() < 50:#balls[i + 1].radius + balls[i].radius:
-            #check_ball_collision(balls[i], balls[i + 1])
             iterative_checking(balls[i])
 
         else:
