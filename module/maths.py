@@ -2,7 +2,12 @@
 This is a custom module of functions that is created in order to practice algorithm and solve mathematics and statistics problems.
 Currently support python3 only.
 """
-from module import integration
+try:
+    from module import integration
+except Exception:
+    import sys
+    sys.path.append('module/')
+    import integration
 
 def factorial(n):
     """
@@ -119,7 +124,7 @@ def normal(mean, var, start = None, end = None):
     if end == None:
         end = start
         start = mean - 5 * sd
-    return round(integral.simpson(f, start, end, 1000000), 5)
+    return round(integration.simpson(f, start, end, 1000000), 5)
 
 def root(n, lower = None, upper = None, deci = 4, power = 2):
     """
