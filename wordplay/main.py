@@ -1,10 +1,10 @@
-import itertools
+import itertools, sys
 
 fin = open('wordplay/wordlist.txt', 'r')
 wordlist = fin.readlines()
 fin.close()
 wordlist = list(i[:-1].lower() for i in wordlist)
-letters = input("What are the letters? Please enter them(don't put any space): ").lower()
+letters = str(sys.argv[-1]).lower()
 permutation = []
 results = []
 
