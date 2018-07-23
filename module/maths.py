@@ -18,7 +18,25 @@ def factorial(n):
     elif n > 1:
         return n * factorial(n - 1)
 
-def prime(n, factor=3):
+def prime(n):
+    if n == 2:
+        return True
+    
+    elif n % 2 == 0:
+        return False
+
+    elif n % 2 != 0:
+        factor = 3
+        while True:
+            if factor <= int(n ** 0.5 + 1):
+                if n % factor == 0:
+                    return False
+            else:
+                break
+            factor += 2
+    return True
+
+def prime_r(n, factor=3):
     """
     Determine whether a number is prime or not.
     """

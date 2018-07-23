@@ -83,10 +83,12 @@ def reversed(array):
     for i in array:
         result.insert(0, i)
     return result
+
 if __name__ == '__main__':
     import random
     l = list(x for x in range(100))
     random.shuffle(l)
     print(l)
     print('=' * 50)
-    print(mergesort(l))
+    print(insertionsort(l))
+    print(l)

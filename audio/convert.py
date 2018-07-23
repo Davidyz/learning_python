@@ -1,6 +1,4 @@
-#!/usr/bin/python3
 #coding=utf-8
-<<<<<<< HEAD
 import os, sys
 '''
 This is a script that can help you add tags to music files in batch, given that your music are stored in the following way: .../artist/album/song.*
@@ -86,19 +84,19 @@ def add_tags(list_of_songs):
     for i in list_of_songs:
         info = i.split('/')
         name = title(info[-1])
-        if len(info) == 9:
-            artist = info[6]
-            album = info[7]
-        if len(info) == 8:
-            artist = info[6]
+        print(name)
+        if len(info) == 4:
+            artist = info[1]
+            album = info[2]
+        if len(info) == 3:
+            artist = info[1]
             album = ""
-        if len(info) == 7:
+        if len(info) == 2:
             artist, album = "", ""
         command = '''tracktag "{song}" --name="{name}" --artist="{artist}" --album="{album}"'''.format(song=i,
                                                                                                        name=title(i.split('/')[-1]),
                                                                                                        artist=artist,
                                                                                                        album=album)
-        print(name)
         os.system(command)
 
 if __name__ == '__main__':
