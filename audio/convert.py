@@ -82,15 +82,16 @@ def add_tags(list_of_songs):
     '''
     for i in list_of_songs:
         info = i.split('/')
+        useful_info = info[info.index('Music') + 1:]
         name = title(info[-1])
         print(name)
-        if len(info) == 4:
-            artist = info[1]
-            album = info[2]
-        if len(info) == 3:
-            artist = info[1]
+        if len(useful_info) == 3:
+            artist = info[0]
+            album = info[1]
+        if len(useful_info) == 2:
+            artist = info[0]
             album = ""
-        if len(info) == 2:
+        if len(useful_info) == 1:
             artist, album = "", ""
         command = '''tracktag "{song}" --name="{name}" --artist="{artist}" --album="{album}"'''.format(song=i,
                                                                                                        name=title(i.split('/')[-1]),
@@ -99,13 +100,11 @@ def add_tags(list_of_songs):
         os.system(command)
 
 if __name__ == '__main__':
-    if len(sys.argv) == 2:
+    try:
         rootdir = sys.argv[1]
-    
-    else:
-        print('Fail to pass the root directory of your music library as an argument!\nProgress may fail!')
-        rootdir = '/mnt/c/Users/30813/Music/'
-    
+    except IndexError:
+        print('Please specify a directory!')
+        exit()
     set_singers()
     set_albums()
     gen_song_list()
