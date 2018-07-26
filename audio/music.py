@@ -1,7 +1,14 @@
+#coding=utf-8
 import os, sys
 
-def is_music(path):
-    return path.split('.')[-1] in ['mp3', 'aac', 'flac', 'ape', 'wav', 'dsd', 'dsf', 'dff'] and os.path.isfile(path)
+def is_music(name):
+    return name.split('.')[-1] in ['mp3', 'aac', 'm4a', 'flac', 'ape', 'wav', 'dsd', 'dsf', 'dff'] and os.path.isfile(name)
+
+def all_music(array):
+    for i in array:
+        if not is_music(i):
+            return False
+    return True
 
 class InputError(Exception):
     pass
