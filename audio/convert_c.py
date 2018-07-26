@@ -29,3 +29,10 @@ class Music():
 
         else:
             raise InputError('\nInvalid path: {}.\nIt is a directory or is not a recognised music file.'.format(path))
+
+    def set_tag(self):
+        command = '''tracktag "{path}" --name="{name}" --artist="{artist}" --album="{album}"'''.format(path = '/'.join(self.__path),
+                                                                                                       name = self.title,
+                                                                                                       artist = self.artist,
+                                                                                                       album = self.album)
+        os.system(command)
