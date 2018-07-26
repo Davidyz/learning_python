@@ -1,38 +1,31 @@
 import os, sys
 
+def is_music(path):
+    return path.split('.')[-1] in ['mp3', 'aac', 'flac', 'ape', 'wav', 'dsd', 'dsf', 'dff'] and os.path.isfile(path)
+
+class InputError(Exception):
+    pass
+
 class Music():
     '''
-    The class for a music object.
+    The class for a music object, designed for music tagging.
+    Author: Davidyz.
     '''
-    def __init__(self, title, form, lossless = True, is_dsd = False, path, artist = None, album = None)
-        self.title = title
-        self.form = form
-        self.lossless = lossless
-        self.dsd = is_dsd
-        self.path = path
-        self.artist = artist
-        self.album = album
-        self.tagging = '''tracktag {directory} '''
-        self.convert = '''ffmpeg -i {} {}'''
+    def __init__(self, path):
+        if is_music(path):
+            self.__path = path.split('/')
+            self.__info = self.__path[self.__path.index('Music') + 1:]
+            self.title = "{}".format(''.join(self.__info[-1].split('.')[:-1]))
+        
+            if len(self.__info) >= 2:
+                self.artist = "{}".format(self.__info[0])
+            else:
+                self.artist = ""
+        
+            if len(self.__info) == 3:
+                self.album = "{}".format(self.__info[1])
+            else:
+                self.album = ""
 
-    def set_artist(self):
-        self.tagging += '''--artist="{}" '''.format(self.artist)
-
-    def set_album(self):
-        self.tagging += '''--album="{}" '''.format(self.album)
-
-    def add_tag(self):
-        os.system(self.tagging.format(directory = self.path)
-
-    def convert(self):
-        if self.lossless and not self.is_dsd:
-            mother_dir = ''.join(self.path.split('/')[:-1])
-            os.system(self.convert.format("""{}""".format(self.path), '"""' + mother_dir + self.title + '.flac"""'))
-            os.system('''rm {}'''.format(self.path))
-
-if __name__ == '__main__':
-    try:
-        path = sys.argv[1]
-    except IndexError:
-        print('Missing argument! Please enter the path!')
-
+        else:
+            raise InputError('\nInvalid path: {}.\nIt is a directory or is not a recognised music file.'.format(path))
