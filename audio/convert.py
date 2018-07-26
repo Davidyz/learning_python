@@ -83,13 +83,14 @@ def add_tags(list_of_songs):
     for i in list_of_songs:
         info = i.split('/')
         useful_info = info[info.index('Music') + 1:]
+        print(useful_info)
         name = title(info[-1])
         print(name)
         if len(useful_info) == 3:
-            artist = info[0]
-            album = info[1]
+            artist = useful_info[0]
+            album = useful_info[1]
         if len(useful_info) == 2:
-            artist = info[0]
+            artist = useful_info[0]
             album = ""
         if len(useful_info) == 1:
             artist, album = "", ""
