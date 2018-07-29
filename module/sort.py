@@ -19,19 +19,19 @@ def quicksort(array):
             j -= 1
     return quicksort(array[:j]) + [pivot] + quicksort(array[j:len(array) - 1])
 
+def switch(ls, index = 0):
+    if index >= len(ls) - 1:
+        return ls
+
+    elif ls[index] > ls[index + 1]:
+        ls[index], ls[index + 1] = ls[index + 1], ls[index]
+
+    return switch(ls, index + 1)
+
 def bubblesort(array):
     if len(array) < 2:
         return array
 
-    def switch(ls, index = 0):
-        if index >= len(ls) - 1:
-            return ls
-
-        elif ls[index] > ls[index + 1]:
-            ls[index], ls[index + 1] = ls[index + 1], ls[index]
-
-        return switch(ls, index + 1)
-    
     switch(array)
 
     return bubblesort(array[:-1]) + [array[-1]]
@@ -46,12 +46,6 @@ def insertionsort(array, index = 1):
     return array
 
 def merge(a, b):
-    '''
-    if not a:
-        return b
-    if not b:
-        return a
-    '''
     output = []
     while len(a) * len(b) != 0:
         if a[0] < b[0]:
@@ -72,6 +66,17 @@ def mergesort(array):
     middle = int(len(array) / 2)
     return merge(mergesort(array[:middle]), mergesort(array[middle:]))
 
+def heapsort(array):
+    if len(array) <= 1:
+        return array
+    
+    for i in range(len(array) - 1, 0, -1):
+        parent = int((i - 1) / 2.0)
+        if array[i] > array[parent]:
+            array[i], array[parent] = array[parent], array[i]
+
+    return heapsort(array[1:]) + [array[0]]
+
 def is_sorted(array):
     for i in range(len(array) - 1):
         if array[i + 1] < array[i]:
@@ -85,10 +90,10 @@ def reversed(array):
     return result
 
 if __name__ == '__main__':
+    #for function tests.
     import random
-    l = list(x for x in range(100))
+    l = list(x for x in range(1000))
     random.shuffle(l)
     print(l)
     print('=' * 50)
-    print(insertionsort(l))
-    print(l)
+    print(heapsort(l))
