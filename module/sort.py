@@ -3,6 +3,7 @@
 A custom module containing some sorting algorithms.
 Recursion is widely used.
 """
+# Codes for quick sort
 def quicksort(array):
     if len(array) < 2:
         return array
@@ -19,6 +20,7 @@ def quicksort(array):
             j -= 1
     return quicksort(array[:j]) + [pivot] + quicksort(array[j:len(array) - 1])
 
+# Codes for bubble sort.
 def switch(ls, index = 0):
     if index >= len(ls) - 1:
         return ls
@@ -36,6 +38,7 @@ def bubblesort(array):
 
     return bubblesort(array[:-1]) + [array[-1]]
 
+# Codes for insertion sort,
 def insertionsort(array, index = 1):
     for i in range(1, len(array)):
         key = array.pop(i)
@@ -45,6 +48,7 @@ def insertionsort(array, index = 1):
         array.insert(j, key)
     return array
 
+# Codes for merge sort.
 def merge(a, b):
     output = []
     while len(a) * len(b) != 0:
@@ -66,6 +70,7 @@ def mergesort(array):
     middle = int(len(array) / 2)
     return merge(mergesort(array[:middle]), mergesort(array[middle:]))
 
+# Codes for heap sort.
 def heapsort(array):
     if len(array) <= 1:
         return array
@@ -77,6 +82,7 @@ def heapsort(array):
 
     return heapsort(array[1:]) + [array[0]]
 
+# General purposed codes for a list.
 def is_sorted(array):
     for i in range(len(array) - 1):
         if array[i + 1] < array[i]:
@@ -90,9 +96,9 @@ def reversed(array):
     return result
 
 if __name__ == '__main__':
-    #for function tests.
+    # for function tests.
     import random
-    l = list(x for x in range(1000))
+    l = list(x for x in range(10))
     random.shuffle(l)
     print(l)
     print('=' * 50)

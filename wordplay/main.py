@@ -3,7 +3,7 @@ import itertools, sys
 sys.path.append('/home/david/git/learning_python/module/')
 import sort
 
-fin = open('wordplay/new_google-10000-english.txt', 'r')
+fin = open('wordplay/google-10000-english.txt', 'r')
 wordlist = fin.readlines()
 fin.close()
 wordlist = list(i[:-1].lower() for i in wordlist)
@@ -17,7 +17,7 @@ else:
 results = []
 
 def binary_search(word, array, start=0, end=None):
-    
+
     if end == None:
         end = len(array) - 1
     if start == end:
@@ -25,23 +25,23 @@ def binary_search(word, array, start=0, end=None):
             return start
         else:
             return None
-    
+
     elif start < end:
         middle = (start + end) // 2
-        
+
         if word == array[middle]:
             return middle
-        
+
         elif word > array[middle]:
             return binary_search(word, array, middle + 1, end)
-        
+
         elif word < array[middle]:
             return binary_search(word, array, start, middle - 1)
 
-for i in range(len(letters)):
+for i in range(len(letters) + 1):
     for j in itertools.permutations(letters, i):
         j = ''.join(j)
         if binary_search(j, wordlist) != None:
-            if not j in results: #j binary_search(j, results) == -1:
+            if not j in results:
                 print(j)
                 results.append(j)
