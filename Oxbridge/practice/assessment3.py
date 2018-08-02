@@ -29,6 +29,7 @@ object_type()
 
 ############################# Q3 ############################
 table_galaxy = table[table['class'] == 'GALAXY']
+print('The number of GALAXY is: {}\n'.format(table_galaxy.shape[0]))
 
 ############################# Q4 ############################
 plt.scatter(table_galaxy['ra'],
@@ -44,7 +45,6 @@ plt.xlabel('RA(degree)')
 plt.ylabel('DEC(degree)')
 plt.savefig('Q4.png')
 plt.show()
-plt.hold(False)
 
 ############################# Q5 ##############################
 table_galaxy['color'] = table_galaxy['u'] - table_galaxy['r']
@@ -60,7 +60,6 @@ def names():
 
 names()
 plt.savefig('Q5.png')
-plt.hold(True)
 plt.show()
 
 ############################# Q6 ###############################
