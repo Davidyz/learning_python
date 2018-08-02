@@ -5,7 +5,7 @@ import matplotlib as mpt
 from scipy.optimize import curve_fit
 import pylab
 
-print("\n\nThe graphs will be saved in the working directory instead of simply showing!!!\n\n")
+print("\n\nThe graphs will be saved in the working directory as well as showing!!!\n\n")
 ############################# Q1 ###########################
 table = pd.read_csv('skyserver.csv')
 rows = table.shape[0]
@@ -43,6 +43,7 @@ plt.title('The Positions of Galaxies')
 plt.xlabel('RA(degree)')
 plt.ylabel('DEC(degree)')
 plt.savefig('Q4.png')
+plt.show()
 plt.hold(False)
 
 ############################# Q5 ##############################
