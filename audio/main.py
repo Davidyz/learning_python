@@ -28,6 +28,9 @@ def generate_song_list(rootdir):
                 l += list(os.path.join(i, j) for j in os.listdir(i) if (is_music(os.path.join(i, j)) or os.path.isdir(os.path.join(i, j))))
                 l.remove(i)
                 complete = False
+    for i in l:
+        if not is_music(i):
+            l.remove(i)
     return l
 
 for i in generate_song_list(music_rootdir):
