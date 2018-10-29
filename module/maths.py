@@ -201,17 +201,19 @@ def differentiate(f, x, accu = 3):
     step = 10 ** (-accu)
     return (f(x + step) - f(x)) / step
 
-def newton_method(function, x=1):
+def newton_method(f, x=1, derivative = differentiate):
     """
     Find one of the roots of equation f using Newton's method.
     f is the function of the equation.
     Correct to the 8th decimal place.
     Return False if can't find a root around the given value of x.
     """
-    f = lambda x : eval(function)
     y = f(x)
     while abs(y) >= 10 ** (-14):
-        m = differentiate(f, x)
+        if derivative.__name__ == 'differentiate':
+            m = derivative(f, x)
+        else:
+            m = derivative(x)
         x = float(x) - y / m
         y1 = y
         y = f(x)
@@ -223,7 +225,7 @@ def newton_method(function, x=1):
 
 def mean(array):
     """
-    Calculate an estimated mean from mid-class values and thei frequencies.
+    Calculate an estimated mean from mid-class values and their frequencies.
     Input file should be an array containing sub arrays, and each subarray should have the value as the first item and its frequency as the second.
     """
     tx = 0
