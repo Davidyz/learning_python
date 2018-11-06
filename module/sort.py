@@ -1,8 +1,21 @@
 #!/usr/bin/python3
 """
-A custom module containing some sorting algorithms.
+A custom module containing some list related algorithms.
 Recursion is widely used.
 """
+def binary_search(array, item):
+    start = 0
+    end = len(array) - 1
+    while start < end:
+        pivot = (end + start) // 2
+        if array[pivot] == item:
+            return pivot
+        elif array[pivot] > item:
+            end = pivot
+        elif array[pivot] < item:
+            start = pivot + 1
+    return -1
+
 # Codes for quick sort
 def quicksort(array):
     if len(array) < 2:
@@ -39,13 +52,32 @@ def bubblesort(array):
     return bubblesort(array[:-1]) + [array[-1]]
 
 # Codes for insertion sort,
+def binary_insert(array, item):
+    start = 0
+    end = len(array) - 1
+    pivot = end // 2
+    
+    while start < end:
+        pivot = (end + start) // 2
+        if array[pivot] == item:
+            return pivot
+        elif array[pivot] > item:
+            end = pivot
+        elif array[pivot] < item:
+            start = pivot + 1
+    
+    return pivot
+
 def insertionsort(array, index = 1):
-    for i in range(1, len(array)):
+    for i in range(0, len(array)):
         key = array.pop(i)
-        j = i
+        '''
         while j > 0 and array[j - 1] > key:
             j -= 1
-        array.insert(j, key)
+        '''
+        
+        array.insert(binary_insert(array[:i], key), key)
+    print(array)
     return array
 
 # Codes for merge sort.
@@ -102,4 +134,4 @@ if __name__ == '__main__':
     random.shuffle(l)
     print(l)
     print('=' * 50)
-    print(heapsort(l))
+    print(insertionsort(l))

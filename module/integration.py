@@ -1,5 +1,9 @@
 #!/usr/bin/python3
 from math import *
+"""
+A set of functions for numerical integration, giving the results as float.
+You should always specify the number of intervals though it is unnecessary, because a fixed number of strips won't work efficiently. Eg, when the range is big, the number of strips should be increased as well, and vice versa (for less time and resource consumption).
+"""
 
 def xcor(n, start_point, r, num):
     """
@@ -46,7 +50,6 @@ def trapezium(f, start_point, end_point, num=10000):
     r = end_point - start_point
     total_area = 0
     width = r / num   # the width of trapezoidal.
-    
 
     ycor = y(f, num, start_point, width)       
     
@@ -57,5 +60,8 @@ def trapezium(f, start_point, end_point, num=10000):
     return total_area
 
 def simpson(f, start_point, end_point, num=10000):
+    """
+    Using simpson's rule to integrate.
+    """
     if num % 2 == 0:
         return (2 * mid_point(f, start_point, end_point, num / 2) + trapezium(f, start_point, end_point, num / 2)) / 3

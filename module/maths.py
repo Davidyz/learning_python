@@ -108,32 +108,6 @@ def binomial(n, p, start, end = None):
         end -= 1
     return round(result, 10)
 
-'''
-def integral(f, start, end):
-    """
-    Using trapezoidal rule of integration to find the total area under a curve.
-    """
-    total_area = 0
-    r = end - start
-    num = int(r * 10000)
-    width = r / num   # the width of trapezoidal.
-    def y(n):
-        """
-        Return the list of y-cordinates.
-        """
-        result = []
-        for i in range(n + 1):
-            result.append(f(start + i * width))
-        
-        return result
-    
-    ycor = y(num)       
-    for i in range(0, len(y(num)) - 1):
-        a = (ycor[i] + ycor[i + 1]) * width / 2
-        total_area += a
-    return total_area
-'''
-
 def normal(mean, var, start = None, end = None):
     from math import pi, e
     sd = var ** 0.5
@@ -206,6 +180,7 @@ def newton_method(f, x=1, derivative = differentiate):
     Find one of the roots of equation f using Newton's method.
     f is the function of the equation.
     Correct to the 8th decimal place.
+    It is preferred to specify the derivative of f(x) as d(x). If not, a numerical method (differentiate(x)) will be used. It should work, but the result may be of low accuracy.
     Return False if can't find a root around the given value of x.
     """
     y = f(x)
