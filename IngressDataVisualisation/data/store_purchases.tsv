@@ -1,0 +1,4 @@
+Time	Transaction Type	Item	New CMU balance	Transaction Description
+2017-11-15 14:24:17	PURCHASE ITEM	YEAR 5 BUNDLE	100	Description: Limited Edition: One key locker, Quantity (total items): 1, Cost: 0CMU
+2017-02-25 00:16:16	PURCHASE ITEM	KEY LOCKER PACK	100	Description: Pack of 5 Key Lockers, Quantity (total items): 1, Cost: 14900CMU
+2017-02-25 00:16:02	PURCHASE CMU	ingress.cmu.large	15000	Purchased soft currency 15000. quanity of items 1, currency JPY, price 1200.000000, orderId GPA.3356-0804-3478-20917
