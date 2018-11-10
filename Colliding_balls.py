@@ -107,13 +107,12 @@ def checkboundary(ball):
 def check_ball_collision(ball1, ball2):
     '''
     Check the collision between two balls.
-    If there is a collision, move the two balls to corresponding directions according to physical laws.
+    If there is a collision, move the two balls to corresponding directions.
+    The motion is not realistic. Still working on it.
     '''
     #global balls
     dx = (ball2.new_coordinates[0] - ball1.new_coordinates[0])
     dy = (ball2.new_coordinates[1] - ball1.new_coordinates[1])
-    #dx = (ball2.xcor() - ball1.xcor())
-    #dy = (ball2.ycor() - ball1.ycor())
     distance = math.sqrt(dx**2 + dy**2)
     R = ball1.radius + ball2.radius ###
     u1x = ball1.velocity[0]
@@ -123,8 +122,8 @@ def check_ball_collision(ball1, ball2):
 
     if distance <= R:
         ball1.SPEED, ball2.SPEED = ball2.SPEED, ball1.SPEED
-        ball1.velocity = [u2x, u2y]
-        ball2.velocity = [u1x, u1y]
+        ball1.velocity = [(2 * ball2.mass * u2x + u1x * (ball1.mass - ball2.mass)) / (ball1.mass + ball2.mass), (2 * ball2.mass * u2y + u1y * (ball1.mass - ball2.mass)) / (ball1.mass + ball2.mass)]
+        ball2.velocity = [(2 * ball1.mass * u1x + u2x * (ball2.mass - ball1.mass)) / (ball1.mass + ball2.mass), (2 * ball1.mass * u1y + u2y * (ball2.mass - ball1.mass)) / (ball1.mass + ball2.mass)]
         ball1.calculate_new_coordinates()
         ball2.calculate_new_coordinates()
 
