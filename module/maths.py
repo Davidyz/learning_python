@@ -9,6 +9,11 @@ except Exception:
     sys.path.append('module/')
     import integration
 
+import math
+
+pi = math.pi
+e = math.e
+
 def factorial(n):
     """
     Return n!.
@@ -221,3 +226,21 @@ def sd(array):
         tx2f += (i[0] ** 2) * i[1]
         tf += i[1]
     return (tx2f / tf - mean(array) ** 2) ** 0.5
+
+def arg(z):
+    """
+    Return the argument of a complex number.
+    """
+    angle = math.atan(float(z.imag) / z.real)
+    if z.imag >= 0 and z.real < 0:
+        angle += pi
+
+    elif z.imag < 0 and z.real < 0:
+        angle -= pi
+    return angle
+
+def modulus(z):
+    """
+    Return the modulus of a complex number.
+    """
+    return math.sqrt(pow(z.imag,2) + pow(z.real,2))
