@@ -34,5 +34,6 @@ def generate_song_list(rootdir):
     return l
 
 for i in generate_song_list(music_rootdir):
-    print(i)
-    Music(i).set_tag()
+    song = Music(i)
+    print(song.info())
+    song.set_tag()

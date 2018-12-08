@@ -30,6 +30,7 @@ class Music():
         If strict_mod is True, the artist and album of the songs will be wiped if the song is not in a directory specifying these infomation.
         '''
         self.__lossless =  path.split('.')[-1] in lossless
+        self.__strict_mod = strict_mod
 
         if is_music(path):
             self.__path = path.split('/')
@@ -41,24 +42,26 @@ class Music():
 
             if len(self.__info) >= 2:
                 self.artist = '''"{}"'''.format(self.__info[0])
-            elif strict_mod and len(self.__info) < 2:
+            elif len(self.__info) < 2:
                 self.artist = '''""'''
         
             if len(self.__info) == 3:
                 self.album = '''"{}"'''.format(self.__info[1])
-            elif strict_mod and len(self.__info) < 3:
+            elif len(self.__info) < 3:
                 self.album = '''""'''
 
         else:
             raise InputError('\nInvalid path: {}.\nIt is a directory or is not a recognised music file.'.format(path))
 
     def set_tag(self):
-        try:
+        if self.__strict_mod == True or len(self.artist) > 2:
             self.command += ' --artist={}'.format(self.artist)
+        if self.__strict_mod == True or len(self.album) > 2:
             self.command += ' --album={}'.format(self.album)
-        except AttributeError:
-            pass
         os.system(self.command)
 
     def is_lossless(self):
         return self.__lossless
+
+    def info(self):
+        return self.__info
