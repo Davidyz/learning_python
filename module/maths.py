@@ -2,6 +2,7 @@
 This is a custom module of functions that is created in order to practice algorithm and solve mathematics and statistics problems.
 Currently support python3 only.
 """
+from __future__ import division
 try:
     from module import integration
 except Exception:
@@ -9,7 +10,7 @@ except Exception:
     sys.path.append('module/')
     import integration
 
-import math
+import math, cmath
 
 pi = math.pi
 e = math.e
@@ -180,7 +181,7 @@ def differentiate(f, x, accu = 3):
     step = 10 ** (-accu)
     return (f(x + step) - f(x)) / step
 
-def newton_method(f, x=1, derivative = differentiate):
+def newton_method(f, derivative = differentiate, x = 1):
     """
     Find one of the roots of equation f using Newton's method.
     f is the function of the equation.
@@ -194,14 +195,14 @@ def newton_method(f, x=1, derivative = differentiate):
             m = derivative(f, x)
         else:
             m = derivative(x)
-        x = float(x) - y / m
+        x = x - y / m
         y1 = y
         y = f(x)
         if m == 0 and y > 10 ** (-14):
             return False
         if abs(y - y1) <= 10 ** (-14):
             break
-    return round(x, 8)
+    return x
 
 def mean(array):
     """
@@ -244,3 +245,6 @@ def modulus(z):
     Return the modulus of a complex number.
     """
     return math.sqrt(pow(z.imag,2) + pow(z.real,2))
+
+if __name__ == '__main__':
+    pass
