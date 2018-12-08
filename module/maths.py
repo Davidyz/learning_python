@@ -14,6 +14,8 @@ import math, cmath
 
 pi = math.pi
 e = math.e
+cos = math.cos
+sin = math.sin
 
 def factorial(n):
     """
@@ -24,37 +26,29 @@ def factorial(n):
     elif n > 1:
         return n * factorial(n - 1)
 
-def prime(n):
-    if n == 2:
-        return True
+def isprime(n):
+    if isinstance(n, int) or isinstance(n, float):
+        if n - int(n) != 0 or n <= 1:
+            return -1
+
+        if n == 2:
+            return True
     
-    elif n % 2 == 0:
-        return False
+        elif n % 2 == 0:
+            return False
 
-    elif n % 2 != 0:
-        factor = 3
-        while True:
-            if factor <= int(n ** 0.5 + 1):
-                if n % factor == 0:
-                    return False
-            else:
-                break
-            factor += 2
-    return True
-
-def prime_r(n, factor=3):
-    """
-    Determine whether a number is prime or not.
-    """
-    if n == 2:
+        elif n % 2 != 0:
+            factor = 3
+            while True:
+                if factor <= math.sqrt(n) + 1:
+                    if n % factor == 0:
+                        return False
+                else:
+                    break
+                factor += 2
         return True
-    if n % 2 == 0:
-        return False
-    if n % factor == 0:
-        return False
-    if factor < n ** 0.5 and n % factor != 0:    
-        return prime(n, factor + 2)
-    return True
+    else:
+        return -1
 
 def choose(n, r):
     """
@@ -190,17 +184,18 @@ def newton_method(f, derivative = differentiate, x = 1):
     Return False if can't find a root around the given value of x.
     """
     y = f(x)
-    while abs(y) >= 10 ** (-14):
-        if derivative.__name__ == 'differentiate':
-            m = derivative(f, x)
-        else:
-            m = derivative(x)
+    if derivative.__name__ == 'differentiate':
+        m = derivative(f, x)
+    else:
+        m = derivative(x)
+    
+    while abs(y) >= pow(10, -14):
         x = x - y / m
         y1 = y
         y = f(x)
-        if m == 0 and y > 10 ** (-14):
+        if m < pow(10, -14) and y > pow(10,0):
             return False
-        if abs(y - y1) <= 10 ** (-14):
+        if abs(y - y1) <= pow(10, -14):
             break
     return x
 
@@ -232,6 +227,13 @@ def arg(z):
     """
     Return the argument of a complex number.
     """
+    if z.real == 0:
+        if z.imag > 0:
+            return pi / 2
+        if z.imag < 0:
+            return -pi / 2
+        else:
+            return 0
     angle = math.atan(float(z.imag) / z.real)
     if z.imag >= 0 and z.real < 0:
         angle += pi
@@ -246,5 +248,21 @@ def modulus(z):
     """
     return math.sqrt(pow(z.imag,2) + pow(z.real,2))
 
+def cpow(z, n, polar = False):
+    """
+    Return the nth power of complex number z(Cartesian form by default).
+    """
+    angle = n * arg(z)
+    mod = pow(modulus(z), n)
+    while angle > pi:
+        angle -= 2 * pi
+    while angle <= -pi:
+        angle += 2 * pi
+    if polar == True:
+        return (mod, angle)
+    else:
+        return mod * (cos(angle) + 1j * sin(angle))
+
 if __name__ == '__main__':
-    pass
+    import sys
+    print(newton_method(lambda x:math.cos(x) - x, lambda x:-math.sin(x) - 1, 100))

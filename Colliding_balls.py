@@ -40,7 +40,7 @@ class Ball(turtle.Turtle):
     Methods for momentum are added because I think it might me useful to adjust the directions after the balls have collided.
     '''
     def total_momentum(self):
-        return self.mass * ((self.v_x ** 2 + self.v_y ** 2) ** 0.5)
+        return self.mass * (math.sqrt(self.v_x ** 2 + self.v_y ** 2))
 
     def x_momentum(self):
         return self.mass * self.v_x
@@ -146,10 +146,8 @@ def generating_balls(n):
             vx = random.randint(-5, 5)
             vy = random.randint(-5, 5)
         color = colors[random.randint(0, len(colors) - 1)]
-        name = 'b' + str(len(balls) + 1)
-        name = Ball(color, vx, vy)
-        balls.append(name)
-
+        balls.append(Ball(color, vx, vy))
+        
     while len(starting_posns) < n:
         unique = True
         coordinates = gen_random_start()
@@ -220,7 +218,7 @@ def iterative_checking(ball):
             break
 
 while True:
-    balls = insertsort(balls)
+    insertsort(balls)
 
     for ball in balls:
         ball.calculate_new_coordinates()
