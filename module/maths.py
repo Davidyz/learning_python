@@ -20,11 +20,17 @@ sin = math.sin
 def factorial(n):
     """
     Return n!.
+    Return -1 if input is not valid (not a natural number).
     """
-    if n == 1:
-        return 1
-    elif n > 1:
-        return n * factorial(n - 1)
+    if int(n) != n or n < 1:
+        return -1
+
+    i = 1
+    result = 1
+    while i <= n:
+        result = result * i
+        i += 1
+    return result
 
 def isprime(n):
     if isinstance(n, int) or isinstance(n, float):
@@ -54,6 +60,8 @@ def choose(n, r):
     """
     The formula used in combination.
     """
+    if not (int(r) == r and int(n) == n):
+        return -1
     if r > n:
         return -1
     if n == r:
@@ -118,55 +126,21 @@ def normal(mean, var, start = None, end = None):
         start = mean - 5 * sd
     return round(integration.simpson(f, start, end, 1000000), 5)
 
-def root(n, lower = None, upper = None, deci = 4, power = 2):
-    """
-    Try to find the nth root for n using binary search.
-    Square root by default.
-    Correct to 4 decimal place by default.
-    Return -1 if a negative number is passed.
-    """
-    if n < 0 and power % 2 == 0:
-        return -1
-
-    if lower == None:
-        lower = n
-
-    if upper == None:
-        upper = n
-
-    if abs(lower - upper) <= 1 / (10 ** (deci * 2)):
-        if lower ** power <= n:
-            if upper ** 2 >= n:
-                return (lower + upper) / 2
-
-    if n < 0:
-        return None
-
-    mid = (lower + upper) / 2
-
-    def decimal(x):
-        return len(str(x).split('.')[1])
-
-    def accu(x):
-        if '.' in str(x):
-            return 1 / (10 ** decimal(x))
-        else:
-            return 10 ** (len(str(x)) - 1)
-
-    if upper ** power < n:
-        return root(n, lower, upper + n / 8, deci, power)
-
-    elif lower ** power > n:
-        return root(n, lower - n / 8, upper, deci, power)
-
-    elif abs(mid ** power - n) <= 1 / (10 ** deci):
-        return round(mid, deci)
-
-    elif mid ** power > n:
-        return root(n, lower, mid - accu(mid), deci, power)
-
-    elif mid ** power < n:
-        return root(n, mid + accu(mid), upper, deci, power)
+def root(m, power = 2):
+    '''
+    Try to find the nth(2 by default) root(+ve) for a real number m.
+    '''
+    f = lambda x:x ** power - m
+    df = lambda x:power * (x ** (power - 1))
+    x = 1
+    y0 = 0
+    y1 = f(x)
+    while abs(y1 - y0) > 10 ** (-13):
+        x = x - y1/df(x)
+        y0 = y1
+        y1 = f(x)
+        print(x)
+    return x
 
 def differentiate(f, x, accu = 3):
     """
@@ -222,6 +196,8 @@ def sd(array):
         tx2f += (i[0] ** 2) * i[1]
         tf += i[1]
     return (tx2f / tf - mean(array) ** 2) ** 0.5
+
+# For complex number since here.
 
 def arg(z):
     """
