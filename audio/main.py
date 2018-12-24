@@ -23,7 +23,7 @@ def generate_song_list(rootdir):
             l.remove(i)
     return l
 
-def single():
+def single(strict = False):
     """
     For a single audio file.
     """
@@ -32,7 +32,8 @@ def single():
     if not music.is_music(sys.argv[1]):             # Check the file type before the operation.
         print('This is not a valid music file!')
         exit()
-    song = music.Music(sys.argv[1])
+
+    song = music.Music(sys.argv[1], strict)
     
     if '-artist' in sys.argv:
         try:
@@ -54,6 +55,13 @@ def single():
     print(song.info())
 
 def main():
+    if '-s' in sys.argv:
+        strict = True
+        sys.argv.remove('-s')
+
+    else:
+        strict = False
+
     if len(sys.argv) == 2 and os.path.isdir(sys.argv[1]):
         mode = 1
     elif len(sys.argv) > 2:
@@ -65,12 +73,13 @@ def main():
     if mode == 1:
         song_list = generate_song_list(sys.argv[1])
         for i in song_list:
-            song = music.Music(i)
-            print(song.info())
+            song = music.Music(i, strict)
+            print(song.info(), strict)
             song.set_tag()
-
+        print(strict)
+    
     elif mode == 0:
-        single()
+        single(strict)
 
 if __name__ == '__main__':
     main()

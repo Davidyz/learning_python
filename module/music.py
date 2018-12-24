@@ -38,7 +38,7 @@ class Music():
             self.title = "{}".format(''.join(self.__info[-1].split('.')[:-1]))
             
             self.command = '''tracktag "{path}" --name="{name}"'''.format(path=path,
-                                                                      name=self.title)
+                                                                          name=self.title)
 
             if len(self.__info) >= 2:
                 self.artist = '''"{}"'''.format(self.__info[0])
@@ -54,9 +54,9 @@ class Music():
             raise InputError('\nInvalid path: {}.\nIt is a directory or is not a recognised music file.'.format(path))
 
     def set_tag(self):
-        if self.__strict_mod == True or len(self.artist) > 2:
+        if (self.__strict_mod or len(self.artist) > 2):
             self.command += ' --artist={}'.format(self.artist)
-        if self.__strict_mod == True or len(self.album) > 2:
+        if (self.__strict_mod or len(self.album) > 2):
             self.command += ' --album={}'.format(self.album)
         os.system(self.command)
 
