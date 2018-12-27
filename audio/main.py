@@ -1,5 +1,5 @@
 #coding=utf-8
-import os, sys, music
+import os, sys, music, platform, time
 
 mode = 0 # 0 for single, 1 for batch.
 
@@ -59,7 +59,7 @@ def single(strict = False):
     song.set_tag()
     print(song.info())
 
-def main():
+def linux():
     if '-s' in sys.argv:
         strict = True
         sys.argv.remove('-s')
@@ -85,5 +85,31 @@ def main():
     elif mode == 0:
         single(strict)
 
+def win():
+    strict = bool(int(input('Strrict mod(1) or not(0)? ')))
+    mode = int(input('Single(0) or in batch(1)? '))
+    path = input('Path (please drag from the File Manager): ')
+    
+    if not ((mode in (0, 1)) and (strict in (True, False))):
+        print('Invalid input!')
+        time.sleep(2)
+        exit()
+
+    if mode == 0:
+        song = music.Music(path, strict)
+        song.artist = input('Artist: ')
+        song.album = input('Album: ')
+        song.set_tag()
+
+    elif mode == 1:
+        song_list = generate_song_list(path)
+        for i in song_list:
+            song = music.Music(i, strict)
+            song.set_tag()
+            printf(song.info())
+
 if __name__ == '__main__':
-    main()
+    if platform.system() in ('Linux', 'Darwin'):
+        linux()
+    elif platform.system() == 'Windows':
+        win()

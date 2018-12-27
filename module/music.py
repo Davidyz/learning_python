@@ -33,7 +33,7 @@ class Music():
         self.__strict_mod = strict_mod
 
         if is_music(path):
-            self.__path = path.split('/')
+            self.__path = path.split(os.path.sep)
             self.__info = self.__path[self.__path.index('Music') + 1:]
             self.title = "{}".format(''.join(self.__info[-1].split('.')[:-1]))
             
