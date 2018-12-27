@@ -3,6 +3,11 @@ import os, sys, music
 
 mode = 0 # 0 for single, 1 for batch.
 
+def printf(array):
+    for i in array:
+        print(i, end=' ')
+    print('\n')
+
 def generate_song_list(rootdir):
     """
     For a directory of music files, return the list of song files in the provided directory and all of its subdir.
@@ -74,9 +79,8 @@ def main():
         song_list = generate_song_list(sys.argv[1])
         for i in song_list:
             song = music.Music(i, strict)
-            print(song.info(), strict)
+            printf(song.info())
             song.set_tag()
-        print(strict)
     
     elif mode == 0:
         single(strict)
