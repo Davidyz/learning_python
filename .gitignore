@@ -4,3 +4,6 @@ vim.exe.stackdump
 .vscode
 .gitattributes
 *.bak
+test.py
+build/
+dist/
