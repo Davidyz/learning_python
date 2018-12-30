@@ -3,9 +3,9 @@ import os, sys, music, platform, time
 
 mode = 0 # 0 for single, 1 for batch.
 
-def printf(array):
-    for i in array:
-        print(i, end=' ')
+def printf(hashtable):
+    for i in hashtable:
+        print(i, hashtable[i], end=' ')
     print('\n')
 
 def generate_song_list(rootdir):
@@ -42,7 +42,7 @@ def single(strict = False):
     
     if '-artist' in sys.argv:
         try:
-            song.artist = sys.argv[sys.argv.index('-artist') + 1]
+            song.info['artist'] = sys.argv[sys.argv.index('-artist') + 1]
         except IndexError:
             print('Missing Argument(s)!')
     else:
@@ -50,7 +50,7 @@ def single(strict = False):
 
     if '-album' in sys.argv:
         try:
-            song.album = sys.argv[sys.argv.index('-album') + 1]
+            song.info['album'] = sys.argv[sys.argv.index('-album') + 1]
         except IndexError:
             print('Missing argument(s)!')
     else:
@@ -79,7 +79,7 @@ def linux():
         song_list = generate_song_list(sys.argv[1])
         for i in song_list:
             song = music.Music(i, strict)
-            printf(song.info())
+            printf(song.info)
             song.set_tag()
     
     elif mode == 0:
@@ -97,8 +97,8 @@ def win():
 
     if mode == 0:
         song = music.Music(path, strict)
-        song.artist = input('Artist: ')
-        song.album = input('Album: ')
+        song.info['artist'] = input('Artist: ')
+        song.info['album'] = input('Album: ')
         song.set_tag()
 
     elif mode == 1:
