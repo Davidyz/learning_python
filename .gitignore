@@ -1,4 +1,4 @@
-
+*.flac
 vim.exe.stackdump
 *.pyc
 .vscode
