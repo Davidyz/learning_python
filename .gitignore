@@ -1,6 +1,8 @@
-
+*.flac
 vim.exe.stackdump
 *.pyc
 .vscode
 .gitattributes
 *.bak
+dist
+build
