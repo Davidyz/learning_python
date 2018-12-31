@@ -71,13 +71,12 @@ def binary_insert(array, item):
 def insertionsort(array, index = 1):
     for i in range(0, len(array)):
         key = array.pop(i)
-        '''
-        while j > 0 and array[j - 1] > key:
-            j -= 1
-        '''
+        for j in range(i - 1, -1, -1):
+            if key > array[j]:
+                array.insert(key, j + 1)
+            elif j == 0:
+                array.insert(key, 0)
         
-        array.insert(binary_insert(array[:i], key), key)
-    print(array)
     return array
 
 # Codes for merge sort.
