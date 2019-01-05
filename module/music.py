@@ -3,10 +3,11 @@
 This is a personal module for music tagging (currently support ID3 tags only because it use 'audiotools', which support ID3 only, under *nix environment). Hopefully new functions can be added.
 '''
 
-import os, ffmpy
+import os, mutagen mutagen.flac
 
 lossless = ['ape', 'wav', 'flac', 'dsd', 'dsf', 'dff']
 skip_tagging = ['dsd', 'dsf', 'dff']
+
 def is_music(name):
     return name.split('.')[-1] in ['mp3', 'aac', 'm4a', 'flac', 'ape', 'wav', 'dsd', 'dsf', 'dff'] and os.path.isfile(name)
 
@@ -18,6 +19,9 @@ def all_music(array):
 
 class InputError(Exception):
     pass
+
+class FormatError(InputError):
+    print('Please convert the source file to .flac format!')
 
 class Music():
     '''
@@ -70,29 +74,13 @@ class Music():
             raise InputError('\nInvalid path: {}.\nIt is a directory or is not a recognised music file.'.format(path))
 
     def set_tag(self):
-        '''
-        if (self.__strict_mod or len(self.artist) > 2):
-            self.command += ' --artist={}'.format(self.artist)
-        if (self.__strict_mod or len(self.album) > 2):
-            self.command += ' --album={}'.format(self.album)
-        os.system(self.command)
-        '''
-        if self.form in skip_tagging:
-            return
-
-        command = []
-        for i in self.info:
-            command.append('-metadata')
-            command.append("{block}={detail}".format(block=i, detail=self.info[i]))
-        
-        inputs = {os.path.sep.join(self.__path):None}
-        outputs = {os.path.sep.join(self.__path[:-1] + ['temp.' + self.form]):['-y', '-q', '0'] + command}
-        try:
-            inputs[self.album_art] = None
-        
-        ffmpy.FFmpeg(inputs=inputs, outputs=outputs).run()
-
-        os.system('mv {} {}'.format('"' + os.path.sep.join(self.__path[:-1] + ['temp.' + self.form]) + '"', '"' + os.path.sep.join(self.__path) + '"'))
+        if self.form == 'flac':
+            song = mutagen.flac.FLAC(os.path.join(self.__path))
+            for i in self.info:
+                song[i] = self.info[i]
+            song.save()
+       else:
+           raise FormatError('Unsupported format!')
 
     def is_lossless(self):
         return self.__lossless
@@ -101,4 +89,4 @@ class Music():
         return self.__info
 
     def path(self):
-        return self.__path
+        return os.path,join(self.__path)
