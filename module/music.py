@@ -87,7 +87,6 @@ class Music():
 
         else:
             pass
-            #raise FormatError('Unsupported format!')
 
     def is_lossless(self):
         return self.__lossless
