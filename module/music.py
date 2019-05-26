@@ -4,6 +4,7 @@ This is a personal module for music tagging (currently support ID3 tags only bec
 '''
 
 import os, mutagen, mutagen.flac
+from mutagen.easyid3 import EasyID3
 
 lossless = ['ape', 'wav', 'flac', 'dsd', 'dsf', 'dff']
 skip_tagging = ['dsd', 'dsf', 'dff']
@@ -19,9 +20,6 @@ def all_music(array):
 
 class InputError(Exception):
     pass
-
-class FormatError(InputError):
-    print('Please convert the source file to .flac format!')
 
 class Music():
     '''
@@ -42,29 +40,13 @@ class Music():
             self.__path = path.split(os.path.sep)
             self.__rawinfo = self.__path[self.__path.index('Music') + 1:]
             
-            """
-            self.title = "{}".format(''.join(self.__info[-1].split('.')[:-1]))
-            
-            #self.command = '''tracktag "{path}" --name="{name}"'''.format(path=path,
-            #                                                              name=self.title)
-
-            if len(self.__info) >= 2:
-                self.artist = '''"{}"'''.format(self.__info[0])
-            elif len(self.__info) < 2:
-                self.artist = '''""'''
-        
-            if len(self.__info) == 3:
-                self.album = '''"{}"'''.format(self.__info[1])
-            elif len(self.__info) < 3:
-                self.album = '''""'''
-            """
             self.info = {'title':''.join(self.__rawinfo[-1].split('.')[:-1])}
             if len(self.__rawinfo) >= 2:
                 self.info['artist'] = self.__rawinfo[0]
             if len(self.__rawinfo) >= 3:
                 self.info['album'] = self.__rawinfo[1]
             
-            if strict_mod:
+            if self.__strict_mod:
                 for i in ['artist', 'album']:
                     if not (i in self.info):
                         self.info[i] = ""
@@ -84,6 +66,21 @@ class Music():
             except mutagen.flac.FLACNoHeaderError:
                 print('Unsupported file!')
                 self.unsupported = True
+        
+        elif self.form == 'mp3':
+            if self.__strict_mod == True:
+                EasyID3(os.path.sep.join(self.__path)).delete()
+
+            try:
+                tag = EasyID3(os.path.sep.join(self.__path))
+
+            except Exception:
+                tag = mutagen.File(os.path.sep.join(self.__path), easy=True)
+                tag.add_tags()
+            
+            for i in self.info:
+                tag[i] = self.info[i]
+            tag.save(v2_version=3)
 
         else:
             pass
