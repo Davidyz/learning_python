@@ -92,4 +92,12 @@ class Music():
         return self.__info
 
     def path(self):
-        return os.path,join(self.__path)
+        return os.path.join(self.__path)
+
+def format(song):
+    if song.split('.')[-1] in ('wav', 'ape'):
+        new_path = '.'.join(song.split('.')[:-1] + ['flac'])
+        os.system('ffmpeg -i {} -q 0 {}'.format(song, new_path))
+        os.system('rm ' + song)
+    else:
+        pass
