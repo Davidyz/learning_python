@@ -69,15 +69,14 @@ def binary_insert(array, item):
     return pivot
 
 def insertionsort(array, index = 1):
-    for i in range(0, len(array)):
-        key = array.pop(i)
+    for i in range(1, len(array)):
+        key = array[i]
         for j in range(i - 1, -1, -1):
-            if key > array[j]:
-                array.insert(key, j + 1)
-            elif j == 0:
-                array.insert(key, 0)
-        
+            if array[i] >= array[j]:
+                array[i], array[j + 1] = array[j + 1], array[i]
+        print(array)
     return array
+
 
 # Codes for merge sort.
 def merge(a, b):
@@ -125,6 +124,14 @@ def reversed(array):
     for i in array:
         result.insert(0, i)
     return result
+
+def clear_item(array, item):
+    '''
+    Clear however many of an item from the array.
+    '''
+    for i in range(array.count(item)):
+        array.remove(item)
+    return array
 
 if __name__ == '__main__':
     # for function tests.
