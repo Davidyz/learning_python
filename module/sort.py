@@ -3,6 +3,9 @@
 A custom module containing some list related algorithms.
 Recursion is widely used.
 """
+from math import ceil
+import Heap
+
 def binary_search(array, item):
     start = 0
     end = len(array) - 1
@@ -100,25 +103,14 @@ def mergesort(array):
     middle = int(len(array) / 2)
     return merge(mergesort(array[:middle]), mergesort(array[middle:]))
 
-# Codes for heap sort.
-def maxify(heap):
-    if len(heap) == 1:
-        return heap
-
-    for i in range(len(heap) - 1, -1, -1):
-        if heap[i // 2] < heap[i]:
-            heap[i // 2], heap[i] = heap[i], heap[i // 2]
-   
-    return [heap[0]] + maxify(heap[1:])
+# Codes for heap sort. Not in working order yet.
 
 def heapsort(array):
-    if len(array) <= 1:
+    if len(array) < 2:
         return array
-    
-    for i in range(len(array) - 1, 0, -1):
-        parent = int((i - 1) / 2.0)
-        if array[i] > array[parent]:
-            array[i], array[parent] = array[parent], array[i]
+
+    index = len(array) - 1
+    array = Heap.max_heap(array)
 
     return heapsort(array[1:]) + [array[0]]
 
@@ -143,8 +135,10 @@ def clear_item(array, item):
 if __name__ == '__main__':
     # for function tests.
     import random
-    l = list(x for x in range(10))
-    random.shuffle(l)
-    print(l)
-    print('=' * 50)
-    print(insertionsort(l))
+    array = list(i for i in range(900))
+    random.shuffle(array)
+    print(array)
+    print('=' * 100)
+    array = heapsort(array)
+    print(array)
+    print(is_sorted(array))

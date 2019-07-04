@@ -6,3 +6,4 @@ vim.exe.stackdump
 *.bak
 dist
 build
+.Rhistory
