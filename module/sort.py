@@ -101,6 +101,16 @@ def mergesort(array):
     return merge(mergesort(array[:middle]), mergesort(array[middle:]))
 
 # Codes for heap sort.
+def maxify(heap):
+    if len(heap) == 1:
+        return heap
+
+    for i in range(len(heap) - 1, -1, -1):
+        if heap[i // 2] < heap[i]:
+            heap[i // 2], heap[i] = heap[i], heap[i // 2]
+   
+    return [heap[0]] + maxify(heap[1:])
+
 def heapsort(array):
     if len(array) <= 1:
         return array
@@ -120,10 +130,7 @@ def is_sorted(array):
     return True
 
 def reversed(array):
-    result = []
-    for i in array:
-        result.insert(0, i)
-    return result
+    return list(array[i] for i in range(len(array) - 1, -1, -1))
 
 def clear_item(array, item):
     '''
