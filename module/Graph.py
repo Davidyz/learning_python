@@ -1,4 +1,5 @@
 from math import inf
+import Array
 
 class Node():
     def __init__(self, adj=None, t_d=0, t_f=0, value = None):
@@ -44,11 +45,19 @@ class Node():
         self.status = 'done'
         return time
 
-    def dump(self):
-        if self.predecessor != None:
-            result = (self.t_discover, self.t_finish, self.predecessor.key)
-        else:
-            result = (self.t_discover, self.t_finish, None)
+    def dump(self, info):
+        if info == 'distance':
+            if self.predecessor != None:
+                result = (self.distance, self.predecessor.key)
+            else:
+                result = (self.distance, None)
+
+        if info == 'time':
+            if self.predecessor != None:
+                result = (self.t_discover, self.t_finish, self.predecessor.key)
+            else:
+                result = (self.t_discover, self.t_finish, None)
+
         print(result)
         return result
 
@@ -66,7 +75,20 @@ def DFS(graph, start):
             time = i.explore(time)
 
 def BFS(graph, start):
-    
+    if start != 0:
+        graph[start], graph[0] = graph[0], graph[start]
+
+    graph[0].distance = 0
+    queue = []
+    queue.append(graph[0])
+
+    while queue:
+        u = queue.pop(0)
+        for i in u.adjacency():
+            if i.distance == inf:
+                i.distance = u.distance + 1
+                i.predecessor = u
+                queue.append(i)
 
 if __name__ == '__main__':
     Graph = []
@@ -85,4 +107,4 @@ if __name__ == '__main__':
     DFS(Graph, 0)
     for i in Graph:
         print(i.key, end=' ')
-        i.dump()
+        i.dump('time')
