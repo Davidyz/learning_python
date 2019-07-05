@@ -1,23 +1,28 @@
+from math import inf
+
 class Node():
-    def __init__(self, adj=None, t_d=0, t_f=0):
+    def __init__(self, adj=None, t_d=0, t_f=0, value = None):
         self._adj = adj
-        self._pre = None
+        self.predecessor = None
         self.t_discover = t_d
         self.t_finish = t_f
-        self._status  = ''  # 'undiscovered', 'exploring' or 'done'
+        self.distance = inf
+        self.status  = ''  # 'undiscovered', 'exploring' or 'done'
+        self.key = value
     
+    '''
     def status(self, status=None):
         if status == None:
             return self._status
         elif status == str:
-            self._status = status
+            self.status = status
 
     def predecessor (self, node=None):
         if node == Node:
-            self._pre = node
+            self.pre = node
         elif node == None:
-            return self._pre
-
+            return self.pre
+    '''
     def adjacency(self, adj=None):
         if adj == None:
             return self._adj
@@ -27,19 +32,23 @@ class Node():
     def explore(self, time):
         time += 1
         self.t_discover = time
-        self._status = 'exploring'
+        self.status = 'exploring'
 
-        for i in adj:
-            if i.status() == 'undiscovered':
-                i.add_predecessor(self)
-                i.explore(time)
+        for i in self._adj:
+            if i.status == 'undiscovered':
+                i.predecessor = self
+                time = i.explore(time)
         
         time += 1
         self.t_finish = time
-        self._status = 'done'
+        self.status = 'done'
+        return time
 
     def dump(self):
-        result = (self.t_discover, self.t_finish, self._pre)
+        if self.predecessor != None:
+            result = (self.t_discover, self.t_finish, self.predecessor.key)
+        else:
+            result = (self.t_discover, self.t_finish, None)
         print(result)
         return result
 
@@ -48,19 +57,23 @@ def DFS(graph, start):
         graph[start], graph[0] = graph[0], graph[start]
 
     for i in graph:
-        i.status('undiscovered')
+        i.status = 'undiscovered'
+        i.adjacency(None)
 
     time = 0
     for i in graph:
-        if i.status() == 'undiscovered':
-            i.explore(time)
+        if i.status == 'undiscovered':
+            time = i.explore(time)
+
+def BFS(graph, start):
+    
 
 if __name__ == '__main__':
     Graph = []
     for i in range(8):
-        Graph.append(Node())
+        Graph.append(Node(value = i))
     
-    Graph[0].adjacency([Graph[1], Graph[2], Graph[3]]) #a
+    Graph[0].adjacency([Graph[1], Graph[3], Graph[4]]) #a
     Graph[1].adjacency([Graph[2], Graph[3]]) #b
     Graph[2].adjacency([Graph[0]]) #c
     Graph[3].adjacency([Graph[2]]) #d
@@ -71,4 +84,5 @@ if __name__ == '__main__':
 
     DFS(Graph, 0)
     for i in Graph:
+        print(i.key, end=' ')
         i.dump()
