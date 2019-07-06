@@ -1,4 +1,4 @@
-import Array, numpy, copy
+import Array, numpy, copy, turtle, time
 index = [0, 0]
 
 def _is_complete(sudoku):
@@ -109,6 +109,52 @@ def first_empty(sudoku):
 
     return index
 
+def draw(sudoku):
+    window = turtle.Screen()
+    drawer = turtle.Turtle()
+    window.tracer(0, 0)
+    drawer.penup()
+    drawer.speed(0)
+    drawer.pensize(5)
+    drawer.goto(-180, 180)
+    drawer.setheading(0)
+    drawer.pendown()
+    drawer.hideturtle()
+
+    for i in range(4):
+        drawer.forward(360)
+        drawer.right(90)
+    
+    for i in range(1, 9):
+        drawer.penup()
+        drawer.goto(-180, 180 - i * 40)
+        drawer.setheading(0)
+        if i % 3 == 0:
+            drawer.pensize(3)
+        else:
+            drawer.pensize(1)
+        drawer.pendown()
+        drawer.forward(360)
+        drawer.penup()
+    
+        drawer.goto(-180 + i * 40, 180)
+        drawer.setheading(270)
+        drawer.pendown()
+        if i % 3 == 0:
+            drawer.pensize(3)
+        else:
+            drawer.pensize(1)
+        drawer.pendown()
+        drawer.forward(360)
+        drawer.penup()
+    
+    drawer.setheading(0)
+    for i in range(9):
+        drawer.goto(-165, 150 - 40 * i)
+        for j in sudoku[i]:
+            drawer.write(str(j).replace('0', ' '), font=('Arial', 15, 'normal'))
+            drawer.forward(40)
+    
 if __name__ == '__main__':
     _sample = [[9,8,0,2,0,0,0,1,0],
                [0,3,6,0,8,1,0,5,0],
@@ -129,10 +175,5 @@ if __name__ == '__main__':
                 [3,4,5,6,7,8,9,1,2],
                 [6,7,8,9,1,2,3,4,5],
                 [9,1,2,3,4,5,6,7,8]]
-    
-    _wrong = _correct
-    _wrong[0][0] = 2
-    
-    pprint(_sample)
-    print('=' * 50)
-    print(first_empty(_correct))
+
+    draw(_correct) 

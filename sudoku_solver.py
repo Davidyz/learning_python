@@ -52,7 +52,7 @@ def DFS_solve(sudoku, stack = []):
 
     while stack:
         candidate = stack.pop()
-        
+
         if Sudoku._is_complete(candidate):
             if Sudoku.check_sudoku(candidate):
                 return candidate
@@ -64,6 +64,7 @@ def DFS_solve(sudoku, stack = []):
             candidate[index[0]][index[1]] = i
             if Sudoku.check_sudoku(candidate):
                 stack.append(copy.deepcopy(candidate))
+    return None
 
 def BFS_solve(sudoku, q = []):
     if q == []:
@@ -83,6 +84,7 @@ def BFS_solve(sudoku, q = []):
             candidate[index[0]][index[1]] = i
             if Sudoku.check_sudoku(candidate):
                 q.append(copy.deepcopy(candidate))
+    return None
     
 if __name__ == '__main__':
     puzzle = enter_sudoku()
@@ -90,6 +92,6 @@ if __name__ == '__main__':
     
     Sudoku.pprint(puzzle)
     start = time.time()
-    Sudoku.pprint(BFS_solve(puzzle))
+    Sudoku.pprint(DFS_solve(puzzle))
     end = time.time()
     print('Solved in {}s.'.format(end - start))
