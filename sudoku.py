@@ -90,7 +90,6 @@ if __name__ == '__main__':
     
     Sudoku.pprint(puzzle)
     start = time.time()
-    Sudoku.pprint(DFS_solve(puzzle))
+    Sudoku.pprint(BFS_solve(puzzle))
     end = time.time()
-    print('Solved in', end - start, 's')
-    print(BFS_solve(puzzle) == DFS_solve(puzzle))
+    print('Solved in {}s.'.format(end - start))
