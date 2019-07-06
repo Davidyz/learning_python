@@ -8,22 +8,9 @@ class Node():
         self.t_discover = t_d
         self.t_finish = t_f
         self.distance = inf
-        self.status  = ''  # 'undiscovered', 'exploring' or 'done'
+        self.status  = 'undiscovered'  # 'undiscovered', 'exploring' or 'done'
         self.key = value
     
-    '''
-    def status(self, status=None):
-        if status == None:
-            return self._status
-        elif status == str:
-            self.status = status
-
-    def predecessor (self, node=None):
-        if node == Node:
-            self.pre = node
-        elif node == None:
-            return self.pre
-    '''
     def adjacency(self, adj=None):
         if adj == None:
             return self._adj

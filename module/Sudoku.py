@@ -47,7 +47,6 @@ def pprint(sudoku):
         print("| {} {} {} | {} {} {} | {} {} {} |".format(*sudoku[i]).replace("0"," "))
         if (i+1) % 3 == 0:
             print("+-------+-------+-------+")
-    print('\n')
 
 def gen_blocks(sudoku):
     '''
