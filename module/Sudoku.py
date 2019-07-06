@@ -103,9 +103,9 @@ def first_empty(sudoku):
     Return the index of the first empty cell in a sudoku.
     '''
     index = [0, 0]
-    while sudoku[index[0]][index[1]] != 0:
-        if index == [8, 8]:
-            return None
+    while index != None:
+        if sudoku[index[0]][index[1]] == 0:
+            return index
         index = add_index(index)
 
     return index
@@ -136,4 +136,4 @@ if __name__ == '__main__':
     
     pprint(_sample)
     print('=' * 50)
-    print(first_non_empty(_wrong))
+    print(first_empty(_correct))
