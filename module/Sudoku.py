@@ -110,6 +110,9 @@ def first_empty(sudoku):
     return index
 
 def draw(sudoku):
+    '''
+    Draw a sudoku puzzle with turtle.
+    '''
     window = turtle.Screen()
     drawer = turtle.Turtle()
     window.tracer(0, 0)
@@ -154,6 +157,18 @@ def draw(sudoku):
         for j in sudoku[i]:
             drawer.write(str(j).replace('0', ' '), font=('Arial', 15, 'normal'))
             drawer.forward(40)
+
+def count_empty(sudoku):
+    '''
+    Return the number of empty cells in a sudoku puzzle.
+    '''
+    counter = 0
+    for i in sudoku:
+        for j in i:
+            if j == 0:
+                counter += 1
+
+    return counter
     
 if __name__ == '__main__':
     _sample = [[9,8,0,2,0,0,0,1,0],

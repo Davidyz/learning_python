@@ -1,5 +1,5 @@
 #!/usr/bin/python3.6
-import Graph, Sudoku, copy
+import Graph, Sudoku, copy, time
 
 _sample = [[9,8,0,2,0,0,0,1,0],
            [0,3,6,0,8,1,0,5,0],
@@ -86,12 +86,16 @@ def BFS_solve(sudoku, q = []):
                 q.append(copy.deepcopy(candidate))
     return None
     
+def timer(function, arg):
+    start = time.time()
+    output = function(arg)
+    end = time.time()
+    return end - start, output
+
 if __name__ == '__main__':
     puzzle = enter_sudoku()
-    import time
     
     Sudoku.pprint(puzzle)
-    start = time.time()
-    Sudoku.pprint(DFS_solve(puzzle))
-    end = time.time()
-    print('Solved in {}s.'.format(end - start))
+    time_spent, solution = timer(DFS_solve, puzzle)
+    Sudoku.pprint(solution)
+    print('Solved in {}s.'.format(time_spent))
