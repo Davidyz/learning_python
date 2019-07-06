@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """
-A custom module containing some list related algorithms.
+A custom module containing some list related algorithms and queues.
 Recursion is widely used.
 """
 from math import ceil
@@ -82,7 +82,7 @@ def insertionsort(array, index = 1):
 
 
 # Codes for merge sort.
-def merge(a, b):
+def _merge(a, b):
     output = []
     while len(a) * len(b) != 0:
         if a[0] < b[0]:
@@ -101,18 +101,23 @@ def mergesort(array):
     if len(array) < 2:
         return array
     middle = int(len(array) / 2)
-    return merge(mergesort(array[:middle]), mergesort(array[middle:]))
+    return _merge(mergesort(array[:middle]), mergesort(array[middle:]))
 
 # Codes for heap sort. Not in working order yet.
 
 def heapsort(array):
     if len(array) < 2:
         return array
-
+    
     index = len(array) - 1
-    array = Heap.max_heap(array)
+    array = Heap.max_heap(array[:index + 1]) + array[index + 1:]
 
-    return heapsort(array[1:]) + [array[0]]
+    while index > 0:
+        array = Heap.max_heap(array[1:index + 1])
+        array.insert(index, array.pop(0))
+        index -= 1
+
+    return array
 
 # General purposed codes for a list.
 def is_sorted(array):
@@ -135,7 +140,7 @@ def clear_item(array, item):
 if __name__ == '__main__':
     # for function tests.
     import random
-    array = list(i for i in range(900))
+    array = list(i for i in range(100))
     random.shuffle(array)
     print(array)
     print('=' * 100)
