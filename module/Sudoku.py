@@ -1,5 +1,5 @@
-import Array, numpy, copy, turtle, time, multiprocessing
-index = [0, 0]
+import Array, copy, turtle, time, multiprocessing
+#index = [0, 0]
 
 def _is_complete(sudoku):
     '''
@@ -47,6 +47,12 @@ def pprint(sudoku):
         print("| {} {} {} | {} {} {} | {} {} {} |".format(*sudoku[i]).replace("0"," "))
         if (i+1) % 3 == 0:
             print("+-------+-------+-------+")
+
+def return_block(index):
+    '''
+    Return the block a cell is in as a tuple (row, column).
+    '''
+    return index[0]//3 * 3 + index[1]//3
 
 def gen_blocks(sudoku):
     '''
@@ -97,17 +103,25 @@ def __enter():
         sudoku.append(list(int(j) for j in char))
     return sudoku
 
-def first_empty(sudoku):
+def first_empty(sudoku, index=None):
     '''
     Return the index of the first empty cell in a sudoku.
     '''
-    index = [0, 0]
-    while index != None:
-        if sudoku[index[0]][index[1]] == 0:
-            return index
+    if index == None:
+        index = [0, 0]
+        while index != None:
+            if sudoku[index[0]][index[1]] == 0:
+                return index
+            index = add_index(index)
+        return index
+    
+    else:
         index = add_index(index)
-
-    return index
+        while index != None:
+            if sudoku[index[0]][index[1]] == 0:
+                return index
+            index = add_index(index)
+        return index
 
 def draw(sudoku):
     '''
@@ -117,7 +131,7 @@ def draw(sudoku):
     drawer = turtle.Turtle()
     window.tracer(0, 0)
     drawer.penup()
-    drawer.speed(0)
+    drawer.speed(1)
     drawer.pensize(5)
     drawer.goto(-180, 180)
     drawer.setheading(0)
@@ -173,6 +187,9 @@ def count_empty(sudoku):
     return counter
     
 def enter_sudoku():
+    '''
+    Enter a single sudoku from the console.
+    '''
     sudoku = []
     
     for i in range(9):
@@ -192,6 +209,10 @@ def enter_sudoku():
     return enter_sudoku()
 
 def DFS_solve(sudoku, visualise=False):
+    '''
+    Use DFS algorithm to solve sudoku.
+    Return the solution.
+    '''
     stack = [sudoku]
 
     while stack:
@@ -213,6 +234,10 @@ def DFS_solve(sudoku, visualise=False):
     return None
 
 def BFS_solve(sudoku, visualise=False):
+    '''
+    Use BFS algorithm to solve Sudoku.
+    Return the solution.
+    '''
     q = [sudoku]
 
     while q:
@@ -233,7 +258,50 @@ def BFS_solve(sudoku, visualise=False):
                     draw(candidate)
     return None
 
+def brutal_solve(sudoku, visualise=False):
+    '''
+    Mimic human's way to solve a sudoku.
+    Return the solution.
+    '''
+    index = first_empty(sudoku)
+    
+    while not (check_sudoku(sudoku) and _is_complete(sudoku)):
+        block = gen_blocks(sudoku)[return_block(index)]
+        num_available = [x for x in range(1, 10)]
+        
+        for i in block:                       # eliminate from blocks
+            if i in num_available:
+                num_available.remove(i)
+        
+        for i in sudoku[index[0]]:            # eliminate from rows
+            if i in num_available:
+                num_available.remove(i)
+
+        list_of_column = [sudoku[x][index[1]] for x in range(9)]
+        for i in list_of_column:
+            if i in num_available:
+                num_available.remove(i)
+        
+        if len(num_available) == 1:
+            sudoku[index[0]][index[1]] = num_available[0]
+            if visualise:
+                draw(sudoku)
+
+
+        if add_index(index) == None:
+            index = first_empty(sudoku)
+        elif first_empty(sudoku, index) != None:
+            index = first_empty(sudoku, index)
+        else:
+            index = first_empty(sudoku)
+    
+    return sudoku
+
 def batch_solve(list_of_sudoku, algo=BFS_solve, visualise=False, cores=max(multiprocessing.cpu_count() // 2, 1), *args):
+    '''
+    Attempt to solve a list of sudoku simutaneously.
+    Return the list of solution in the same order of the input.
+    '''
     if cores > multiprocessing.cpu_count():
         cores = multiprocessing.cpu_count()
         print('Processes exceeded the number of cores you have. Using the total number of cores for the number of processes.')
@@ -243,12 +311,19 @@ def batch_solve(list_of_sudoku, algo=BFS_solve, visualise=False, cores=max(multi
     return result
                     
 def timer(function, *args):
+    '''
+    Measure the running time required for an operation.
+    Output: time, returned value of the operation.
+    '''
     start = time.time()
     output = function(*args)
     end = time.time()
     return end - start, output
 
 def load_sudoku(path='puzzles.txt'):
+    '''
+    Return the arrays stored in a file.
+    '''
     fin = open(path, 'r')
     puzzles = fin.readlines()
     fin.close()
@@ -259,6 +334,9 @@ def load_sudoku(path='puzzles.txt'):
     return puzzles
 
 def dump_sudoku(array, path='puzzles.txt'):
+    '''
+    Write an array into a file.
+    '''
     fin = open(path, 'r')
     legacy = fin.readlines()
     fin.close()
@@ -269,6 +347,10 @@ def dump_sudoku(array, path='puzzles.txt'):
     fin.close()
 
 def ask_for_puzzle():
+    '''
+    Return a list of sudoku entered from console as well as its difficulty.
+    The list can be used for dump_sudoku().
+    '''
     puzzles = []
     stop = False
     finished = {'y':True,
@@ -276,16 +358,34 @@ def ask_for_puzzle():
                 '':True}
 
     while not stop:
-        puzzle = __enter()
-        puzzle.append(input("What's the difficulty of the puzzle: "))
-        puzzles.append(puzzle)
-        stop = bool(finished[input('Have you finished?(Y/n) ').lower()])
-
+        try:
+            puzzle = __enter()
+            puzzle.append(input("What's the difficulty of the puzzle: "))
+            puzzles.append(puzzle)
+            stop = bool(finished[input('Have you finished?(Y/n) ').lower()])
+        except KeyboardInterrupt:
+            stop = True
+            print('\n')
     return puzzles
 
 if __name__ == '__main__':
-    puzzle = __enter()
-    pprint(puzzle)
-    time_spent, result = timer(BFS_solve, puzzle)
-    pprint(result)
+    '''
+    total_time = 0
+    algo = brutal_solve
+
+    for puzzle in [x[0] for x in load_sudoku('puzzles.txt')]:
+        pprint(puzzle)
+        time_spent, result = timer(algo, puzzle, False)
+        pprint(result)
+        total_time += time_spent
+        print('')
+
+    print('Solved in {}s using {}.'.format(total_time, algo.__name__))
+    '''
+    dump_sudoku(ask_for_puzzle())
+    '''
+    time_spent, result = timer(batch_solve, [x[0] for x in load_sudoku('puzzles.txt')], BFS_solve, False, 4)
+    for i in result:
+        pprint(i)
     print('Solved in {}s.'.format(time_spent))
+    '''
