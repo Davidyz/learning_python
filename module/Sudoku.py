@@ -1,4 +1,4 @@
-import Array, numpy, copy, turtle, time
+import Array, numpy, copy, turtle, time, multiprocessing
 index = [0, 0]
 
 def _is_complete(sudoku):
@@ -86,7 +86,7 @@ def check_sudoku(sudoku):
 
     return True
             
-def _enter():
+def __enter():
     '''
     Enter a sudoku from console.
     '''
@@ -157,6 +157,8 @@ def draw(sudoku):
         for j in sudoku[i]:
             drawer.write(str(j).replace('0', ' '), font=('Arial', 15, 'normal'))
             drawer.forward(40)
+    if (not _is_complete(sudoku)) and check_sudoku(sudoku):
+        window.reset()
 
 def count_empty(sudoku):
     '''
@@ -170,25 +172,120 @@ def count_empty(sudoku):
 
     return counter
     
+def enter_sudoku():
+    sudoku = []
+    
+    for i in range(9):
+        char = input("Enter the {}th row (all-together, eg: 123456789): ".format(str(i + 1)))
+        if char == '':
+            return _sample
+        sudoku.append(list(int(j) for j in char))
+    
+    if len(sudoku) == 9:
+        for i in sudoku:
+            if len(i) != 9:
+                print('Wrong Input!')
+                return enter_sudoku()
+        return sudoku
+
+    print('Wrong Input!')
+    return enter_sudoku()
+
+def DFS_solve(sudoku, visualise=False):
+    stack = [sudoku]
+
+    while stack:
+        candidate = stack.pop()
+
+        if _is_complete(candidate):
+            if check_sudoku(candidate):
+                return candidate
+            else:
+                continue
+
+        index = first_empty(candidate)
+        for i in range(1, 10):
+            candidate[index[0]][index[1]] = i
+            if check_sudoku(candidate):
+                stack.append(copy.deepcopy(candidate))
+                if visualise:
+                    draw(candidate)
+    return None
+
+def BFS_solve(sudoku, visualise=False):
+    q = [sudoku]
+
+    while q:
+        candidate = q.pop(0)
+    
+        if _is_complete(candidate):
+            if check_sudoku(candidate):
+                return candidate
+            else:
+                continue
+
+        index = first_empty(candidate)
+        for i in range(1, 10):
+            candidate[index[0]][index[1]] = i
+            if check_sudoku(candidate):
+                q.append(copy.deepcopy(candidate))
+                if visualise:
+                    draw(candidate)
+    return None
+
+def batch_solve(list_of_sudoku, algo=BFS_solve, visualise=False, cores=max(multiprocessing.cpu_count() // 2, 1), *args):
+    if cores > multiprocessing.cpu_count():
+        cores = multiprocessing.cpu_count()
+        print('Processes exceeded the number of cores you have. Using the total number of cores for the number of processes.')
+    
+    pool = multiprocessing.Pool(processes=cores)
+    result = pool.starmap_async(algo, tuple((i, visualise) for i in list_of_sudoku)).get()
+    return result
+                    
+def timer(function, *args):
+    start = time.time()
+    output = function(*args)
+    end = time.time()
+    return end - start, output
+
+def load_sudoku(path='puzzles.txt'):
+    fin = open(path, 'r')
+    puzzles = fin.readlines()
+    fin.close()
+    puzzles = Array.clear_item(puzzles, '\n')
+    for i in range(len(puzzles)):
+        puzzles[i] = eval(puzzles[i])
+        puzzles[i] = (puzzles[i][:9], puzzles[i][9])
+    return puzzles
+
+def dump_sudoku(array, path='puzzles.txt'):
+    fin = open(path, 'r')
+    legacy = fin.readlines()
+    fin.close()
+    fin = open(path, 'w')
+    content = Array.clear_item(legacy + array, '\n')
+    for i in content:
+        fin.write(str(i) + '\n')
+    fin.close()
+
+def ask_for_puzzle():
+    puzzles = []
+    stop = False
+    finished = {'y':True,
+                'n':False,
+                '':True}
+
+    while not stop:
+        puzzle = __enter()
+        puzzle.append(input("What's the difficulty of the puzzle: "))
+        puzzles.append(puzzle)
+        stop = bool(finished[input('Have you finished?(Y/n) ').lower()])
+
+    return puzzles
+
 if __name__ == '__main__':
-    _sample = [[9,8,0,2,0,0,0,1,0],
-               [0,3,6,0,8,1,0,5,0],
-               [1,0,0,0,0,5,0,2,0],
-               [0,0,0,5,0,0,2,0,1],
-               [8,0,0,0,1,0,4,0,0],
-               [0,6,0,0,2,0,9,0,0],
-               [7,4,3,1,5,0,6,0,0],
-               [0,2,0,8,4,0,0,0,7],
-               [0,0,0,7,0,3,0,0,2]]
-
-    _correct = [[1,2,3,4,5,6,7,8,9],
-                [4,5,6,7,8,9,1,2,3],
-                [7,8,9,1,2,3,4,5,6],
-                [2,3,4,5,6,7,8,9,1],
-                [5,6,7,8,9,1,2,3,4],
-                [8,9,1,2,3,4,5,6,7],
-                [3,4,5,6,7,8,9,1,2],
-                [6,7,8,9,1,2,3,4,5],
-                [9,1,2,3,4,5,6,7,8]]
-
-    draw(_correct) 
+    puzzle = __enter()
+    pprint(puzzle)
+    time_spent, result = timer(BFS_solve, puzzle)
+    pprint(result)
+    print('Solved in {}s.'.format(time_spent))
