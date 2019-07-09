@@ -1,5 +1,4 @@
 import Array, copy, turtle, time, multiprocessing
-#index = [0, 0]
 
 def _is_complete(sudoku):
     '''
@@ -128,10 +127,11 @@ def draw(sudoku):
     Draw a sudoku puzzle with turtle.
     '''
     window = turtle.Screen()
+    window.setup(400, 400)
     drawer = turtle.Turtle()
     window.tracer(0, 0)
     drawer.penup()
-    drawer.speed(1)
+    drawer.speed(0)
     drawer.pensize(5)
     drawer.goto(-180, 180)
     drawer.setheading(0)
@@ -258,35 +258,73 @@ def BFS_solve(sudoku, visualise=False):
                     draw(candidate)
     return None
 
-def brutal_solve(sudoku, visualise=False):
+def __column(sudoku, index):
+    '''
+    Return the array of numbers occured in the column.
+    '''
+    return Array.clear_item([sudoku[x][index[1]] for x in range(9)], 0)
+        
+def __row(sudoku, index):
+    '''
+    Return the array of numbers occured in the row.
+    '''
+    return Array.clear_item(sudoku[index[0]], 0)
+
+def __block(sudoku, index):
+    '''
+    Return the array of numbers occured in the block.
+    '''
+    return Array.clear_item(gen_blocks(sudoku)[return_block(index)], 0)
+            
+def brutal_solve(sudoku, visualise=False, parallel=False):
     '''
     Mimic human's way to solve a sudoku.
     Return the solution.
     '''
     index = first_empty(sudoku)
+    func_list = (__row, __column, __block)
+    guessed_index = []
+    modified = True
     
-    while not (check_sudoku(sudoku) and _is_complete(sudoku)):
-        block = gen_blocks(sudoku)[return_block(index)]
-        num_available = [x for x in range(1, 10)]
+    while (not (check_sudoku(sudoku) and _is_complete(sudoku))):
+        if not parallel:
+            block = gen_blocks(sudoku)[return_block(index)]
+            num_available = [x for x in range(1, 10)]
         
-        for i in block:                       # eliminate from blocks
-            if i in num_available:
-                num_available.remove(i)
+            for i in block:                       # eliminate from blocks
+                if i in num_available:
+                    num_available.remove(i)
         
-        for i in sudoku[index[0]]:            # eliminate from rows
-            if i in num_available:
-                num_available.remove(i)
+            for i in sudoku[index[0]]:            # eliminate from rows
+                if i in num_available:
+                    num_available.remove(i)
 
-        list_of_column = [sudoku[x][index[1]] for x in range(9)]
-        for i in list_of_column:
-            if i in num_available:
-                num_available.remove(i)
+            list_of_column = [sudoku[x][index[1]] for x in range(9)]
+            for i in list_of_column:
+                if i in num_available:
+                    num_available.remove(i)
+
+        else:
+            num_available = [i for i in range(1, 10)]
+            pool = multiprocessing.Pool(processes=3)
+            num_occured = []
+            subprocesses = []
+            for i in func_list:
+                subprocesses.append(pool.apply_async(i, args=(sudoku, index)))
+
+            for i in subprocesses:
+                num_occured += i.get()
+            pool.terminate()
+
+            num_occured = set(num_occured)
+            for i in num_occured:
+                if i in num_available:
+                    num_available.remove(i)
         
         if len(num_available) == 1:
             sudoku[index[0]][index[1]] = num_available[0]
             if visualise:
                 draw(sudoku)
-
 
         if add_index(index) == None:
             index = first_empty(sudoku)
@@ -294,18 +332,14 @@ def brutal_solve(sudoku, visualise=False):
             index = first_empty(sudoku, index)
         else:
             index = first_empty(sudoku)
-    
+
     return sudoku
 
-def batch_solve(list_of_sudoku, algo=BFS_solve, visualise=False, cores=max(multiprocessing.cpu_count() // 2, 1), *args):
+def batch_solve(algo, list_of_sudoku, visualise=False, cores=max(multiprocessing.cpu_count() // 2, 1), *args):
     '''
     Attempt to solve a list of sudoku simutaneously.
     Return the list of solution in the same order of the input.
     '''
-    if cores > multiprocessing.cpu_count():
-        cores = multiprocessing.cpu_count()
-        print('Processes exceeded the number of cores you have. Using the total number of cores for the number of processes.')
-    
     pool = multiprocessing.Pool(processes=cores)
     result = pool.starmap_async(algo, tuple((i, visualise) for i in list_of_sudoku)).get()
     return result
