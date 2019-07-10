@@ -5,6 +5,11 @@ except ModuleNotFoundError:
     pass
 
 class Cell():
+    def __doc__(self):
+        '''
+        The Cell object is defined for the individual cells in a sudoku puzzle. self.value stands for the value filled into the cell. If self.value == 0, it is an empty cell. 
+        The __weight attribute is used to determine which cell to start filling.
+        '''
     def __init__(self, index, value=0):
         self.__index = index
         self.value = value
@@ -64,18 +69,31 @@ class Cell():
         return str(self.value)
 
     def is_empty(self):
+        '''
+        Return true if the cell is is_empty. Encapsulated to reduce the amount of effort needed while using.
+        '''
         return self.value == 0
     
     def weight(self, w=None):
+        '''
+        Return or set the weight for a cell.
+        '''
         if w == None:
             return self.__weight
         elif type(w) == int:
             self.__weight = w
 
     def get_index(self):
+        '''
+        Return the index of the cell.
+        '''
         return self.__index
 
 class Board():
+    def __doc__(self):
+        '''
+        A class designed to help solve a sudoku puzzle.
+        '''
     def __init__(self, data = [[0 for i in range(9)] for i in range(9)]):
         self.size = len(data)
 
@@ -90,13 +108,23 @@ class Board():
                 self.cells.append(j)
     
     def set_value(self, index, i):
+        '''
+        Set value i to the cell with given index in the board.
+        '''
         self.__data[index[0]][index[1]].value = i
 
     def sort_cells(self):
+        '''
+        Sort the cells in an increasing order of their weight.
+        '''
         self.cells = Array.mergesort(self.cells)
         return self.cells
 
     def first_empty(self):
+        '''
+        Return the index of the first empty cell in the board.
+        Return None if all of them are filled.
+        '''
         for i in self.__data:
             for j in i:
                 if j.value == 0:
@@ -104,12 +132,18 @@ class Board():
         return None
 
     def is_complete(self):
+        '''
+        Return true if there are no empty cells in the board.
+        '''
         for i in self.cells:
             if i.value == 0:
                 return False
         return True
 
     def gen_block(self):
+        '''
+        Return a list of blocks in which each block is stored as a sub-list.
+        '''
         blocks = [[] for i in range(9)]
         for i in self.cells:
             row, column = i.get_index()
@@ -117,6 +151,9 @@ class Board():
         return blocks
 
     def validate(self):
+        '''
+        Check whether the sudoku is correctly filled, no matter it is fully filled or not.
+        '''
         # check rows:
         for i in self.__data:
             occured = []
@@ -148,9 +185,12 @@ class Board():
         return True
 
     def gen_weight(self):
+        '''
+        Assign the weights for each cell.
+        '''
         for i in self.cells:
             if i.value != 0:
-                i.value = -1
+                i.__weight = -1
                 continue
             index = i.get_index()
             occured = []
@@ -168,9 +208,15 @@ class Board():
             i.weight(len(set(occured)))
 
     def max_weight(self):
+        '''
+        Return the cell with the highest weight.
+        '''
         return sort_cells(self)[-1]
     
     def pprint(self):
+        '''
+        Print the sudoku nicely.
+        '''
         print("+-------+-------+-------+")
         for i in range(9):
             print("| {} {} {} | {} {} {} | {} {} {} |".format(*[str(j.value) for j in self.__data[i]]).replace("0"," "))
