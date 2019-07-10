@@ -1,21 +1,210 @@
-import Array, copy, turtle, time, multiprocessing
+import Array, copy, turtle, time, multiprocessing, math
+try:
+    import pysnooper
+except ModuleNotFoundError:
+    pass
+
+class Cell():
+    def __init__(self, index, value=0):
+        self.__index = index
+        self.value = value
+        if value != 0:
+            self.__weight = -1
+        else:
+            self.__weight = 0
+    
+    def __next__(self):
+        if self.index == [8, 8]:
+            return None
+        elif self.index[1] == 8:
+            return [self.index[0] + 1, 0]
+        else:
+            return [self.index[0], self.index[1] + 1]
+    
+    def __int__(self):
+        return self.value
+    
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return self.__weight == other.weight()
+        else:
+            return self.__weight == other
+
+    def __ne__(self, other):
+        if type(other) == type(self):
+            return self.__weight != other.weight()
+        else:
+            return self.__weight != other
+
+    def __gt__(self, other):
+        if type(other) == type(self):
+            return self.__weight > other.weight()
+        else:
+            return self.__weight > other
+    
+    def __lt__(self, other):
+        if type(other) == type(self):
+            return self.__weight < other.weight()
+        else:
+            return self.__weight < other
+
+    def __ge__(self, other):
+        if type(other) == type(self):
+            return self.__weight >= other.weight()
+        else:
+            return self.__weight >= other
+
+    def __le__(self, other):
+        if type(other) == type(self):
+            return self.__weight <= other.weight()
+        else:
+            return self.__weight <= other
+
+    def __str__(self):
+        return str(self.value)
+
+    def is_empty(self):
+        return self.value == 0
+    
+    def weight(self, w=None):
+        if w == None:
+            return self.__weight
+        elif type(w) == int:
+            self.__weight = w
+
+    def get_index(self):
+        return self.__index
+
+class Board():
+    def __init__(self, data = [[0 for i in range(9)] for i in range(9)]):
+        self.size = len(data)
+
+        for i in range(9):
+            for j in range(9):
+                data[i][j] = Cell([i, j], data[i][j])
+        self.__data = data
+        
+        self.cells = []
+        for i in self.__data:
+            for j in i:
+                self.cells.append(j)
+    
+    def set_value(self, index, i):
+        self.__data[index[0]][index[1]].value = i
+
+    def sort_cells(self):
+        self.cells = Array.mergesort(self.cells)
+        return self.cells
+
+    def first_empty(self):
+        for i in self.__data:
+            for j in i:
+                if j.value == 0:
+                    return j.get_index()
+        return None
+
+    def is_complete(self):
+        for i in self.cells:
+            if i.value == 0:
+                return False
+        return True
+
+    def gen_block(self):
+        blocks = [[] for i in range(9)]
+        for i in self.cells:
+            row, column = i.get_index()
+            blocks[row // 3 * 3 + column // 3].append(i)
+        return blocks
+
+    def validate(self):
+        # check rows:
+        for i in self.__data:
+            occured = []
+            for j in i:
+                if (j.value != 0) and (not (j.value in occured)):
+                    occured.append(j.value)
+                else:
+                    return False
+
+        # check columns:
+        for column in range(9):
+            c = []
+            occured = []
+            for row in range(9):
+                c.append(self.__data[row][column])
+            for i in c:
+                if (i.value != 0) and (not (i.value in occured)):
+                    occured.append(i.value)
+                else:
+                    return False
+
+        for i in self.gen_block():
+            occured = []
+            for j in i:
+                if (j.value != 0) and not ((j.value in occured)):
+                    occured.append(j.value)
+                else:
+                    return False
+        return True
+
+    def gen_weight(self):
+        for i in self.cells:
+            if i.value != 0:
+                i.value = -1
+                continue
+            index = i.get_index()
+            occured = []
+            for j in self.__data[index[0]]:
+                if (not j.value in occured) and (j.value != 0):
+                    occured.append(j.value)
+
+            for j in [self.__data[k][index[1]] for k in range(9)]:
+                if (not (j.value in occured)) and (j.value != 0):
+                    occured.append(j.value)
+
+            for j in self.gen_block()[index[0] // 3 * 3 + index[1] // 3]:
+                if (not (j.value in occured)) and (j.value != 0):
+                    occured.append(j.value)
+            i.weight(len(set(occured)))
+
+    def max_weight(self):
+        return sort_cells(self)[-1]
+    
+    def pprint(self):
+        print("+-------+-------+-------+")
+        for i in range(9):
+            print("| {} {} {} | {} {} {} | {} {} {} |".format(*[str(j.value) for j in self.__data[i]]).replace("0"," "))
+            if (i + 1) % 3 == 0:
+                print("+-------+-------+-------+")
+
+def timer(function, *args):
+    '''
+    Measure the running time required for an operation.
+    Output: time, returned value of the operation.
+    '''
+    start = time.time()
+    result = function(*args)
+    end = time.time()
+    return end - start, result
 
 def _is_complete(sudoku):
     '''
     Check whether a sudoku is completely filled in.
     '''
     for i in sudoku:
-        if 0 in i:
-            return False
+        for j in i:
+            if j == 0:
+                return False
     return True
 
 def _check(array):
     '''
     Check whether the array is a valid one in a sudoku.
     '''
-    temp = copy.deepcopy(array)
-    temp = Array.clear_item(temp, 0)
-    return len(temp) == len(set(temp))
+    for i in range(len(array) - 1):
+        if (array[i] in array[i + 1:]) and (array[i] != 0):
+            return False
+    return True
 
 def add_index(index):
     '''
@@ -208,6 +397,24 @@ def enter_sudoku():
     print('Wrong Input!')
     return enter_sudoku()
 
+def __column(sudoku, index):
+    '''
+    Return the array of numbers occured in the column.
+    '''
+    return Array.clear_item([sudoku[x][index[1]] for x in range(9)], 0)
+        
+def __row(sudoku, index):
+    '''
+    Return the array of numbers occured in the row.
+    '''
+    return Array.clear_item(sudoku[index[0]], 0)
+
+def __block(sudoku, index):
+    '''
+    Return the array of numbers occured in the block.
+    '''
+    return Array.clear_item(gen_blocks(sudoku)[return_block(index)], 0)
+
 def DFS_solve(sudoku, visualise=False):
     '''
     Use DFS algorithm to solve sudoku.
@@ -258,39 +465,27 @@ def BFS_solve(sudoku, visualise=False):
                     draw(candidate)
     return None
 
-def __column(sudoku, index):
-    '''
-    Return the array of numbers occured in the column.
-    '''
-    return Array.clear_item([sudoku[x][index[1]] for x in range(9)], 0)
-        
-def __row(sudoku, index):
-    '''
-    Return the array of numbers occured in the row.
-    '''
-    return Array.clear_item(sudoku[index[0]], 0)
-
-def __block(sudoku, index):
-    '''
-    Return the array of numbers occured in the block.
-    '''
-    return Array.clear_item(gen_blocks(sudoku)[return_block(index)], 0)
-            
-def brutal_solve(sudoku, visualise=False, parallel=False):
+def elimination_solve(sudoku, visualise=False, parallel=False):
     '''
     Mimic human's way to solve a sudoku.
     Return the solution.
     '''
-    index = first_empty(sudoku)
-    func_list = (__row, __column, __block)
-    guessed_index = []
     modified = True
     
-    while (not (check_sudoku(sudoku) and _is_complete(sudoku))):
-        if not parallel:
+    while modified:
+        index = first_empty(sudoku)
+        if index == None:
+            if check_sudoku(sudoku) and _is_complete(sudoku):
+                return sudoku
+            elif check_sudoku(sudoku):
+                return DFS_solve(sudoku, visualise)
+            else:
+                return None
+
+        for i in range(81):
             block = gen_blocks(sudoku)[return_block(index)]
             num_available = [x for x in range(1, 10)]
-        
+    
             for i in block:                       # eliminate from blocks
                 if i in num_available:
                     num_available.remove(i)
@@ -302,39 +497,35 @@ def brutal_solve(sudoku, visualise=False, parallel=False):
             list_of_column = [sudoku[x][index[1]] for x in range(9)]
             for i in list_of_column:
                 if i in num_available:
-                    num_available.remove(i)
+                   num_available.remove(i)
 
-        else:
-            num_available = [i for i in range(1, 10)]
-            pool = multiprocessing.Pool(processes=3)
-            num_occured = []
-            subprocesses = []
-            for i in func_list:
-                subprocesses.append(pool.apply_async(i, args=(sudoku, index)))
+            if len(num_available) == 1:
+                sudoku[index[0]][index[1]] = num_available[0]
+                modified = True
+                if visualise:
+                    draw(sudoku)
 
-            for i in subprocesses:
-                num_occured += i.get()
-            pool.terminate()
+            else:
+                modified = False
 
-            num_occured = set(num_occured)
-            for i in num_occured:
-                if i in num_available:
-                    num_available.remove(i)
-        
-        if len(num_available) == 1:
-            sudoku[index[0]][index[1]] = num_available[0]
-            if visualise:
-                draw(sudoku)
+            if add_index(index) == None:
+                index = first_empty(sudoku)
+                continue
 
-        if add_index(index) == None:
-            index = first_empty(sudoku)
-        elif first_empty(sudoku, index) != None:
-            index = first_empty(sudoku, index)
-        else:
-            index = first_empty(sudoku)
+            elif first_empty(sudoku, index) != None:
+                index = first_empty(sudoku, index)
+            
+            elif first_empty(sudoku) == None:
+                break
+                print('here')
 
-    return sudoku
-
+            else:
+                index = first_empty(sudoku)
+    if check_sudoku(sudoku) and _is_complete(sudoku):
+        return sudoku
+    elif check_sudoku(sudoku):
+        return DFS_solve(sudoku)
+    
 def batch_solve(algo, list_of_sudoku, visualise=False, cores=max(multiprocessing.cpu_count() // 2, 1), *args):
     '''
     Attempt to solve a list of sudoku simutaneously.
@@ -343,16 +534,6 @@ def batch_solve(algo, list_of_sudoku, visualise=False, cores=max(multiprocessing
     pool = multiprocessing.Pool(processes=cores)
     result = pool.starmap_async(algo, tuple((i, visualise) for i in list_of_sudoku)).get()
     return result
-                    
-def timer(function, *args):
-    '''
-    Measure the running time required for an operation.
-    Output: time, returned value of the operation.
-    '''
-    start = time.time()
-    output = function(*args)
-    end = time.time()
-    return end - start, output
 
 def load_sudoku(path='puzzles.txt'):
     '''
@@ -401,6 +582,15 @@ def ask_for_puzzle():
             stop = True
             print('\n')
     return puzzles
+
+def blank_cells(sudoku):
+    num = 0
+    index = [0, 0]
+    while index != None:
+        if sudoku[index[0]][index[1]] == 0:
+            num += 1
+        index = add_index(index)
+    return num
 
 if __name__ == '__main__':
     '''
