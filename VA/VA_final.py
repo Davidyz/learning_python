@@ -1,4 +1,4 @@
-import Sudoku, csv, multiprocessing, copy
+import Sudoku, csv, multiprocessing, copy, time
 import pysnooper
 
 puzzles = Sudoku.load_sudoku('puzzles.txt')
@@ -12,9 +12,10 @@ difficulty = {'easy':1,
 
 data = []
 for i in puzzles:
-    data.append([Sudoku.blank_cells(i[0]), difficulty[i[1]], 0, 0, 0, 0, 0])
+    data.append([Sudoku.count_empty(i[0]), difficulty[i[1]], 0, 0, 0, 0, 0])
 
-pool = multiprocessing.Pool(5)
+start = time.time()
+pool = multiprocessing.Pool(4)
 DFS_times = pool.starmap_async(Sudoku.timer, ((Sudoku.DFS_solve, i[0]) for i in copy.deepcopy(puzzles)))
 BFS_times = pool.starmap_async(Sudoku.timer, ((Sudoku.BFS_solve, i[0]) for i in copy.deepcopy(puzzles)))
 Eli_times = pool.starmap_async(Sudoku.timer, ((Sudoku.elimination_solve, i[0]) for i in copy.deepcopy(puzzles)))
@@ -42,3 +43,6 @@ with open('VA/data.csv', 'w') as f:
     f_csv.writerow(headers)
     f_csv.writerows(data)
     f.close()
+
+end = time.time()
+print('Finished in {} seconds.'.format(str(round(end-start, 4))))

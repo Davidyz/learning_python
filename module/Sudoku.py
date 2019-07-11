@@ -128,7 +128,7 @@ class Board():
         for i in self.__data:
             for j in i:
                 if j.value == 0:
-                    return j.get_index()
+                    return j
         return None
 
     def is_complete(self):
@@ -160,7 +160,7 @@ class Board():
             for j in i:
                 if (j.value != 0) and (not (j.value in occured)):
                     occured.append(j.value)
-                else:
+                elif j.value in occured:
                     return False
 
         # check columns:
@@ -172,15 +172,15 @@ class Board():
             for i in c:
                 if (i.value != 0) and (not (i.value in occured)):
                     occured.append(i.value)
-                else:
+                elif i.value in occured:
                     return False
 
         for i in self.gen_block():
             occured = []
             for j in i:
-                if (j.value != 0) and not ((j.value in occured)):
+                if (j.value != 0) and (not (j.value in occured)):
                     occured.append(j.value)
-                else:
+                elif j.value in occured:
                     return False
         return True
 
@@ -211,7 +211,11 @@ class Board():
         '''
         Return the cell with the highest weight.
         '''
-        return sort_cells(self)[-1]
+        highest = self.cells[0]
+        for i in self.cells[1:]:
+            if i.weight() > highest.weight():
+                highest = i
+        return highest
     
     def pprint(self):
         '''
@@ -222,6 +226,58 @@ class Board():
             print("| {} {} {} | {} {} {} | {} {} {} |".format(*[str(j.value) for j in self.__data[i]]).replace("0"," "))
             if (i + 1) % 3 == 0:
                 print("+-------+-------+-------+")
+    
+    def draw(self):
+        '''
+        Draw a sudoku puzzle with turtle.
+        '''
+        window = turtle.Screen()
+        window.setup(400, 400)
+        drawer = turtle.Turtle()
+        window.tracer(0, 0)
+        drawer.penup()
+        drawer.speed(0)
+        drawer.pensize(5)
+        drawer.goto(-180, 180)
+        drawer.setheading(0)
+        drawer.pendown()
+        drawer.hideturtle()
+
+        for i in range(4):
+            drawer.forward(360)
+            drawer.right(90)
+
+        for i in range(1, 9):
+            drawer.penup()
+            drawer.goto(-180, 180 - i * 40)
+            drawer.setheading(0)
+            if i % 3 == 0:
+                drawer.pensize(3)
+            else:
+                drawer.pensize(1)
+            drawer.pendown()
+            drawer.forward(360)
+            drawer.penup()
+
+            drawer.goto(-180 + i * 40, 180)
+            drawer.setheading(270)
+            drawer.pendown()
+            if i % 3 == 0:
+                drawer.pensize(3)
+            else:
+                drawer.pensize(1)
+            drawer.pendown()
+            drawer.forward(360)
+            drawer.penup()
+
+        drawer.setheading(0)
+        for i in range(9):
+            drawer.goto(-165, 150 - 40 * i)
+            for j in self.__data[i]:
+                drawer.write(str(j).replace('0', ' '), font=('Arial', 15, 'normal'))
+                drawer.forward(40)
+        if (not self.is_complete()) and self.validate():
+            window.reset()
 
 def timer(function, *args):
     '''
@@ -262,15 +318,6 @@ def add_index(index):
         return [index[0], index[1] + 1]
     elif index[1] == 8:
         return [index[0] + 1, 0]
-
-def sub_index(index):
-    '''
-    Return the last index in sudoku.
-    '''
-    if index[1] == 0:
-        return [index[0] - 1, 8]
-    elif index[1] > 0:
-        return [index[0], index[1] - 1]
 
 def pprint(sudoku):
     '''
@@ -443,24 +490,6 @@ def enter_sudoku():
     print('Wrong Input!')
     return enter_sudoku()
 
-def __column(sudoku, index):
-    '''
-    Return the array of numbers occured in the column.
-    '''
-    return Array.clear_item([sudoku[x][index[1]] for x in range(9)], 0)
-        
-def __row(sudoku, index):
-    '''
-    Return the array of numbers occured in the row.
-    '''
-    return Array.clear_item(sudoku[index[0]], 0)
-
-def __block(sudoku, index):
-    '''
-    Return the array of numbers occured in the block.
-    '''
-    return Array.clear_item(gen_blocks(sudoku)[return_block(index)], 0)
-
 def DFS_solve(sudoku, visualise=False):
     '''
     Use DFS algorithm to solve sudoku.
@@ -471,20 +500,46 @@ def DFS_solve(sudoku, visualise=False):
     while stack:
         candidate = stack.pop()
 
-        if _is_complete(candidate):
-            if check_sudoku(candidate):
+        if candidate.is_complete():
+            if candidate.validate():
                 return candidate
             else:
                 continue
 
-        index = first_empty(candidate)
+        index = candidate.first_empty()
         for i in range(1, 10):
-            candidate[index[0]][index[1]] = i
-            if check_sudoku(candidate):
+            index.value = i
+            if candidate.validate():
                 stack.append(copy.deepcopy(candidate))
                 if visualise:
-                    draw(candidate)
+                    candidate.draw()
     return None
+
+def DFS_weight(sudoku, visualise=False):
+    '''
+    Use DFS algorithm to solve sudoku but start each iteration from the cell with maimum weight. The input needs to be a Board object.
+    '''
+    stack = [sudoku]
+    while stack:
+        candidate = stack.pop(-1)
+        candidate.gen_weight()
+        
+        if candidate.is_complete():
+            if candidate.validate():
+                return candidate
+            else:
+                continue
+
+        guess = candidate.max_weight()
+        for i in range(1, 10):
+            guess.value = i
+            guess.weight(-1)
+            if candidate.validate():
+                stack.append(copy.deepcopy(candidate))
+                if visualise:
+                    candidate.draw()
+    return None
+
 
 def BFS_solve(sudoku, visualise=False):
     '''
@@ -496,19 +551,43 @@ def BFS_solve(sudoku, visualise=False):
     while q:
         candidate = q.pop(0)
     
-        if _is_complete(candidate):
-            if check_sudoku(candidate):
+        if candidate.is_complete():
+            if candidate.validate():
                 return candidate
             else:
                 continue
 
-        index = first_empty(candidate)
+        index = candidate.first_empty()
         for i in range(1, 10):
-            candidate[index[0]][index[1]] = i
-            if check_sudoku(candidate):
+            index.value = i
+            if candidate.validate():
                 q.append(copy.deepcopy(candidate))
                 if visualise:
-                    draw(candidate)
+                    candidate.draw()
+    return None
+
+def BFS_weight(sudoku, visualise=False):
+    '''
+    Use BFS algorithm to solve sudoku but start each iteration from the cell with maimum weight. The input needs to be a Board object.
+    '''
+    q = [sudoku]
+    while q:
+        candidate = q.pop(0)
+        candidate.gen_weight()
+        if candidate.is_complete():
+            if candidate.validate():
+                return candidate
+            else:
+                continue
+
+        guess = candidate.max_weight()
+        for i in range(1, 10):
+            guess.value = i
+            guess.weight(-1)
+            if candidate.validate():
+                q.append(copy.deepcopy(candidate))
+                if visualise:
+                    candidate.draw()
     return None
 
 def elimination_solve(sudoku, visualise=False, parallel=False):
@@ -567,11 +646,12 @@ def elimination_solve(sudoku, visualise=False, parallel=False):
 
             else:
                 index = first_empty(sudoku)
+
     if check_sudoku(sudoku) and _is_complete(sudoku):
         return sudoku
     elif check_sudoku(sudoku):
         return DFS_solve(sudoku)
-    
+
 def batch_solve(algo, list_of_sudoku, visualise=False, cores=max(multiprocessing.cpu_count() // 2, 1), *args):
     '''
     Attempt to solve a list of sudoku simutaneously.
@@ -628,15 +708,6 @@ def ask_for_puzzle():
             stop = True
             print('\n')
     return puzzles
-
-def blank_cells(sudoku):
-    num = 0
-    index = [0, 0]
-    while index != None:
-        if sudoku[index[0]][index[1]] == 0:
-            num += 1
-        index = add_index(index)
-    return num
 
 if __name__ == '__main__':
     '''
