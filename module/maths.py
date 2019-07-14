@@ -149,7 +149,7 @@ def differentiate(f, x, accu = 3):
     step = 10 ** (-accu)
     return (f(x + step) - f(x)) / step
 
-def newton_method(f, derivative = differentiate, x = 1):
+def newton_method(f, derivative = differentiate, x = 1, accuracy=14):
     """
     Find one of the roots of equation f using Newton's method.
     f is the function of the equation.
@@ -158,20 +158,18 @@ def newton_method(f, derivative = differentiate, x = 1):
     Return False if can't find a root around the given value of x.
     """
     y = f(x)
-    if derivative.__name__ == 'differentiate':
-        m = derivative(f, x)
-    else:
-        m = derivative(x)
-    
     while abs(y) >= pow(10, -14):
+        if derivative.__name__ == 'differentiate':
+            m = derivative(f, x, accuracy)
+        else:
+            m = derivative(x)
         x = x - y / m
         y1 = y
         y = f(x)
-        if m < pow(10, -14) and y > pow(10,0):
+        if abs(m) < pow(10, -14) and abs(y) > pow(10,0):
             return False
-        if abs(y - y1) <= pow(10, -14):
-            break
-    return x
+        if abs(y - y1) <= pow(10, -accuracy):
+            return x
 
 def mean(array):
     """
@@ -241,4 +239,4 @@ def cpow(z, n, polar = False):
 
 if __name__ == '__main__':
     import sys
-    print(newton_method(lambda x:math.cos(x) - x, lambda x:-math.sin(x) - 1, 100))
+    print(newton_method(lambda x:math.cos(x) - x, lambda x:-math.sin(x) - 1, 100, 2))
