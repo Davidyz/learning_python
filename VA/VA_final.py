@@ -16,8 +16,8 @@ for i in puzzles:
 
 start = time.time()
 pool = multiprocessing.Pool(4)
-DFS_times = pool.starmap_async(Sudoku.timer, ((Sudoku.DFS_solve, i[0]) for i in copy.deepcopy(puzzles)))
-BFS_times = pool.starmap_async(Sudoku.timer, ((Sudoku.BFS_solve, i[0]) for i in copy.deepcopy(puzzles)))
+DFS_times = pool.starmap_async(Sudoku.timer, ((Sudoku.DFS_solve, Sudoku.Board(i[0])) for i in copy.deepcopy(puzzles)))
+BFS_times = pool.starmap_async(Sudoku.timer, ((Sudoku.BFS_solve, Sudoku.Board(i[0])) for i in copy.deepcopy(puzzles)))
 Eli_times = pool.starmap_async(Sudoku.timer, ((Sudoku.elimination_solve, i[0]) for i in copy.deepcopy(puzzles)))
 DFS_weight_times = pool.starmap_async(Sudoku.timer, ((Sudoku.DFS_weight, Sudoku.Board(i[0])) for i in copy.deepcopy(puzzles)))
 BFS_weight_times = pool.starmap_async(Sudoku.timer, ((Sudoku.BFS_weight, Sudoku.Board(i[0])) for i in copy.deepcopy(puzzles)))

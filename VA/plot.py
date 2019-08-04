@@ -13,11 +13,6 @@ with open('VA/data.csv') as f:
         data.append(list(i))
     f.close()
 
-header = {'number_of_blank':0,
-          'difficulty':1,
-          'DFS_time_spent':2,
-          'BFS_time_spent':3}
-
 blanks = [int(i[0]) for i in data]
 difficulty = [int(i[1]) for i in data]
 DFS_time = [math.log10(float(i[2]) + 1) for i in data]

@@ -1,6 +1,6 @@
 import Array, copy, turtle, time, multiprocessing, math
 try:
-    import pysnooper
+    import pysnooper, numba
 except ModuleNotFoundError:
     pass
 
@@ -112,13 +112,6 @@ class Board():
         Set value i to the cell with given index in the board.
         '''
         self.__data[index[0]][index[1]].value = i
-
-    def sort_cells(self):
-        '''
-        Sort the cells in an increasing order of their weight.
-        '''
-        self.cells = Array.mergesort(self.cells)
-        return self.cells
 
     def first_empty(self):
         '''
@@ -278,6 +271,15 @@ class Board():
                 drawer.forward(40)
         if (not self.is_complete()) and self.validate():
             window.reset()
+    
+    def row(self, cell):
+        return self.__data[cell.get_index()[0]]
+
+    def column(self, cell):
+        return [self.__data[i][cell.get_index()[1]] for i in range(9)]
+
+    def block(self, cell):
+        return self.gen_block()[cell.get_index()[0] // 3 * 3 + cell.get_index()[1] // 3]
 
 def timer(function, *args):
     '''
@@ -495,10 +497,10 @@ def DFS_solve(sudoku, visualise=False):
     Use DFS algorithm to solve sudoku.
     Return the solution.
     '''
-    stack = [sudoku]
+    stack = [copy.deepcopy(sudoku)]
 
     while stack:
-        candidate = stack.pop()
+        candidate = stack.pop(-1)
 
         if candidate.is_complete():
             if candidate.validate():
@@ -509,6 +511,7 @@ def DFS_solve(sudoku, visualise=False):
         index = candidate.first_empty()
         for i in range(1, 10):
             index.value = i
+            index.weight(-1)
             if candidate.validate():
                 stack.append(copy.deepcopy(candidate))
                 if visualise:
@@ -519,7 +522,7 @@ def DFS_weight(sudoku, visualise=False):
     '''
     Use DFS algorithm to solve sudoku but start each iteration from the cell with maimum weight. The input needs to be a Board object.
     '''
-    stack = [sudoku]
+    stack = [copy.deepcopy(sudoku)]
     while stack:
         candidate = stack.pop(-1)
         candidate.gen_weight()
@@ -540,13 +543,12 @@ def DFS_weight(sudoku, visualise=False):
                     candidate.draw()
     return None
 
-
 def BFS_solve(sudoku, visualise=False):
     '''
     Use BFS algorithm to solve Sudoku.
     Return the solution.
     '''
-    q = [sudoku]
+    q = [copy.deepcopy(sudoku)]
 
     while q:
         candidate = q.pop(0)
@@ -560,6 +562,7 @@ def BFS_solve(sudoku, visualise=False):
         index = candidate.first_empty()
         for i in range(1, 10):
             index.value = i
+            index.weight(-1)
             if candidate.validate():
                 q.append(copy.deepcopy(candidate))
                 if visualise:
@@ -570,7 +573,7 @@ def BFS_weight(sudoku, visualise=False):
     '''
     Use BFS algorithm to solve sudoku but start each iteration from the cell with maimum weight. The input needs to be a Board object.
     '''
-    q = [sudoku]
+    q = [copy.deepcopy(sudoku)]
     while q:
         candidate = q.pop(0)
         candidate.gen_weight()
@@ -590,67 +593,36 @@ def BFS_weight(sudoku, visualise=False):
                     candidate.draw()
     return None
 
-def elimination_solve(sudoku, visualise=False, parallel=False):
+def elimination(puzzle, visualise=False):
     '''
-    Mimic human's way to solve a sudoku.
-    Return the solution.
+    Try to rewrite elimination with Board() and Cell().
     '''
-    modified = True
-    
-    while modified:
-        index = first_empty(sudoku)
-        if index == None:
-            if check_sudoku(sudoku) and _is_complete(sudoku):
-                return sudoku
-            elif check_sudoku(sudoku):
-                return DFS_solve(sudoku, visualise)
-            else:
-                return None
+    sudoku = copy.deepcopy(puzzle)
 
-        for i in range(81):
-            block = gen_blocks(sudoku)[return_block(index)]
-            num_available = [x for x in range(1, 10)]
-    
-            for i in block:                       # eliminate from blocks
-                if i in num_available:
+    while not (sudoku.validate() and sudoku.is_complete()):
+        sudoku.gen_weight()
+        cell = sudoku.max_weight()
+        if cell.weight() < 8:
+            break
+        elif cell.weight() == 8:
+            num_available = [i for i in range(1, 10)]
+            for i in set([j.value for j in sudoku.row(cell) + sudoku.column(cell) + sudoku.block(cell)]):
+                try:
                     num_available.remove(i)
-        
-            for i in sudoku[index[0]]:            # eliminate from rows
-                if i in num_available:
-                    num_available.remove(i)
+                except ValueError:
+                    pass
+            cell.value = num_available[0]
+            cell.weight(-1)
+        if visualise:
+            sudoku.draw()
 
-            list_of_column = [sudoku[x][index[1]] for x in range(9)]
-            for i in list_of_column:
-                if i in num_available:
-                   num_available.remove(i)
-
-            if len(num_available) == 1:
-                sudoku[index[0]][index[1]] = num_available[0]
-                modified = True
-                if visualise:
-                    draw(sudoku)
-
-            else:
-                modified = False
-
-            if add_index(index) == None:
-                index = first_empty(sudoku)
-                continue
-
-            elif first_empty(sudoku, index) != None:
-                index = first_empty(sudoku, index)
-            
-            elif first_empty(sudoku) == None:
-                break
-                print('here')
-
-            else:
-                index = first_empty(sudoku)
-
-    if check_sudoku(sudoku) and _is_complete(sudoku):
+    if sudoku.is_complete() and sudoku.validate():
         return sudoku
-    elif check_sudoku(sudoku):
-        return DFS_solve(sudoku)
+
+    elif sudoku.validate():
+        return DFS_weight(sudoku, visualise)
+    elif (not sudoku.validate()) and sudoku.is_complete():
+        return None
 
 def batch_solve(algo, list_of_sudoku, visualise=False, cores=max(multiprocessing.cpu_count() // 2, 1), *args):
     '''
