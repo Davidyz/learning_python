@@ -80,13 +80,11 @@ def fibonacci(n):
     Return the nth number in the fibonacci sequence.
     Starting from 0, 1
     """
-    if n <= 1:
-        return 0
-    if n == 2:
-        return 1
-    else:
-        result = fibonacci(n - 1) + fibonacci(n - 2)
-    return result
+    a, b = 0, 1
+    while n > 1:
+        a, b = b, a + b
+        n -= 1
+    return a
 
 def triangle(n):
     def triangle_helper(n, result = [1, [1, 1]]):
