@@ -89,7 +89,7 @@ def linux():
         single(strict)
 
 def win():
-    strict = bool(int(input('Strrict mod(1) or not(0)? ')))
+    strict = bool(int(input('Strict mod(1) or not(0)? ')))
     mode = int(input('Single(0) or in batch(1)? '))
     path = input('Path (please drag from the File Manager): ')
     
