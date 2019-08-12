@@ -168,6 +168,7 @@ def newton_method(f, derivative = differentiate, x = 1, accuracy=14):
             return False
         if abs(y - y1) <= pow(10, -accuracy):
             return x
+    return x
 
 def mean(array):
     """
