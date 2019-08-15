@@ -2,9 +2,8 @@
 from math import *
 """
 A set of functions for numerical integration, giving the results as float.
-You should always specify the number of intervals though it is unnecessary, because a fixed number of strips won't work efficiently. Eg, when the range is big, the number of strips should be increased as well, and vice versa (for less time and resource consumption).
+You should always specify the number of intervals though it is not necessary, because a fixed number of strips won't work efficiently. Eg, when the range is big, the number of strips should be increased as well, and vice versa (for less time and resource consumption).
 """
-
 def mapping(f, start_point, end_point, num):
     """
     Map the function into a dictionary.
@@ -63,20 +62,29 @@ def simpson(f, start_point, end_point, num=10000):
     Using simpson's rule to integrate.
     Re-written with mapping().
     """
+    integral = 0
+    interval = (end_point - start_point) / float(num)
     if num % 2 == 0:
-        num = num // 2
         table = mapping(f, start_point, end_point, num)
-        return (2 * mid_point(f, start_point, end_point, num, table) + trapezium(f, start_point, end_point, num, table)) / 3
+        keys = tuple(i for i in table)
+        for i in range(num + 1):
+            if i % 2:
+                integral += 4 * table[keys[i]]
+            else:
+                integral += 2 * table[keys[i]] 
+        integral -= (table[keys[0]] + table[keys[-1]])
+        return integral * interval / 3
+
     else:
         raise ValueError("num must be an even number!")
 
 if __name__ == "__main__":
     def f(x):
-        return sqrt(x ** 2 - 1)
+        return e ** (- x ** 2 / 2)
     
-    start_point = 1
-    end_point = 2
-    num = 100000
+    start_point = -1000
+    end_point = 1000
+    num = 10000
     print("simpson  ", simpson(f, start_point, end_point, num))
     print("trapezium", trapezium(f, start_point, end_point, num))
     print("mid_point", mid_point(f, start_point, end_point, num))

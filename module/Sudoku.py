@@ -1,6 +1,6 @@
 import Array, copy, turtle, time, multiprocessing, math
 try:
-    import pysnooper, numba
+    import pysnooper
 except ModuleNotFoundError:
     pass
 
@@ -290,90 +290,6 @@ def timer(function, *args):
     result = function(*args)
     end = time.time()
     return end - start, result
-
-def _is_complete(sudoku):
-    '''
-    Check whether a sudoku is completely filled in.
-    '''
-    for i in sudoku:
-        for j in i:
-            if j == 0:
-                return False
-    return True
-
-def _check(array):
-    '''
-    Check whether the array is a valid one in a sudoku.
-    '''
-    for i in range(len(array) - 1):
-        if (array[i] in array[i + 1:]) and (array[i] != 0):
-            return False
-    return True
-
-def add_index(index):
-    '''
-    Return the next index in sudoku.
-    '''
-    if index == [8,8]:
-        return None
-    elif index[1] < 8:
-        return [index[0], index[1] + 1]
-    elif index[1] == 8:
-        return [index[0] + 1, 0]
-
-def pprint(sudoku):
-    '''
-    Print a Sudoku puzzle that is defined as a list with 9 items such that every item represent one of the 9 rows.
-    '''
-    print("+-------+-------+-------+")
-    for i in range(9):
-        print("| {} {} {} | {} {} {} | {} {} {} |".format(*sudoku[i]).replace("0"," "))
-        if (i+1) % 3 == 0:
-            print("+-------+-------+-------+")
-
-def return_block(index):
-    '''
-    Return the block a cell is in as a tuple (row, column).
-    '''
-    return index[0]//3 * 3 + index[1]//3
-
-def gen_blocks(sudoku):
-    '''
-    Return blocks in a sudoku.
-    '''
-    blocks = list([] for i in range(9))
-    for i in range(9):
-        row = i // 3
-        for j in range(9):
-            column = j // 3
-            blocks[row*3+column].append(sudoku[i][j])
-    return blocks
-
-def check_sudoku(sudoku):
-    '''
-    Check the validity of a sudoku.
-    '''
-    # check rows
-    for i in sudoku:
-        if not _check(i):
-            return False
-
-    # check columns
-    for column in range(len(sudoku)):
-        array = []
-        
-        for row in range(len(sudoku)):
-            array.append(sudoku[row][column])
-        if not _check(array):
-            return False
-
-    # check blocks
-    blocks = gen_blocks(sudoku)
-    for i in blocks:
-        if not _check(i):
-            return False
-
-    return True
             
 def __enter():
     '''
@@ -386,90 +302,6 @@ def __enter():
         sudoku.append(list(int(j) for j in char))
     return sudoku
 
-def first_empty(sudoku, index=None):
-    '''
-    Return the index of the first empty cell in a sudoku.
-    '''
-    if index == None:
-        index = [0, 0]
-        while index != None:
-            if sudoku[index[0]][index[1]] == 0:
-                return index
-            index = add_index(index)
-        return index
-    
-    else:
-        index = add_index(index)
-        while index != None:
-            if sudoku[index[0]][index[1]] == 0:
-                return index
-            index = add_index(index)
-        return index
-
-def draw(sudoku):
-    '''
-    Draw a sudoku puzzle with turtle.
-    '''
-    window = turtle.Screen()
-    window.setup(400, 400)
-    drawer = turtle.Turtle()
-    window.tracer(0, 0)
-    drawer.penup()
-    drawer.speed(0)
-    drawer.pensize(5)
-    drawer.goto(-180, 180)
-    drawer.setheading(0)
-    drawer.pendown()
-    drawer.hideturtle()
-
-    for i in range(4):
-        drawer.forward(360)
-        drawer.right(90)
-    
-    for i in range(1, 9):
-        drawer.penup()
-        drawer.goto(-180, 180 - i * 40)
-        drawer.setheading(0)
-        if i % 3 == 0:
-            drawer.pensize(3)
-        else:
-            drawer.pensize(1)
-        drawer.pendown()
-        drawer.forward(360)
-        drawer.penup()
-    
-        drawer.goto(-180 + i * 40, 180)
-        drawer.setheading(270)
-        drawer.pendown()
-        if i % 3 == 0:
-            drawer.pensize(3)
-        else:
-            drawer.pensize(1)
-        drawer.pendown()
-        drawer.forward(360)
-        drawer.penup()
-    
-    drawer.setheading(0)
-    for i in range(9):
-        drawer.goto(-165, 150 - 40 * i)
-        for j in sudoku[i]:
-            drawer.write(str(j).replace('0', ' '), font=('Arial', 15, 'normal'))
-            drawer.forward(40)
-    if (not _is_complete(sudoku)) and check_sudoku(sudoku):
-        window.reset()
-
-def count_empty(sudoku):
-    '''
-    Return the number of empty cells in a sudoku puzzle.
-    '''
-    counter = 0
-    for i in sudoku:
-        for j in i:
-            if j == 0:
-                counter += 1
-
-    return counter
-    
 def enter_sudoku():
     '''
     Enter a single sudoku from the console.
@@ -602,6 +434,9 @@ def elimination(puzzle, visualise=False):
     while not (sudoku.validate() and sudoku.is_complete()):
         sudoku.gen_weight()
         cell = sudoku.max_weight()
+        print(cell.weight())
+        if cell.weight() == 9:
+            break
         if cell.weight() < 8:
             break
         elif cell.weight() == 8:
@@ -620,7 +455,23 @@ def elimination(puzzle, visualise=False):
         return sudoku
 
     elif sudoku.validate():
-        return DFS_weight(sudoku, visualise)
+        cell = sudoku.max_weight()
+        num_available = [i for i in range(1, 10)]
+        
+        for i in set([j.value for j in sudoku.row(cell) + sudoku.column(cell) + sudoku.block(cell)]):
+            if i in num_available:
+                num_available.remove(i)
+        
+        candidates = []
+        for i in num_available:
+            cell.value = i
+            candidates.append(copy.deepcopy(sudoku))
+        
+        for i in candidates:
+            result = elimination(i, visualise)
+            if result != None:
+                return result
+
     elif (not sudoku.validate()) and sudoku.is_complete():
         return None
 

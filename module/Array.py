@@ -4,7 +4,7 @@ A custom module containing some list related algorithms and queues.
 Recursion is widely used.
 """
 from math import ceil
-import Heap
+import heap
 
 def binary_search(array, item):
     start = 0
