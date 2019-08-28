@@ -68,6 +68,9 @@ class Cell():
     def __str__(self):
         return str(self.value)
 
+    def __hash__(self):
+        return self.value
+    
     def is_empty(self):
         '''
         Return true if the cell is is_empty. Encapsulated to reduce the amount of effort needed while using.
@@ -281,6 +284,13 @@ class Board():
     def block(self, cell):
         return self.gen_block()[cell.get_index()[0] // 3 * 3 + cell.get_index()[1] // 3]
 
+    def count_empty(self):
+        count = 0
+        for i in self.__data:
+            for j in i:
+                count += int(j == 0)
+        return count
+
 def timer(function, *args):
     '''
     Measure the running time required for an operation.
@@ -434,20 +444,20 @@ def elimination(puzzle, visualise=False):
     while not (sudoku.validate() and sudoku.is_complete()):
         sudoku.gen_weight()
         cell = sudoku.max_weight()
-        print(cell.weight())
-        if cell.weight() == 9:
+        
+        if cell.weight() != 8:
             break
-        if cell.weight() < 8:
-            break
+        
         elif cell.weight() == 8:
             num_available = [i for i in range(1, 10)]
+            
             for i in set([j.value for j in sudoku.row(cell) + sudoku.column(cell) + sudoku.block(cell)]):
-                try:
+                if i in num_available:
                     num_available.remove(i)
-                except ValueError:
-                    pass
+            
             cell.value = num_available[0]
             cell.weight(-1)
+        
         if visualise:
             sudoku.draw()
 
@@ -465,11 +475,12 @@ def elimination(puzzle, visualise=False):
         candidates = []
         for i in num_available:
             cell.value = i
+            cell.weight(-1)
             candidates.append(copy.deepcopy(sudoku))
         
         for i in candidates:
             result = elimination(i, visualise)
-            if result != None:
+            if isinstance(result, Board):
                 return result
 
     elif (not sudoku.validate()) and sudoku.is_complete():
