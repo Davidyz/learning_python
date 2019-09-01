@@ -1,3 +1,4 @@
+# Q1
 import maths, Array
 a = Array.reversed([i for i in str(maths.factorial(2019))])
 count = 0
@@ -8,6 +9,7 @@ for i in a:
         break
 print('1. ', count)
 
+# Q2
 import itertools
 numbers = (i for i in range(1, 2020))
 pairs = (i for i in itertools.combinations(numbers, 2))
