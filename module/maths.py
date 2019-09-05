@@ -16,6 +16,10 @@ pi = math.pi
 e = math.e
 cos = math.cos
 sin = math.sin
+lg = math.log10
+
+def ln(x):
+    return math.log1p(x - 1)
 
 def factorial(n):
     """
@@ -193,6 +197,15 @@ def sd(array):
         tx2f += (i[0] ** 2) * i[1]
         tf += i[1]
     return (tx2f / tf - mean(array) ** 2) ** 0.5
+
+def summation(f, a, b=None):
+    if b == None:
+        b = a
+        a = 1
+    s = 0
+    for x in range(a, b + 1):
+        s += f(x)
+    return s
 
 # For complex number since here.
 
