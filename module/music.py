@@ -92,8 +92,27 @@ class Music():
         return self.__info
 
     def path(self):
-        return os.path.join(self.__path)
+        return os.path.sep.join(self.__path)
 
+class Lyric(Music):
+    def __init__(self, path):
+        Music.__init__(self, path)
+        self.lyric = ['[by:Davidyz]']
+
+    def append(self, time, line):
+        self.lyric.append('[{}]{}'.format(time, line))
+
+    def dump(self):
+        for i in self.info:
+            if self.info != '':
+                self.lyric.insert(0, '[{}:{}]'.format(i[:2], self.info[i]))
+
+        with open(self.path().replace(self.form, 'lrc'), 'w') as fin:
+            for i in self.lyric:
+                fin.write(i + '\n')
+            fin.close()
+
+        
 def format(song):
     if song.split('.')[-1] in ('wav', 'ape'):
         new_path = '.'.join(song.split('.')[:-1] + ['flac'])
