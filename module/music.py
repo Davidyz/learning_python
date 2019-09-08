@@ -88,31 +88,78 @@ class Music():
     def is_lossless(self):
         return self.__lossless
 
-    def info(self):
-        return self.__info
-
     def path(self):
         return os.path.sep.join(self.__path)
 
 class Lyric(Music):
     def __init__(self, path):
         Music.__init__(self, path)
-        self.lyric = ['[by:Davidyz]']
+        self.lyric = {}
 
     def append(self, time, line):
-        self.lyric.append('[{}]{}'.format(time, line))
+        time = ('[' + time + ']').split(':')
+        for i in time:
+            if len(i) < 2:
+                i = '0' + i
+            
+        self.lyric[':'.join(time)] = line
+        copy = {}
+        for i in sorted(self.lyric.keys()):
+            copy[i] = self.lyric[i]
+        self.lyric = copy
+    
+    def pprint(self):
+        for i in self.lyric:
+            print(i, self.lyric[i])
 
-    def dump(self):
-        for i in self.info:
-            if self.info != '':
-                self.lyric.insert(0, '[{}:{}]'.format(i[:2], self.info[i]))
+    def load(self, path=None):
+        if os.path.isfile(self.path().replace(self.form, 'lrc')) and path == None:
+            path = self.path().replace(self.form, 'lrc')
 
-        with open(self.path().replace(self.form, 'lrc'), 'w') as fin:
-            for i in self.lyric:
-                fin.write(i + '\n')
-            fin.close()
+        elif not os.path.isfile(path):
+            return
 
+        with open(path) as fin:
+            content = fin.readlines()
+            for i in content:
+                key = i[:i.index(']') + 1].replace('\n', '')
+                value = i[i.index(']') + 1:].replace('\n', '')
+                if value == '':
+                    try:
+                        int(key[1])
+                    except ValueError:
+                        continue
+
+                self.lyric[key] = value
         
+        return self.lyric
+
+    def dump(self, path = None):
+        if path == None:
+            path = self.path().replace(self.form, 'lrc')
+
+        with open(path, 'w') as fin:
+            for i in self.info:
+                if self.info[i] != '':
+                    fin.write('[{}:{}]\n'.format(i[:2], self.info[i]))
+            
+            fin.write('[by:Davidyz]\n')
+
+            for i in self.lyric:
+                fin.write(i + self.lyric[i] + '\n')
+            fin.close()
+    
+    def modify(self, time, line):
+        self.lyric['[' + time + ']'] = line
+        
+    def remove(self, time):
+        key = time
+        if not '[' in time:
+            key = '[' + time + ']'
+
+        if key in self.lyric:
+            del self.lyric[key]
+
 def format(song):
     if song.split('.')[-1] in ('wav', 'ape'):
         new_path = '.'.join(song.split('.')[:-1] + ['flac'])
