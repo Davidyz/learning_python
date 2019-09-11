@@ -10,7 +10,7 @@ lossless = ['ape', 'wav', 'flac', 'dsd', 'dsf', 'dff']
 skip_tagging = ['dsd', 'dsf', 'dff']
 
 def is_music(name):
-    return name.split('.')[-1] in ['mp3', 'aac', 'm4a', 'flac', 'ape', 'wav', 'dsd', 'dsf', 'dff'] and os.path.isfile(name)
+    return (name.split('.')[-1] in ('mp3', 'aac', 'm4a', 'flac', 'ape', 'wav', 'dsd', 'dsf', 'dff')) and os.path.isfile(name)
 
 def all_music(array):
     for i in array:
@@ -122,10 +122,24 @@ class Lyric(Music):
         with open(path) as fin:
             content = fin.readlines()
             for i in content:
-                key = i[:i.index(']') + 1].replace('\n', '')
-                value = i[i.index(']') + 1:].replace('\n', '')
+                i = i.replace('\n', '')
+                if i == '':
+                    continue
+
+                try:
+                    key = i[:i.index(']') + 1]
+                    value = i[i.index(']') + 1:]
+                except ValueError:
+                    key = i
+                    value = ''
+                if 'al:' in key:
+                    self.info['album'] = key[key.index(':') + 1:-1]
+                elif 'ar:' in key:
+                    self.info['artist'] = key[key.index(':') + 1:-1]
+
                 if value == '':
                     try:
+                        print(key)
                         int(key[1])
                     except ValueError:
                         continue
@@ -161,7 +175,7 @@ class Lyric(Music):
             del self.lyric[key]
 
 def format(song):
-    if song.split('.')[-1] in ('wav', 'ape'):
+    if song.form in ('wav', 'ape'):
         new_path = '.'.join(song.split('.')[:-1] + ['flac'])
         os.system('ffmpeg -i {} -q 0 {}'.format(song, new_path))
         os.system('rm ' + song)
