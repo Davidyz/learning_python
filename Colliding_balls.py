@@ -9,8 +9,8 @@ N = int(input('Number of balls: '))
 window = turtle.Screen()
 window.tracer(0,0)
 
-width = 1800
-height = 1000
+width = window.window_width()
+height = window.window_height()
 
 colors = ['red','blue','green','yellow','orange','black','purple',
           'lightblue','pink']
@@ -29,7 +29,7 @@ class Ball(turtle.Turtle):
 
         self.velocity = [v_x, v_y]
         self.new_coordinates = [0,0]
-        self.SPEED = 1 #choose values later
+        self.SPEED = 4 #choose values later
         #perhaps will use later, keep default for now
         self.mass = 1
         self.radius = 10
@@ -69,6 +69,7 @@ class Ball(turtle.Turtle):
     def change_size(self):
         self.shapesize(self.radius/10)
 
+'''
 #make border
 border = turtle.Turtle()
 border.hideturtle()
@@ -82,13 +83,15 @@ for i in range(2):
     border.left(90)
     border.forward(height)
     border.left(90)
+'''
 
 #check boundary
-def checkboundary(ball):
+def checkboundary(screen, ball):
     '''
     Check the collision between a ball and boundaries.
     If there is a collision, move the ball to corresponding direction according to physical laws.
     '''
+    width, height = screen.window_width(), screen.window_height()
     ball.hit_boundary = False
     ball.calculate_new_coordinates()
     x = ball.new_coordinates[0]  #save writing this again
@@ -160,6 +163,15 @@ def generating_balls(n):
 
     for i in range(len(balls)):
         balls[i].setposition(starting_posns[i])
+        coordinates = starting_posns[i]
+        if coordinates[0] > 0 and coordinates[1] > 0:
+            balls[i].color('red')
+        elif coordinates[0] > 0 and coordinates[1] < 0:
+            balls[i].color('blue')
+        elif coordinates[0] < 0 and coordinates[1] > 0:
+            balls[i].color('green')
+        else:
+            balls[i].color('yellow')
 
 def quicksort(array):
     '''
@@ -222,7 +234,7 @@ while True:
 
     for ball in balls:
         ball.calculate_new_coordinates()
-        checkboundary(ball)
+        checkboundary(window, ball)
     
     for i in range(0, len(balls) - 1):
         if balls[i + 1].distance() - balls[i].distance() < 50:#balls[i + 1].radius + balls[i].radius:
