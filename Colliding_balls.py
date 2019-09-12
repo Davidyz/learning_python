@@ -5,6 +5,7 @@
 import turtle, time, math, random
 
 N = int(input('Number of balls: '))
+CoefficientOfRestitution = 1
 
 window = turtle.Screen()
 window.tracer(0,0)
@@ -12,11 +13,8 @@ window.tracer(0,0)
 width = window.window_width()
 height = window.window_height()
 
-colors = ['red','blue','green','yellow','orange','black','purple',
-          'lightblue','pink']
-
+colors = ['red', 'blue', 'green', 'yellow', 'orange', 'black', 'purple', 'lightblue', 'pink']
 balls = [] #store ball objects as dictionary
-
 starting_posns = []
 
 class Ball(turtle.Turtle):
@@ -29,7 +27,7 @@ class Ball(turtle.Turtle):
 
         self.velocity = [v_x, v_y]
         self.new_coordinates = [0,0]
-        self.SPEED = 4 #choose values later
+        self.SPEED = 5 #choose values later
         #perhaps will use later, keep default for now
         self.mass = 1
         self.radius = 10
@@ -86,7 +84,7 @@ for i in range(2):
 '''
 
 #check boundary
-def checkboundary(screen, ball):
+def checkboundary(screen, ball, e=1/2):
     '''
     Check the collision between a ball and boundaries.
     If there is a collision, move the ball to corresponding direction according to physical laws.
@@ -98,16 +96,20 @@ def checkboundary(screen, ball):
     y = ball.new_coordinates[1]
     r = ball.radius + 1 #(+ padding)
     if x+r > width/2 or x-r < -width/2:
-        ball.velocity[0] = -1*ball.velocity[0]
+        ball.velocity[0] = -e*ball.velocity[0]
         ball.calculate_new_coordinates()
         ball.hit_boundary = True
+        return True
 
     if y+r > height/2 or y-r < -height/2:
-        ball.velocity[1] = -1*ball.velocity[1]
+        ball.velocity[1] = -e*ball.velocity[1]
         ball.calculate_new_coordinates()
         ball.hit_boundary = True
+        return True
+    else:
+        return False
 
-def check_ball_collision(ball1, ball2):
+def check_ball_collision(ball1, ball2, e=1/2):
     '''
     Check the collision between two balls.
     If there is a collision, move the two balls to corresponding directions.
@@ -124,11 +126,14 @@ def check_ball_collision(ball1, ball2):
     u2y = ball2.velocity[1]
 
     if distance <= R:
-        ball1.SPEED, ball2.SPEED = ball2.SPEED, ball1.SPEED
+        ball1.SPEED, ball2.SPEED = e * ball2.SPEED, e * ball1.SPEED
         ball1.velocity = [(2 * ball2.mass * u2x + u1x * (ball1.mass - ball2.mass)) / (ball1.mass + ball2.mass), (2 * ball2.mass * u2y + u1y * (ball1.mass - ball2.mass)) / (ball1.mass + ball2.mass)]
         ball2.velocity = [(2 * ball1.mass * u1x + u2x * (ball2.mass - ball1.mass)) / (ball1.mass + ball2.mass), (2 * ball1.mass * u1y + u2y * (ball2.mass - ball1.mass)) / (ball1.mass + ball2.mass)]
         ball1.calculate_new_coordinates()
         ball2.calculate_new_coordinates()
+        return True
+    else:
+        return False
 
 def check_distance(a,b):
     '''Distances between two coordinates a and b'''
@@ -222,29 +227,35 @@ generating_balls(N)
 def iterative_checking(ball):
     index = balls.index(ball)
     i = index + 1
+    count = 0
     while balls[i].distance() - ball.distance() <= ball.radius + balls[i].radius:
-        check_ball_collision(ball, balls[i])
+        if check_ball_collision(ball, balls[i], CoefficientOfRestitution):
+            count += 1
         if i + 1 < len(balls):
             i += 1
         else:
             break
+    return count
 
 while True:
     insertsort(balls)
-
+    
+    CollisionCount = 0
     for ball in balls:
         ball.calculate_new_coordinates()
-        checkboundary(window, ball)
+        if checkboundary(window, ball, CoefficientOfRestitution):
+            CollisionCount += 1
+
     
     for i in range(0, len(balls) - 1):
         if balls[i + 1].distance() - balls[i].distance() < 50:#balls[i + 1].radius + balls[i].radius:
-            iterative_checking(balls[i])
+            CollisionCount += iterative_checking(balls[i])
 
         else:
             pass
 
     for i in balls:
         i.move_ball()
-    
+    print(sum((i.SPEED for i in balls)) / N, CollisionCount)
     window.update()
     time.sleep(1 / 60)
