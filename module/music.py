@@ -91,12 +91,29 @@ class Music():
     def path(self):
         return os.path.sep.join(self.__path)
 
+    def format(self, target=None):
+        if target == None:
+            if self.is_lossless():
+                target = 'flac'
+                self.__lossless = True
+            else:
+                target = 'mp3'
+                self.__lossless = False
+        
+        path = os.path.sep.join(self.__path)
+        command = 'ffmpeg -i "{}" -q 0 "{}" -y'.format(path, path.replace(self.form, target))
+        os.system(command)
+        os.system('rm "{}"'.format(path))
+
 class Lyric(Music):
     def __init__(self, path):
         Music.__init__(self, path)
         self.lyric = {}
 
     def append(self, time, line):
+        """
+        Add a new line to the lyric (cached).
+        """
         time = ('[' + time + ']').split(':')
         for i in time:
             if len(i) < 2:
@@ -113,6 +130,9 @@ class Lyric(Music):
             print(i, self.lyric[i])
 
     def load(self, path=None):
+        """
+        Read an existing lrc file and store the infomation in a dict().
+        """
         if os.path.isfile(self.path().replace(self.form, 'lrc')) and path == None:
             path = self.path().replace(self.form, 'lrc')
 
@@ -145,10 +165,11 @@ class Lyric(Music):
                         continue
 
                 self.lyric[key] = value
-        
-        return self.lyric
 
     def dump(self, path = None):
+        """
+        Write the cached lyric information into a lrc file. Overwrite if existing.
+        """
         if path == None:
             path = self.path().replace(self.form, 'lrc')
 
@@ -164,9 +185,15 @@ class Lyric(Music):
             fin.close()
     
     def modify(self, time, line):
+        """
+        Modify a specific line in the lyrics.
+        """
         self.lyric['[' + time + ']'] = line
         
     def remove(self, time):
+        """
+        Remove a specific line in the lyrics.
+        """
         key = time
         if not '[' in time:
             key = '[' + time + ']'

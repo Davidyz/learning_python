@@ -6,7 +6,7 @@ unsupported_file = []
 
 def printf(hashtable):
     for i in hashtable:
-        print(i, ':', hashtable[i], end=' ')
+        print(i, ':', hashtable[i], end='; ')
     print('\n')
 
 def generate_song_list(rootdir):
