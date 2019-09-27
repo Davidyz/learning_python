@@ -16,6 +16,10 @@ pi = math.pi
 e = math.e
 cos = math.cos
 sin = math.sin
+tan = math.tan
+asin = math.asin
+acos = math.acos
+atan = math.atan2
 lg = math.log10
 
 def ln(x):
@@ -26,14 +30,17 @@ def factorial(n):
     Return n!.
     Return -1 if input is not valid (not a natural number).
     """
-    if int(n) != n or n < 1:
+    if int(n) != n or n < 0:
         return -1
 
-    i = 1
+    if n < 0:
+        return 1
+
     result = 1
-    while i <= n:
-        result = result * i
-        i += 1
+    while n >= 1:
+        result *= n
+        n -= 1
+    
     return result
 
 def isprime(n):
@@ -79,13 +86,31 @@ def choose(n, r):
     else:
         return
 
+def intpow(x, n):
+    """
+    Return the nth power of x.
+    n has to be an integer.
+    """
+    if n % 1 != 0:
+        return None
+    elif n < 0:
+        return 1 / intpow(x, -n)
+    if n == 0:
+        return 1
+    elif n == 1:
+        return x
+    if n % 2 == 0:
+        return intpow(x * x, n // 2)
+    else:
+        return intpow(x * x, (n - 1) // 2) * x
+
 def fibonacci(n):
     """
     Return the nth number in the fibonacci sequence.
     Starting from 0, 1
     """
     a, b = 0, 1
-    while n > 1:
+    while n > 0:
         a, b = b, a + b
         n -= 1
     return a

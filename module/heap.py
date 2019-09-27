@@ -1,6 +1,6 @@
 import math
 '''
-I did not notice the issue that python's array index start from 0 while in pseudocode it start from 1. As a result, the way in which child() and parent() work must be modified as below so that the heap algorithms can work properly.
+I did not notice the issue that python's array index start from 0 while in pseudocode it start from 1. As a result, child() and parent() must be modified as below so that the heap algorithms can work properly.
 '''
 def parent(index):
     return math.floor((index - 1) / 2)

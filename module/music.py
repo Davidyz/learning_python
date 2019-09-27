@@ -1,6 +1,6 @@
 #coding=utf-8
 '''
-This is a personal module for music tagging (currently support ID3 tags only because it use 'audiotools', which support ID3 only, under *nix environment). Hopefully new functions can be added.
+This is a personal module for music tagging and .lrc file processing. Mutagen integrated.
 '''
 
 import os, mutagen, mutagen.flac
@@ -91,7 +91,7 @@ class Music():
     def path(self):
         return os.path.sep.join(self.__path)
 
-    def format(self, target=None):
+    def format(self, target=None, replace=True):
         if target == None:
             if self.is_lossless():
                 target = 'flac'
@@ -103,7 +103,8 @@ class Music():
         path = os.path.sep.join(self.__path)
         command = 'ffmpeg -i "{}" -q 0 "{}" -y'.format(path, path.replace(self.form, target))
         os.system(command)
-        os.system('rm "{}"'.format(path))
+        if replace:
+            os.system('rm "{}"'.format(path))
 
 class Lyric(Music):
     def __init__(self, path):
@@ -152,6 +153,7 @@ class Lyric(Music):
                 except ValueError:
                     key = i
                     value = ''
+                
                 if 'al:' in key:
                     self.info['album'] = key[key.index(':') + 1:-1]
                 elif 'ar:' in key:
