@@ -10,7 +10,7 @@ except Exception:
     sys.path.append('module/')
     import integration
 
-import math, cmath
+import math, cmath, copy, random
 
 pi = math.pi
 e = math.e
@@ -273,6 +273,98 @@ def cpow(z, n, polar = False):
         return (mod, angle)
     else:
         return mod * (cos(angle) + 1j * sin(angle))
+
+# Codes for matrix. Temporarily without numpy.
+def randmat(row, column, np=False):
+    if np:
+        import numpy
+        return numpy.matrix([[random.getrandbits(7) for i in range(column)] for j in range(row)])
+    else:
+        return [[random.getrandbits(7) for i in range(column)] for j in range(row)]
+
+def printm(matrix):
+    for i in matrix:
+        for j in i:
+            print(j, end=' ')
+        print('\n', end='')
+    print('\n')
+
+def get_row(matrix, n):
+    return matrix[n]
+
+def get_column(matrix, n):
+    return [i[n] for i in matrix]
+
+def DotProduct(vect1, vect2):
+    if len(vect1) == len(vect2):
+        return sum((vect1[i] * vect2[i] for i in range(len(vect1))))
+    else:
+        raise ValueError('Vect1 and Vect2 are not with same dimensions.')
+
+def add(mat1, mat2):
+    if len(mat1) != len(mat2) or len(mat1[0]) != len(mat2[0]):
+        raise ValueError('Mat1 and Mat2 are not of the same dimensions.')
+    return [[mat1[row][column] + mat2[row][column] for column in range(len(mat1[0]))] for row in range(len(mat1))]
+
+def multiply(mat1, mat2):
+    if len(mat1[0]) != len(mat2):
+        return ValueError('Mat1 and Mat2 are not conformable!')
+    result = [[0 for j in mat2[0]] for i in mat1]
+    row, column = len(result), len(result[0])
+    
+    for i in range(row):
+        for j in range(column):
+            result[i][j] = DotProduct(get_row(mat1, i), get_column(mat2, j))
+    return result
+
+def transpose(matrix):
+    transposed = [[] for i in range(len(matrix[0]))]
+
+    for column in range(len(matrix[0])):
+        for row in range(len(matrix)):
+            transposed[column].append(matrix[row][column])
+
+    return transposed
+
+def minor(matrix, row, column):
+    matrix = copy.deepcopy(matrix)
+    min_matrix = []
+
+    for i in range(len(matrix)):
+        if i != row:
+            min_matrix.append(matrix[i])
+            min_matrix[-1].pop(column)
+        else:
+            pass
+
+    return min_matrix
+
+def determinant(matrix):
+    if len(matrix) != len(matrix[0]):
+        raise ValueError('Not a square matrix!')
+
+    if len(matrix) == 1:
+        return matrix[0][0]
+
+    det = 0
+    for i in range(len(matrix[0])):
+        det += matrix[0][i] * determinant(minor(matrix, 0, i)) * (-1) ** i
+
+    return det
+
+def inverse(matrix):
+    det = determinant(matrix)
+    if len(matrix) != len(matrix[0]) or det == 0:
+        return None
+    
+    matrix = copy.deepcopy(matrix)
+    inverse = [[] for i in range(len(matrix))]
+
+    for row in range(len(matrix)):
+        for column in range(len(matrix)):
+            inverse[row].append((-1) ** (row + column) * determinant(minor(matrix, row, column)) / det)
+    
+    return transpose(inverse)
 
 if __name__ == '__main__':
     import sys
