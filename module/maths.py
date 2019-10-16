@@ -199,6 +199,16 @@ def newton_method(f, derivative = differentiate, x = 1, accuracy=14):
             return x
     return x
 
+def summation(f, a, b=None):
+    if b == None:
+        b = a
+        a = 1
+    s = 0 
+    for x in range(a, b + 1):
+        s += f(x)
+    return s
+
+# Codes for statistics.
 def mean(array):
     """
     Calculate an estimated mean from mid-class values and their frequencies.
@@ -207,30 +217,25 @@ def mean(array):
     tx = 0
     tf = 0
     for i in array:
-        tx += i[0] * i[1]
-        tf += i[1]
+        if isinstance(i, list) or isinstance(i, tuple):
+            tx += i[0] * i[1]
+            tf += i[1]
+        else:
+            tx += i
+            tf += 1
     return tx / tf
 
-def sd(array):
-    """
-    Calculate an estimated standard deviation from mid-class values and their frequencies.
-    The input should has the same format as mean().
-    """
-    tx2f = 0
-    tf = 0
-    for i in array:
-        tx2f += (i[0] ** 2) * i[1]
-        tf += i[1]
-    return (tx2f / tf - mean(array) ** 2) ** 0.5
-
-def summation(f, a, b=None):
-    if b == None:
-        b = a
-        a = 1
+def moment(array, n):
     s = 0
-    for x in range(a, b + 1):
-        s += f(x)
+    for i in array:
+        if isinstance(i, list) or isinstance(i, tuple):
+            s += i[1] * (i[0] ** n)
+        else:
+            s += i ** n
     return s
+
+def StandardDeviation(array):
+    return math.sqrt(moment(array, 2) - mean(array) ** 2)
 
 # For complex number since here.
 
@@ -275,25 +280,14 @@ def cpow(z, n, polar = False):
         return mod * (cos(angle) + 1j * sin(angle))
 
 # Codes for matrix. Temporarily without numpy.
-def randmat(row, column, np=False):
-    if np:
-        import numpy
-        return numpy.matrix([[random.getrandbits(7) for i in range(column)] for j in range(row)])
+class DimensionError(Exception):
+   pass
+
+def VectorSum(vec1, vec2):
+    if len(vec1) == len(vec2):
+        return [vec1[i] + vec2[i] for i in range(len(vec1))]
     else:
-        return [[random.getrandbits(7) for i in range(column)] for j in range(row)]
-
-def printm(matrix):
-    for i in matrix:
-        for j in i:
-            print(j, end=' ')
-        print('\n', end='')
-    print('\n')
-
-def get_row(matrix, n):
-    return matrix[n]
-
-def get_column(matrix, n):
-    return [i[n] for i in matrix]
+        raise DimensionError('The vectors are not of the same dimension.')
 
 def DotProduct(vect1, vect2):
     if len(vect1) == len(vect2):
@@ -301,21 +295,108 @@ def DotProduct(vect1, vect2):
     else:
         raise ValueError('Vect1 and Vect2 are not with same dimensions.')
 
+class matrix():
+    def __init__(self, mat):
+        for i in range(len(mat) - 1):
+            if len(mat[i]) != len(mat[i + 1]):
+                raise ValueError('Not a valid matrix!')
+
+        self.__mat = mat
+        self.__dimension = len(mat), len(mat[0])
+        self.__iterater = 0
+        self.__CurrentRow = self.__mat[0]
+    
+    def __len__(self):
+        return self.__dimension[0] * self.__dimension[1]
+
+    def __iter__(self):
+        return iter(self.__mat)
+
+    def __mul__(self, other):
+        '''
+        Self post-multiplied by other.
+        '''
+        if isinstance(other, matrix):
+            if self.__dimension[1] == other.dimension()[0]:
+                result = [[0 for j in range(other.dimension()[1])] for i in range(self.__dimension[0])]
+                row, column = len(result), len(result[0])
+
+                for i in range(row):
+                    for j in range(column):
+                        result[i][j] = DotProduct(self.__mat[i], other.column(j))
+                return result
+
+            else:
+                raise DimensionError('The matrices are not conformable!')
+
+        elif isinstance(other, int) or isinstance(other, float):
+            newmat = copy.deepcopy(self)
+            for i in newmat:
+                for j in i:
+                    j = other * j
+            return newmat
+
+    def __add__(self, n):
+        if self.__dimension == n.dimension():
+            newmat = []
+            for i in range(self.__dimension[0]):
+                newmat.append(VectorSum(self.__mat[i], n.row(i)))
+            return matrix(newmat)
+        
+        else:
+            raise DimensionError('The matrices are not conformable!')
+    
+    def minor(self, row, column):
+        if self.__dimension[0] == self.__dimension[1]:
+            min_matrix = []
+            for i in range(self.__dimension[0]):
+                if i != row:
+                    min_matrix.append(self.row(i))
+                    min_matrix[-1].pop(column)
+                
+        return matrix(min_matrix)
+    
+    def determinant(self):
+        if len(self) == 1:
+            return self.row(0)[0]
+        
+        det = 0
+        for i in range(self.__dimension[1]):
+            det += self.__mat[0][i] * self.minor(0, i).determinant() * (-1) ** i
+        
+        return det
+
+    def dimension(self):
+        return self.__dimension
+
+    def row(self, n):
+        return self.__mat[n]
+
+    def column(self, n):
+        return [i[n] for i in self.__mat]
+
+    def show(self):
+        for i in self.__mat:
+            print(i)
+        print('\n')
+
+def identity(n):
+    mat = [[0 for i in range(n)] for j in range(n)]
+    for i in range(n):
+        mat[i][i] = 1
+    return matrix(mat)
+
+def randmat(row, column, np=False):
+    if np:
+        import numpy
+        return numpy.matrix([[random.getrandbits(7) for i in range(column)] for j in range(row)])
+    else:
+        return matrix([[random.getrandbits(7) for i in range(column)] for j in range(row)])
+
 def add(mat1, mat2):
     if len(mat1) != len(mat2) or len(mat1[0]) != len(mat2[0]):
         raise ValueError('Mat1 and Mat2 are not of the same dimensions.')
     return [[mat1[row][column] + mat2[row][column] for column in range(len(mat1[0]))] for row in range(len(mat1))]
-
-def multiply(mat1, mat2):
-    if len(mat1[0]) != len(mat2):
-        return ValueError('Mat1 and Mat2 are not conformable!')
-    result = [[0 for j in mat2[0]] for i in mat1]
-    row, column = len(result), len(result[0])
-    
-    for i in range(row):
-        for j in range(column):
-            result[i][j] = DotProduct(get_row(mat1, i), get_column(mat2, j))
-    return result
 
 def transpose(matrix):
     transposed = [[] for i in range(len(matrix[0]))]
@@ -348,6 +429,8 @@ def determinant(matrix):
 
     det = 0
     for i in range(len(matrix[0])):
+        if matrix[0][i] == 0:
+            continue
         det += matrix[0][i] * determinant(minor(matrix, 0, i)) * (-1) ** i
 
     return det
