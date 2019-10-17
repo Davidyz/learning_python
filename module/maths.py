@@ -19,7 +19,7 @@ sin = math.sin
 tan = math.tan
 asin = math.asin
 acos = math.acos
-atan = math.atan2
+atan = math.atan
 lg = math.log10
 
 def ln(x):
@@ -166,7 +166,6 @@ def root(m, power = 2):
         x = x - y1/df(x)
         y0 = y1
         y1 = f(x)
-        print(x)
     return x
 
 def differentiate(f, x, accu = 3):
@@ -305,7 +304,17 @@ class matrix():
         self.__dimension = len(mat), len(mat[0])
         self.__iterater = 0
         self.__CurrentRow = self.__mat[0]
+        self.__columns = []
     
+    def __eq__(self, other):
+        if isinstance(other, matrix) and other.dimension() == self.__dimension:
+            for i in range(self.__dimension[0]):
+                for j in range(self.__dimension[1]):
+                    if self.__mat[i][j] != other.row(i)[j]:
+                        return False
+            return True
+        return False
+
     def __len__(self):
         return self.__dimension[0] * self.__dimension[1]
 
@@ -324,7 +333,7 @@ class matrix():
                 for i in range(row):
                     for j in range(column):
                         result[i][j] = DotProduct(self.__mat[i], other.column(j))
-                return result
+                return matrix(result)
 
             else:
                 raise DimensionError('The matrices are not conformable!')
@@ -348,12 +357,11 @@ class matrix():
     
     def minor(self, row, column):
         if self.__dimension[0] == self.__dimension[1]:
-            min_matrix = []
-            for i in range(self.__dimension[0]):
-                if i != row:
-                    min_matrix.append(self.row(i))
-                    min_matrix[-1].pop(column)
-                
+            min_matrix = copy.deepcopy(self.__mat)
+            min_matrix.pop(row)
+            for i in min_matrix:
+                i.pop(column)
+
         return matrix(min_matrix)
     
     def determinant(self):
@@ -361,10 +369,13 @@ class matrix():
             return self.row(0)[0]
         
         det = 0
-        for i in range(self.__dimension[1]):
+        for i in range(self.__dimension[0]):
             det += self.__mat[0][i] * self.minor(0, i).determinant() * (-1) ** i
         
         return det
+    
+    def transpose(self):
+        return matrix(self.columns())
 
     def dimension(self):
         return self.__dimension
@@ -372,8 +383,28 @@ class matrix():
     def row(self, n):
         return self.__mat[n]
 
+    def inverse(self):
+        det = self.determinant()
+        if det == 0:
+            return None
+        elif self.__dimension[0] != self.__dimension[1]:
+            return None
+        else:
+
+            inverse = [[0 for j in range(self.__dimension[0])] for i in range(self.__dimension[0])]
+            for row in range(self.__dimension[0]):
+                for column in range(self.__dimension[1]):
+                    inverse[column][row] = self.minor(row, column).determinant() * (-1) ** (row + column) / det
+            return matrix(inverse)
+
     def column(self, n):
         return [i[n] for i in self.__mat]
+
+    def columns(self):
+        if self.__columns == []:
+            for i in range(self.__dimension[1]):
+                self.__columns.append([j[i] for j in self.__mat])
+        return self.__columns
 
     def show(self):
         for i in self.__mat:
@@ -392,62 +423,6 @@ def randmat(row, column, np=False):
         return numpy.matrix([[random.getrandbits(7) for i in range(column)] for j in range(row)])
     else:
         return matrix([[random.getrandbits(7) for i in range(column)] for j in range(row)])
-
-def add(mat1, mat2):
-    if len(mat1) != len(mat2) or len(mat1[0]) != len(mat2[0]):
-        raise ValueError('Mat1 and Mat2 are not of the same dimensions.')
-    return [[mat1[row][column] + mat2[row][column] for column in range(len(mat1[0]))] for row in range(len(mat1))]
-
-def transpose(matrix):
-    transposed = [[] for i in range(len(matrix[0]))]
-
-    for column in range(len(matrix[0])):
-        for row in range(len(matrix)):
-            transposed[column].append(matrix[row][column])
-
-    return transposed
-
-def minor(matrix, row, column):
-    matrix = copy.deepcopy(matrix)
-    min_matrix = []
-
-    for i in range(len(matrix)):
-        if i != row:
-            min_matrix.append(matrix[i])
-            min_matrix[-1].pop(column)
-        else:
-            pass
-
-    return min_matrix
-
-def determinant(matrix):
-    if len(matrix) != len(matrix[0]):
-        raise ValueError('Not a square matrix!')
-
-    if len(matrix) == 1:
-        return matrix[0][0]
-
-    det = 0
-    for i in range(len(matrix[0])):
-        if matrix[0][i] == 0:
-            continue
-        det += matrix[0][i] * determinant(minor(matrix, 0, i)) * (-1) ** i
-
-    return det
-
-def inverse(matrix):
-    det = determinant(matrix)
-    if len(matrix) != len(matrix[0]) or det == 0:
-        return None
-    
-    matrix = copy.deepcopy(matrix)
-    inverse = [[] for i in range(len(matrix))]
-
-    for row in range(len(matrix)):
-        for column in range(len(matrix)):
-            inverse[row].append((-1) ** (row + column) * determinant(minor(matrix, row, column)) / det)
-    
-    return transpose(inverse)
 
 if __name__ == '__main__':
     import sys
