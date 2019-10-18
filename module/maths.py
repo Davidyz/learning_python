@@ -282,6 +282,13 @@ def cpow(z, n, polar = False):
 class DimensionError(Exception):
    pass
 
+class Vector():
+    def __init__(self, data):
+        self.__vec = data
+    
+    def __len__(self):
+        return len(self.__vec)
+
 def VectorSum(vec1, vec2):
     if len(vec1) == len(vec2):
         return [vec1[i] + vec2[i] for i in range(len(vec1))]
@@ -301,7 +308,7 @@ class matrix():
                 raise ValueError('Not a valid matrix!')
 
         self.__mat = mat
-        self.__dimension = len(mat), len(mat[0])
+        self.__dimension = [len(mat), len(mat[0])]
         self.__iterater = 0
         self.__CurrentRow = self.__mat[0]
         self.__columns = []
@@ -365,6 +372,8 @@ class matrix():
         return matrix(min_matrix)
     
     def determinant(self):
+        if self.__dimension[0] != self.__dimension[1]:
+            raise DimensionError('This is not a square matrix and have no determinant.')
         if len(self) == 1:
             return self.row(0)[0]
         
@@ -384,6 +393,9 @@ class matrix():
         return self.__mat[n]
 
     def inverse(self):
+        if self.__dimension[0] != self.__dimension[1]:
+            raise DimensionError('This is not a square matrix and have no inverse.')
+
         det = self.determinant()
         if det == 0:
             return None
@@ -398,7 +410,7 @@ class matrix():
             return matrix(inverse)
 
     def column(self, n):
-        return [i[n] for i in self.__mat]
+        return self.columns()[n]
 
     def columns(self):
         if self.__columns == []:
@@ -410,6 +422,19 @@ class matrix():
         for i in self.__mat:
             print(i)
         print('\n')
+
+    def PopRow(self, n):
+        if self.__dimension[0] > n:
+            self.__dimension[0] -= 1
+            return self.__mat.pop(n)
+
+    def PopColumn(self, n):
+        if self.__dimension[1] > n:
+            self.__dimension[1] -= 1
+            return [i.pop(n) for i in self.__mat]
+
+def zeros(row, column):
+    return matrix([[0 for i in range(column)] for j in range(row)])
 
 def identity(n):
     mat = [[0 for i in range(n)] for j in range(n)]
