@@ -3,14 +3,7 @@ This is a custom module of functions that is created in order to practice algori
 Currently support python3 only.
 """
 from __future__ import division
-try:
-    from module import integration
-except Exception:
-    import sys
-    sys.path.append('module/')
-    import integration
-
-import math, cmath, copy, random
+import math, cmath, copy, random, integration
 
 pi = math.pi
 e = math.e
@@ -283,17 +276,50 @@ class DimensionError(Exception):
    pass
 
 class Vector():
+    """
+    Reinventing wheels to practice coding and make tools to cheat in maths homework.
+    """
     def __init__(self, data):
-        self.__vec = data
+        if isinstance(data, list):
+            self.__vec = data
+        elif isinstance(data, Matrix) and min(data.dimension()) == 1:
+            if data.dimension()[1] >= data.dimension()[0]:
+                self.__vec = data.row(0)
+            else:
+                self.__vec = data.column(0)
+        else:
+            raise ValueError('Please check the input. Only lists and matrix() are supported.')
     
     def __len__(self):
         return len(self.__vec)
+    
+    def __getitem__(self, n):
+        return self.__vec[n]
 
-def VectorSum(vec1, vec2):
-    if len(vec1) == len(vec2):
-        return [vec1[i] + vec2[i] for i in range(len(vec1))]
-    else:
-        raise DimensionError('The vectors are not of the same dimension.')
+    def __setitem__(self, index, value):
+        self.__vec[index] = value
+
+    def __add__(self, other):
+        if len(self) == len(other):
+            return [self[i] + other[i] for i in range(len(self))]
+
+    def __abs__(self):
+        return math.sqrt(sum([i ** 2 for i in self.__vec]))
+
+    def __mul__(self, other):
+        if isinstance(other, int) or isinstance(other, float):
+            for i in range(len(self)):
+                self[i] *= other
+        
+        if isinstance(other, Vector):
+            if len(self) == len(other):
+                return sum((self[i] * other[i] for i in range(len(self))))
+    
+    def show(self):
+        print(self.__vec)
+
+def angle(vec1, vec2):
+    return acos(vec1 * vec2 / abs(vec1) / abs(vec2))
 
 def DotProduct(vect1, vect2):
     if len(vect1) == len(vect2):
@@ -301,7 +327,10 @@ def DotProduct(vect1, vect2):
     else:
         raise ValueError('Vect1 and Vect2 are not with same dimensions.')
 
-class matrix():
+class Matrix():
+    """
+    To assist maths homework and practice coding.
+    """
     def __init__(self, mat):
         for i in range(len(mat) - 1):
             if len(mat[i]) != len(mat[i + 1]):
@@ -314,7 +343,7 @@ class matrix():
         self.__columns = []
     
     def __eq__(self, other):
-        if isinstance(other, matrix) and other.dimension() == self.__dimension:
+        if isinstance(other, Matrix) and other.dimension() == self.__dimension:
             for i in range(self.__dimension[0]):
                 for j in range(self.__dimension[1]):
                     if self.__mat[i][j] != other.row(i)[j]:
@@ -332,36 +361,42 @@ class matrix():
         '''
         Self post-multiplied by other.
         '''
-        if isinstance(other, matrix):
+        if isinstance(other, Matrix):
             if self.__dimension[1] == other.dimension()[0]:
                 result = [[0 for j in range(other.dimension()[1])] for i in range(self.__dimension[0])]
                 row, column = len(result), len(result[0])
 
                 for i in range(row):
                     for j in range(column):
-                        result[i][j] = DotProduct(self.__mat[i], other.column(j))
-                return matrix(result)
+                        result[i][j] = Vector(self.__mat[i]) * Vector(other.column(j))
+                return Matrix(result)
 
             else:
                 raise DimensionError('The matrices are not conformable!')
 
         elif isinstance(other, int) or isinstance(other, float):
-            newmat = copy.deepcopy(self)
-            for i in newmat:
-                for j in i:
-                    j = other * j
-            return newmat
+            newmat = copy.deepcopy(self.__mat)
+            for i in range(self.__dimension[0]):
+                for j in range(self.__dimension[1]):
+                    newmat[i][j] *= other
+            return Matrix(newmat)
 
     def __add__(self, n):
         if self.__dimension == n.dimension():
             newmat = []
             for i in range(self.__dimension[0]):
-                newmat.append(VectorSum(self.__mat[i], n.row(i)))
-            return matrix(newmat)
+                newmat.append(list(Vector(self.__mat[i]) + Vector(n.row(i))))
+            return Matrix(newmat)
         
         else:
             raise DimensionError('The matrices are not conformable!')
     
+    def __sub__(self, other):
+        return self + other * (-1)
+
+    def __neg__(self):
+        return self * (-1)
+
     def minor(self, row, column):
         if self.__dimension[0] == self.__dimension[1]:
             min_matrix = copy.deepcopy(self.__mat)
@@ -369,7 +404,7 @@ class matrix():
             for i in min_matrix:
                 i.pop(column)
 
-        return matrix(min_matrix)
+        return Matrix(min_matrix)
     
     def determinant(self):
         if self.__dimension[0] != self.__dimension[1]:
@@ -384,7 +419,7 @@ class matrix():
         return det
     
     def transpose(self):
-        return matrix(self.columns())
+        return Matrix(self.columns())
 
     def dimension(self):
         return self.__dimension
@@ -399,15 +434,13 @@ class matrix():
         det = self.determinant()
         if det == 0:
             return None
-        elif self.__dimension[0] != self.__dimension[1]:
-            return None
         else:
 
             inverse = [[0 for j in range(self.__dimension[0])] for i in range(self.__dimension[0])]
             for row in range(self.__dimension[0]):
                 for column in range(self.__dimension[1]):
                     inverse[column][row] = self.minor(row, column).determinant() * (-1) ** (row + column) / det
-            return matrix(inverse)
+            return Matrix(inverse)
 
     def column(self, n):
         return self.columns()[n]
@@ -431,23 +464,24 @@ class matrix():
     def PopColumn(self, n):
         if self.__dimension[1] > n:
             self.__dimension[1] -= 1
+            self.__columns = []
             return [i.pop(n) for i in self.__mat]
 
 def zeros(row, column):
-    return matrix([[0 for i in range(column)] for j in range(row)])
+    return Matrix([[0 for i in range(column)] for j in range(row)])
 
 def identity(n):
     mat = [[0 for i in range(n)] for j in range(n)]
     for i in range(n):
         mat[i][i] = 1
-    return matrix(mat)
+    return Matrix(mat)
 
 def randmat(row, column, np=False):
     if np:
         import numpy
         return numpy.matrix([[random.getrandbits(7) for i in range(column)] for j in range(row)])
     else:
-        return matrix([[random.getrandbits(7) for i in range(column)] for j in range(row)])
+        return Matrix([[random.getrandbits(7) for i in range(column)] for j in range(row)])
 
 if __name__ == '__main__':
     import sys
