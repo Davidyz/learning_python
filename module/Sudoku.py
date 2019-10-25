@@ -1,4 +1,4 @@
-import Array, copy, turtle, time, multiprocessing, math
+import copy, turtle, time, multiprocessing, math
 try:
     import pysnooper
 except ModuleNotFoundError:
@@ -97,9 +97,9 @@ class Board():
         '''
         A class designed to help solve a sudoku puzzle.
         '''
-    def __init__(self, data = [[0 for i in range(9)] for i in range(9)]):
+    def __init__(self, data = [[0 for i in range(9)] for i in range(9)], difficulty='medium'):
         self.size = len(data)
-
+        self.difficulty = difficulty
         for i in range(9):
             for j in range(9):
                 data[i][j] = Cell([i, j], data[i][j])
@@ -321,7 +321,7 @@ def enter_sudoku():
     for i in range(9):
         char = input("Enter the {}th row (all-together, eg: 123456789): ".format(str(i + 1)))
         if char == '':
-            return _sample
+            return
         sudoku.append(list(int(j) for j in char))
     
     if len(sudoku) == 9:
@@ -502,10 +502,10 @@ def load_sudoku(path='puzzles.txt'):
     fin = open(path, 'r')
     puzzles = fin.readlines()
     fin.close()
-    puzzles = Array.clear_item(puzzles, '\n')
+    puzzles = [i for i in puzzles if i != '\n']
     for i in range(len(puzzles)):
         puzzles[i] = eval(puzzles[i])
-        puzzles[i] = (puzzles[i][:9], puzzles[i][9])
+        puzzles[i] = Board(puzzles[i][:9], difficulty=puzzles[i][9])
     return puzzles
 
 def dump_sudoku(array, path='puzzles.txt'):
@@ -516,7 +516,7 @@ def dump_sudoku(array, path='puzzles.txt'):
     legacy = fin.readlines()
     fin.close()
     fin = open(path, 'w')
-    content = Array.clear_item(legacy + array, '\n')
+    content = [i for i in legacy + array if i != '\n']
     for i in content:
         fin.write(str(i) + '\n')
     fin.close()
