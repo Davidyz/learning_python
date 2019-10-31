@@ -8,3 +8,4 @@ dist
 build
 temp.py
 test.py
+.Rhistory

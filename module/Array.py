@@ -108,7 +108,7 @@ def mergesort(array):
 def heapsort(array):
     if len(array) < 2:
         return array
-
+    
     index = len(array) - 1
     array = Heap.max_heap(array[:index + 1]) + array[index + 1:]
 
