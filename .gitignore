@@ -6,4 +6,6 @@ vim.exe.stackdump
 *.bak
 dist
 build
+temp.py
+test.py
 .Rhistory

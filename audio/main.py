@@ -6,7 +6,7 @@ unsupported_file = []
 
 def printf(hashtable):
     for i in hashtable:
-        print(i, ':', hashtable[i], end=' ')
+        print(i, ':', hashtable[i], end='; ')
     print('\n')
 
 def generate_song_list(rootdir):
@@ -89,7 +89,7 @@ def linux():
         single(strict)
 
 def win():
-    strict = bool(int(input('Strrict mod(1) or not(0)? ')))
+    strict = bool(int(input('Strict mod(1) or not(0)? ')))
     mode = int(input('Single(0) or in batch(1)? '))
     path = input('Path (please drag from the File Manager): ')
     

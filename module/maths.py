@@ -3,33 +3,37 @@ This is a custom module of functions that is created in order to practice algori
 Currently support python3 only.
 """
 from __future__ import division
-try:
-    from module import integration
-except Exception:
-    import sys
-    sys.path.append('module/')
-    import integration
-
-import math, cmath
+import math, cmath, copy, random, integration
 
 pi = math.pi
 e = math.e
 cos = math.cos
 sin = math.sin
+tan = math.tan
+asin = math.asin
+acos = math.acos
+atan = math.atan
+lg = math.log10
+
+def ln(x):
+    return math.log1p(x - 1)
 
 def factorial(n):
     """
     Return n!.
     Return -1 if input is not valid (not a natural number).
     """
-    if int(n) != n or n < 1:
+    if int(n) != n or n < 0:
         return -1
 
-    i = 1
+    if n < 0:
+        return 1
+
     result = 1
-    while i <= n:
-        result = result * i
-        i += 1
+    while n >= 1:
+        result *= n
+        n -= 1
+    
     return result
 
 def isprime(n):
@@ -75,18 +79,34 @@ def choose(n, r):
     else:
         return
 
+def intpow(x, n):
+    """
+    Return the nth power of x.
+    n has to be an integer.
+    """
+    if n % 1 != 0:
+        return None
+    elif n < 0:
+        return 1 / intpow(x, -n)
+    if n == 0:
+        return 1
+    elif n == 1:
+        return x
+    if n % 2 == 0:
+        return intpow(x * x, n // 2)
+    else:
+        return intpow(x * x, (n - 1) // 2) * x
+
 def fibonacci(n):
     """
     Return the nth number in the fibonacci sequence.
     Starting from 0, 1
     """
-    if n <= 1:
-        return 0
-    if n == 2:
-        return 1
-    else:
-        result = fibonacci(n - 1) + fibonacci(n - 2)
-    return result
+    a, b = 0, 1
+    while n > 0:
+        a, b = b, a + b
+        n -= 1
+    return a
 
 def triangle(n):
     def triangle_helper(n, result = [1, [1, 1]]):
@@ -139,7 +159,6 @@ def root(m, power = 2):
         x = x - y1/df(x)
         y0 = y1
         y1 = f(x)
-        print(x)
     return x
 
 def differentiate(f, x, accu = 3):
@@ -149,7 +168,7 @@ def differentiate(f, x, accu = 3):
     step = 10 ** (-accu)
     return (f(x + step) - f(x)) / step
 
-def newton_method(f, derivative = differentiate, x = 1):
+def newton_method(f, derivative = differentiate, x = 1, accuracy=14):
     """
     Find one of the roots of equation f using Newton's method.
     f is the function of the equation.
@@ -158,21 +177,30 @@ def newton_method(f, derivative = differentiate, x = 1):
     Return False if can't find a root around the given value of x.
     """
     y = f(x)
-    if derivative.__name__ == 'differentiate':
-        m = derivative(f, x)
-    else:
-        m = derivative(x)
-    
     while abs(y) >= pow(10, -14):
+        if derivative.__name__ == 'differentiate':
+            m = derivative(f, x, accuracy)
+        else:
+            m = derivative(x)
         x = x - y / m
         y1 = y
         y = f(x)
-        if m < pow(10, -14) and y > pow(10,0):
+        if abs(m) < pow(10, -14) and abs(y) > pow(10,0):
             return False
-        if abs(y - y1) <= pow(10, -14):
-            break
+        if abs(y - y1) <= pow(10, -accuracy):
+            return x
     return x
 
+def summation(f, a, b=None):
+    if b == None:
+        b = a
+        a = 1
+    s = 0 
+    for x in range(a, b + 1):
+        s += f(x)
+    return s
+
+# Codes for statistics.
 def mean(array):
     """
     Calculate an estimated mean from mid-class values and their frequencies.
@@ -181,21 +209,25 @@ def mean(array):
     tx = 0
     tf = 0
     for i in array:
-        tx += i[0] * i[1]
-        tf += i[1]
+        if isinstance(i, list) or isinstance(i, tuple):
+            tx += i[0] * i[1]
+            tf += i[1]
+        else:
+            tx += i
+            tf += 1
     return tx / tf
 
-def sd(array):
-    """
-    Calculate an estimated standard deviation from mid-class values and their frequencies.
-    The input should has the same format as mean().
-    """
-    tx2f = 0
-    tf = 0
+def moment(array, n):
+    s = 0
     for i in array:
-        tx2f += (i[0] ** 2) * i[1]
-        tf += i[1]
-    return (tx2f / tf - mean(array) ** 2) ** 0.5
+        if isinstance(i, list) or isinstance(i, tuple):
+            s += i[1] * (i[0] ** n)
+        else:
+            s += i ** n
+    return s
+
+def StandardDeviation(array):
+    return math.sqrt(moment(array, 2) - mean(array) ** 2)
 
 # For complex number since here.
 
@@ -239,6 +271,244 @@ def cpow(z, n, polar = False):
     else:
         return mod * (cos(angle) + 1j * sin(angle))
 
+# Codes for matrix. Temporarily without numpy.
+class DimensionError(Exception):
+   pass
+
+class Vector():
+    """
+    Reinventing wheels to practice coding and make tools to cheat in maths homework.
+    """
+    def __init__(self, data):
+        if isinstance(data, list):
+            self.__vec = data
+        elif isinstance(data, Matrix) and min(data.dimension()) == 1:
+            if data.dimension()[1] >= data.dimension()[0]:
+                self.__vec = data.row(0)
+            else:
+                self.__vec = data.column(0)
+        else:
+            raise ValueError('Please check the input. Only lists and matrix() are supported.')
+    
+    def __len__(self):
+        return len(self.__vec)
+    
+    def __getitem__(self, n):
+        return self.__vec[n]
+
+    def __setitem__(self, index, value):
+        self.__vec[index] = value
+
+    def __add__(self, other):
+        if len(self) == len(other):
+            return [self[i] + other[i] for i in range(len(self))]
+
+    def __abs__(self):
+        return math.sqrt(sum([i ** 2 for i in self.__vec]))
+
+    def __mul__(self, other):
+        if isinstance(other, int) or isinstance(other, float):
+            for i in range(len(self)):
+                self[i] *= other
+        
+        if isinstance(other, Vector):
+            if len(self) == len(other):
+                return sum((self[i] * other[i] for i in range(len(self))))
+    
+    def show(self):
+        print(self.__vec)
+
+def angle(vec1, vec2):
+    return acos(vec1 * vec2 / abs(vec1) / abs(vec2))
+
+def DotProduct(vect1, vect2):
+    if len(vect1) == len(vect2):
+        return sum((vect1[i] * vect2[i] for i in range(len(vect1))))
+    else:
+        raise ValueError('Vect1 and Vect2 are not with same dimensions.')
+
+class Matrix():
+    """
+    To assist maths homework and practice coding.
+    """
+    def __init__(self, mat, constant = False):
+        for i in range(len(mat) - 1):
+            if len(mat[i]) != len(mat[i + 1]):
+                raise ValueError('Not a valid matrix!')
+        if constant:
+            for i in range(len(mat)):
+                mat[i] = tuple(mat[i])
+            mat = tuple(mat)
+            self.__const = True
+        else:
+            self.__const = False
+
+        self.__mat = mat
+        self.__dimension = [len(mat), len(mat[0])]
+        self.__iterater = 0
+        self.__CurrentRow = self.__mat[0]
+        self.__columns = []
+    
+    def __eq__(self, other):
+        if isinstance(other, Matrix) and other.dimension() == self.__dimension:
+            for i in range(self.__dimension[0]):
+                for j in range(self.__dimension[1]):
+                    if self.__mat[i][j] != other.row(i)[j]:
+                        return False
+            return True
+        return False
+
+    def __len__(self):
+        return self.__dimension[0] * self.__dimension[1]
+
+    def __iter__(self):
+        return iter(self.__mat)
+
+    def __mul__(self, other):
+        '''
+        Self post-multiplied by other.
+        '''
+        if isinstance(other, Matrix):
+            if self.__dimension[1] == other.dimension()[0]:
+                result = [[0 for j in range(other.dimension()[1])] for i in range(self.__dimension[0])]
+                row, column = len(result), len(result[0])
+
+                for i in range(row):
+                    for j in range(column):
+                        result[i][j] = Vector(self.__mat[i]) * Vector(other.column(j))
+                return Matrix(result)
+
+            else:
+                raise DimensionError('The matrices are not conformable!')
+
+        elif isinstance(other, int) or isinstance(other, float):
+            newmat = copy.deepcopy(self.__mat)
+            for i in range(self.__dimension[0]):
+                for j in range(self.__dimension[1]):
+                    newmat[i][j] *= other
+            return Matrix(newmat)
+
+    def __add__(self, n):
+        if self.__dimension == n.dimension():
+            newmat = []
+            for i in range(self.__dimension[0]):
+                newmat.append(list(Vector(self.__mat[i]) + Vector(n.row(i))))
+            return Matrix(newmat)
+        
+        else:
+            raise DimensionError('The matrices are not conformable!')
+    
+    def __sub__(self, other):
+        return self + other * (-1)
+
+    def __neg__(self):
+        return self * (-1)
+    
+    def __getitem__(self, x):
+        return self.__mat[x]
+    
+    def __setitem__(self, x, y, value):
+        if not self.__const:
+            self.__mat[x][y] = value
+        else:
+            raise ValueError('This is a constant matrix!')
+    
+    def isConst(self):
+        return self.__const
+
+    def minor(self, row, column):
+        if self.__dimension[0] == self.__dimension[1]:
+            min_matrix = copy.deepcopy(self.__mat)
+            min_matrix.pop(row)
+            for i in min_matrix:
+                i.pop(column)
+
+        return Matrix(min_matrix)
+    
+    def determinant(self):
+        if self.__dimension[0] != self.__dimension[1]:
+            raise DimensionError('This is not a square matrix and have no determinant.')
+        if len(self) == 1:
+            return self.row(0)[0]
+        
+        det = 0
+        for i in range(self.__dimension[0]):
+            det += self.__mat[0][i] * self.minor(0, i).determinant() * (-1) ** i
+        
+        return det
+    
+    def transpose(self):
+        return Matrix(self.columns())
+
+    def dimension(self):
+        return self.__dimension
+
+    def row(self, n):
+        return self.__mat[n]
+
+    def inverse(self):
+        if self.__dimension[0] != self.__dimension[1]:
+            raise DimensionError('This is not a square matrix and have no inverse.')
+
+        det = self.determinant()
+        if det == 0:
+            return None
+        else:
+
+            inverse = [[0 for j in range(self.__dimension[0])] for i in range(self.__dimension[0])]
+            for row in range(self.__dimension[0]):
+                for column in range(self.__dimension[1]):
+                    inverse[column][row] = self.minor(row, column).determinant() * (-1) ** (row + column) / det
+            return Matrix(inverse)
+
+    def column(self, n):
+        return self.columns()[n]
+
+    def columns(self):
+        if self.__columns == []:
+            for i in range(self.__dimension[1]):
+                self.__columns.append([j[i] for j in self.__mat])
+        return self.__columns
+
+    def show(self):
+        for i in self.__mat:
+            print(i)
+        print('\n')
+
+    def PopRow(self, n):
+        if self.__dimension[0] > n:
+            self.__dimension[0] -= 1
+            return self.__mat.pop(n)
+
+    def PopColumn(self, n):
+        if self.__dimension[1] > n:
+            self.__dimension[1] -= 1
+            self.__columns = []
+            return [i.pop(n) for i in self.__mat]
+    
+    def SetMinor(self, x, y, new_minor):
+        '''
+        Set the minor of the (x, y)th element to be the new_minor.
+        '''
+        new_minor = copy.deepcopy(list(new_minor)).insert(x, self.__mat[x])
+
+        for i in range(self.__dimension[0]):
+            if i != x:
+                new_minor[i].insert(y, self.__mat[i][y])
+        self.__mat = new_minor
+
+def zeros(row, column):
+    return Matrix([[0 for i in range(column)] for j in range(row)])
+
+def identity(n):
+    mat = [[0 for i in range(n)] for j in range(n)]
+    for i in range(n):
+        mat[i][i] = 1
+    return Matrix(mat)
+
+def randmat(row, column, const=False):
+    return Matrix([[random.getrandbits(7) for i in range(column)] for j in range(row)], const)
+
 if __name__ == '__main__':
     import sys
-    print(newton_method(lambda x:math.cos(x) - x, lambda x:-math.sin(x) - 1, 100))
+    print(newton_method(lambda x:math.cos(x) - x, lambda x:-math.sin(x) - 1, 100, 2))

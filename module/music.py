@@ -1,6 +1,6 @@
 #coding=utf-8
 '''
-This is a personal module for music tagging (currently support ID3 tags only because it use 'audiotools', which support ID3 only, under *nix environment). Hopefully new functions can be added.
+This is a personal module for music tagging and .lrc file processing. Mutagen integrated.
 '''
 
 import os, mutagen, mutagen.flac
@@ -10,7 +10,7 @@ lossless = ['ape', 'wav', 'flac', 'dsd', 'dsf', 'dff']
 skip_tagging = ['dsd', 'dsf', 'dff']
 
 def is_music(name):
-    return name.split('.')[-1] in ['mp3', 'aac', 'm4a', 'flac', 'ape', 'wav', 'dsd', 'dsf', 'dff'] and os.path.isfile(name)
+    return (name.split('.')[-1] in ('mp3', 'aac', 'm4a', 'flac', 'ape', 'wav', 'dsd', 'dsf', 'dff')) and os.path.isfile(name)
 
 def all_music(array):
     for i in array:
@@ -88,14 +88,123 @@ class Music():
     def is_lossless(self):
         return self.__lossless
 
-    def info(self):
-        return self.__info
-
     def path(self):
-        return os.path.join(self.__path)
+        return os.path.sep.join(self.__path)
+
+    def format(self, target=None, replace=True):
+        if target == None:
+            if self.is_lossless():
+                target = 'flac'
+                self.__lossless = True
+            else:
+                target = 'mp3'
+                self.__lossless = False
+        
+        path = os.path.sep.join(self.__path)
+        command = 'ffmpeg -i "{}" -q 0 "{}" -y'.format(path, path.replace(self.form, target))
+        os.system(command)
+        if replace:
+            os.system('rm "{}"'.format(path))
+
+class Lyric(Music):
+    def __init__(self, path):
+        Music.__init__(self, path)
+        self.lyric = {}
+
+    def append(self, time, line):
+        """
+        Add a new line to the lyric (cached).
+        """
+        time = ('[' + time + ']').split(':')
+        for i in time:
+            if len(i) < 2:
+                i = '0' + i
+            
+        self.lyric[':'.join(time)] = line
+        copy = {}
+        for i in sorted(self.lyric.keys()):
+            copy[i] = self.lyric[i]
+        self.lyric = copy
+    
+    def pprint(self):
+        for i in self.lyric:
+            print(i, self.lyric[i])
+
+    def load(self, path=None):
+        """
+        Read an existing lrc file and store the infomation in a dict().
+        """
+        if os.path.isfile(self.path().replace(self.form, 'lrc')) and path == None:
+            path = self.path().replace(self.form, 'lrc')
+
+        elif not os.path.isfile(path):
+            return
+
+        with open(path) as fin:
+            content = fin.readlines()
+            for i in content:
+                i = i.replace('\n', '')
+                if i == '':
+                    continue
+
+                try:
+                    key = i[:i.index(']') + 1]
+                    value = i[i.index(']') + 1:]
+                except ValueError:
+                    key = i
+                    value = ''
+                
+                if 'al:' in key:
+                    self.info['album'] = key[key.index(':') + 1:-1]
+                elif 'ar:' in key:
+                    self.info['artist'] = key[key.index(':') + 1:-1]
+
+                if value == '':
+                    try:
+                        print(key)
+                        int(key[1])
+                    except ValueError:
+                        continue
+
+                self.lyric[key] = value
+
+    def dump(self, path = None):
+        """
+        Write the cached lyric information into a lrc file. Overwrite if existing.
+        """
+        if path == None:
+            path = self.path().replace(self.form, 'lrc')
+
+        with open(path, 'w') as fin:
+            for i in self.info:
+                if self.info[i] != '':
+                    fin.write('[{}:{}]\n'.format(i[:2], self.info[i]))
+            
+            fin.write('[by:Davidyz]\n')
+
+            for i in self.lyric:
+                fin.write(i + self.lyric[i] + '\n')
+            fin.close()
+    
+    def modify(self, time, line):
+        """
+        Modify a specific line in the lyrics.
+        """
+        self.lyric['[' + time + ']'] = line
+        
+    def remove(self, time):
+        """
+        Remove a specific line in the lyrics.
+        """
+        key = time
+        if not '[' in time:
+            key = '[' + time + ']'
+
+        if key in self.lyric:
+            del self.lyric[key]
 
 def format(song):
-    if song.split('.')[-1] in ('wav', 'ape'):
+    if song.form in ('wav', 'ape'):
         new_path = '.'.join(song.split('.')[:-1] + ['flac'])
         os.system('ffmpeg -i {} -q 0 {}'.format(song, new_path))
         os.system('rm ' + song)

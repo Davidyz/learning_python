@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 import itertools, sys
-sys.path.append('/home/david/git/learning_python/module/')
-import sort
 
 fin = open('wordplay/google-10000-english.txt', 'r')
 wordlist = fin.readlines()

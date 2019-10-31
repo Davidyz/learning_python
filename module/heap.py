@@ -1,6 +1,6 @@
 import math
 '''
-I did not notice the issue that python's array index start from 0 while in pseudocode it start from 1. As a result, the way in which child() and parent() work must be modified as below so that the heap algorithms can work properly.
+I did not notice the issue that python's array index start from 0 while in pseudocode it start from 1. As a result, child() and parent() must be modified as below so that the heap algorithms can work properly.
 '''
 def parent(index):
     return math.floor((index - 1) / 2)
@@ -21,9 +21,9 @@ def is_max(heap, index=None):
 
     return True
 
-def maxify(heap, index):
+def maxify(heap, index=0):
     '''
-    Maxify a heap started from heap[index].
+    Move the item specified by index to the place it should be at.
     '''
     l_child , r_child = child(index)
 
@@ -41,11 +41,7 @@ def maxify(heap, index):
 
 def max_heap(heap):
     for i in range(parent(len(heap) - 1), -1, -1):
-        if heap[i] < heap[2 * i]:
-            maxify(heap, i)
-        if ((2 * i) + 1 < len(heap)) and (heap[i] < heap[2 * i + 1]):
-            maxify(heap, i)
-
+        maxify(heap, i)
     return heap
 
 def remove_max(heap):
@@ -55,7 +51,7 @@ def remove_max(heap):
     return item
 
 if __name__ == '__main__':
-    heap = [9,8,7,6,5,4,3,2,1]
+    heap = [1,2,3,4,5,6,7,8,9]
     print(heap)
-    remove_max(heap)
+    max_heap(heap)
     print(heap)
