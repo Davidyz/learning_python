@@ -1,4 +1,4 @@
-import copy, turtle, time, multiprocessing, math
+import copy, turtle, time, multiprocessing
 try:
     import pysnooper
 except ModuleNotFoundError:
@@ -110,6 +110,9 @@ class Board():
             for j in i:
                 self.cells.append(j)
     
+    def __copy__(self):
+        return Board(self.__data)
+
     def set_value(self, index, i):
         '''
         Set value i to the cell with given index in the board.
