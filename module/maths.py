@@ -331,10 +331,17 @@ class Matrix():
     """
     To assist maths homework and practice coding.
     """
-    def __init__(self, mat):
+    def __init__(self, mat, constant = False):
         for i in range(len(mat) - 1):
             if len(mat[i]) != len(mat[i + 1]):
                 raise ValueError('Not a valid matrix!')
+        if constant:
+            for i in range(len(mat)):
+                mat[i] = tuple(mat[i])
+            mat = tuple(mat)
+            self.__const = True
+        else:
+            self.__const = False
 
         self.__mat = mat
         self.__dimension = [len(mat), len(mat[0])]
@@ -396,6 +403,18 @@ class Matrix():
 
     def __neg__(self):
         return self * (-1)
+    
+    def __getitem__(self, x):
+        return self.__mat[x]
+    
+    def __setitem__(self, x, y, value):
+        if not self.__const:
+            self.__mat[x][y] = value
+        else:
+            raise ValueError('This is a constant matrix!')
+    
+    def isConst(self):
+        return self.__const
 
     def minor(self, row, column):
         if self.__dimension[0] == self.__dimension[1]:
@@ -466,6 +485,17 @@ class Matrix():
             self.__dimension[1] -= 1
             self.__columns = []
             return [i.pop(n) for i in self.__mat]
+    
+    def SetMinor(self, x, y, new_minor):
+        '''
+        Set the minor of the (x, y)th element to be the new_minor.
+        '''
+        new_minor = copy.deepcopy(list(new_minor)).insert(x, self.__mat[x])
+
+        for i in range(self.__dimension[0]):
+            if i != x:
+                new_minor[i].insert(y, self.__mat[i][y])
+        self.__mat = new_minor
 
 def zeros(row, column):
     return Matrix([[0 for i in range(column)] for j in range(row)])
@@ -476,12 +506,8 @@ def identity(n):
         mat[i][i] = 1
     return Matrix(mat)
 
-def randmat(row, column, np=False):
-    if np:
-        import numpy
-        return numpy.matrix([[random.getrandbits(7) for i in range(column)] for j in range(row)])
-    else:
-        return Matrix([[random.getrandbits(7) for i in range(column)] for j in range(row)])
+def randmat(row, column, const=False):
+    return Matrix([[random.getrandbits(7) for i in range(column)] for j in range(row)], const)
 
 if __name__ == '__main__':
     import sys
