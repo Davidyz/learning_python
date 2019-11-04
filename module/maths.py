@@ -36,6 +36,9 @@ def factorial(n):
     
     return result
 
+def isnumber(n):
+    return isinstance(n, int) or isinstance(n, float)
+
 def isprime(n):
     if isinstance(n, int) or isinstance(n, float):
         if n - int(n) != 0 or n <= 1:
@@ -307,7 +310,7 @@ class Vector():
         return math.sqrt(sum([i ** 2 for i in self.__vec]))
 
     def __mul__(self, other):
-        if isinstance(other, int) or isinstance(other, float):
+        if isnumber(other):
             for i in range(len(self)):
                 self[i] *= other
         
@@ -321,11 +324,11 @@ class Vector():
 def angle(vec1, vec2):
     return acos(vec1 * vec2 / abs(vec1) / abs(vec2))
 
-def DotProduct(vect1, vect2):
-    if len(vect1) == len(vect2):
-        return sum((vect1[i] * vect2[i] for i in range(len(vect1))))
-    else:
-        raise ValueError('Vect1 and Vect2 are not with same dimensions.')
+def CrossProduct(vec1, vec2):
+    if len(vec1) == len(vec2) == 3: # only works for 3D vector now.
+        return Vector([vec1[1] * vec2[2] - vec1[2] * vec2[1],
+                       vec1[2] * vec2[0] - vec1[0] * vec2[2],
+                       vec1[0] * vec2[1] - vec1[1] * vec2[0]])
 
 class Matrix():
     """
@@ -381,7 +384,7 @@ class Matrix():
             else:
                 raise DimensionError('The matrices are not conformable!')
 
-        elif isinstance(other, int) or isinstance(other, float):
+        elif isnumber(other):
             newmat = copy.deepcopy(self.__mat)
             for i in range(self.__dimension[0]):
                 for j in range(self.__dimension[1]):
@@ -498,13 +501,16 @@ class Matrix():
         self.__mat = new_minor
 
 def zeros(row, column):
-    return Matrix([[0 for i in range(column)] for j in range(row)])
+    return Matrix([[0] * column] * row)
 
 def identity(n):
-    mat = [[0 for i in range(n)] for j in range(n)]
-    for i in range(n):
+    '''
+    List comprehension was not applied because it appeared to be much slower than an additional for loop.
+    '''
+    mat = zeros(n, n)
+    for i in range(mat.dimension()[0]):
         mat[i][i] = 1
-    return Matrix(mat)
+    return mat
 
 def randmat(row, column, const=False):
     return Matrix([[random.getrandbits(7) for i in range(column)] for j in range(row)], const)
