@@ -26,7 +26,7 @@ def factorial(n):
     if int(n) != n or n < 0:
         return -1
 
-    if n < 0:
+    if n <= 1:
         return 1
 
     result = 1
@@ -353,16 +353,16 @@ class Matrix():
         self.__columns = []
     
     def __eq__(self, other):
-        if isinstance(other, Matrix) and other.dimension() == self.__dimension:
-            for i in range(self.__dimension[0]):
-                for j in range(self.__dimension[1]):
+        if isinstance(other, Matrix) and other.dimension() == self.dimension():
+            for i in range(self.dimension()[0]):
+                for j in range(self.dimension()[1]):
                     if self.__mat[i][j] != other.row(i)[j]:
                         return False
             return True
         return False
 
     def __len__(self):
-        return self.__dimension[0] * self.__dimension[1]
+        return self.dimension()[0] * self.dimension()[1]
 
     def __iter__(self):
         return iter(self.__mat)
@@ -372,8 +372,8 @@ class Matrix():
         Self post-multiplied by other.
         '''
         if isinstance(other, Matrix):
-            if self.__dimension[1] == other.dimension()[0]:
-                result = [[0 for j in range(other.dimension()[1])] for i in range(self.__dimension[0])]
+            if self.dimension()[1] == other.dimension()[0]:
+                result = [[0 for j in range(other.dimension()[1])] for i in range(self.dimension()[0])]
                 row, column = len(result), len(result[0])
 
                 for i in range(row):
@@ -386,15 +386,15 @@ class Matrix():
 
         elif isnumber(other):
             newmat = copy.deepcopy(self.__mat)
-            for i in range(self.__dimension[0]):
-                for j in range(self.__dimension[1]):
+            for i in range(self.dimension()[0]):
+                for j in range(self.dimension()[1]):
                     newmat[i][j] *= other
             return Matrix(newmat)
 
     def __add__(self, n):
-        if self.__dimension == n.dimension():
+        if self.dimension() == n.dimension():
             newmat = []
-            for i in range(self.__dimension[0]):
+            for i in range(self.dimension()[0]):
                 newmat.append(list(Vector(self.__mat[i]) + Vector(n.row(i))))
             return Matrix(newmat)
         
@@ -403,7 +403,15 @@ class Matrix():
     
     def __sub__(self, other):
         return self + other * (-1)
-
+    
+    def __pow__(self, other):
+        if int(other) == other and self.dimension()[0] == self.dimension()[1]:
+            ans = identity(self.dimension()[0])
+            for i in range(other):
+                ans.show()
+                ans = self * ans
+            return ans
+            
     def __neg__(self):
         return self * (-1)
     
@@ -420,7 +428,7 @@ class Matrix():
         return self.__const
 
     def minor(self, row, column):
-        if self.__dimension[0] == self.__dimension[1]:
+        if self.dimension()[0] == self.dimension()[1]:
             min_matrix = copy.deepcopy(self.__mat)
             min_matrix.pop(row)
             for i in min_matrix:
@@ -444,7 +452,7 @@ class Matrix():
         return Matrix(self.columns())
 
     def dimension(self):
-        return self.__dimension
+        return [len(self.__mat), len(self.__mat[0])]
 
     def row(self, n):
         return self.__mat[n]
@@ -484,8 +492,8 @@ class Matrix():
             return self.__mat.pop(n)
 
     def PopColumn(self, n):
-        if self.__dimension[1] > n:
-            self.__dimension[1] -= 1
+        if self.dimension()[1] > n:
+            self.dimension()[1] -= 1
             self.__columns = []
             return [i.pop(n) for i in self.__mat]
     
@@ -493,27 +501,66 @@ class Matrix():
         '''
         Set the minor of the (x, y)th element to be the new_minor.
         '''
-        new_minor = copy.deepcopy(list(new_minor)).insert(x, self.__mat[x])
+        new_minor = copy.deepcopy(list(new_minor))
+        new_minor.insert(x, self.__mat[x])
 
-        for i in range(self.__dimension[0]):
+        for i in range(self.dimension()[0]):
             if i != x:
                 new_minor[i].insert(y, self.__mat[i][y])
         self.__mat = new_minor
+        return self
+
+    def InsertRow(self, row, n=None):
+        if len(row) == self.dimension()[1]:
+            if n == None:
+                self.__mat.append(list(row))
+            else:
+                self.__mat.insert(n, list(row))
+            return self
+
+        else:
+            raise DimensionError('Matrix and row must have the same number of columns.')
+
+    def InsertColumn(self, column, n=None):
+        if len(column) == self.dimension()[0]:
+            if n == None:
+                n = self.dimension()[1] - 1
+
+            for i in range(self.dimension()[0]):
+                self.__mat[i].append(column[i])
+            return self
+        else:
+            raise DimensionError('Matrix and column must have the same number of rows.')
+    
+    def SetRow(self, row, n):
+        self.PopRow(n)
+        self.InsertRow(row, n)
+
+    def SetColumn(self, column, n):
+        self.PopColumn(n)
+        self.InsertColumn(column, n)
 
 def zeros(row, column):
-    return Matrix([[0] * column] * row)
+    return Matrix([[0 for i in range(column)] for j in range(row)])
 
 def identity(n):
     '''
-    List comprehension was not applied because it appeared to be much slower than an additional for loop.
+    List comprehension was not fully applied because it appeaared to be much slower than an additional for loop.
     '''
-    mat = zeros(n, n)
-    for i in range(mat.dimension()[0]):
+    mat = [[0 for i in range(n)] for j in range(n)]
+    for i in range(n):
         mat[i][i] = 1
-    return mat
+    return Matrix(mat)
 
-def randmat(row, column, const=False):
-    return Matrix([[random.getrandbits(7) for i in range(column)] for j in range(row)], const)
+def randmat(row, column, bits=7, const=False):
+    return Matrix([[random.getrandbits(bits) for i in range(column)] for j in range(row)], const)
+
+def rotate2(coordinates, angle):
+    '''
+    Rotate the coordinates anticlockwise by the angle measured in radian.
+    '''
+    return Matrix([[cos(angle), -sin(angle)], [sin(angle), cos(angle)]]) * coordinates
+
 
 if __name__ == '__main__':
     import sys
