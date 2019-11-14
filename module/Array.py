@@ -20,6 +20,9 @@ def binary_search(array, item):
     return -1
 
 # Codes for quick sort
+def pivot(array):
+    pass
+
 def quicksort(array):
     if len(array) < 2:
         return array
@@ -55,34 +58,25 @@ def bubblesort(array):
     return bubblesort(array[:-1]) + [array[-1]]
 
 # Codes for insertion sort,
-def binary_insert(array, item):
-    start = 0
-    end = len(array) - 1
-    pivot = end // 2
-    
-    while start < end:
-        pivot = (end + start) // 2
-        if array[pivot] == item:
-            return pivot
-        elif array[pivot] > item:
-            end = pivot
-        elif array[pivot] < item:
-            start = pivot + 1
-    
-    return pivot
-
 def insertionsort(array, index = 1):
-    for i in range(1, len(array)):
-        key = array[i]
-        for j in range(i - 1, -1, -1):
-            if array[i] >= array[j]:
-                array[i], array[j + 1] = array[j + 1], array[i]
-        print(array)
+    if len(array) == 1:
+        return array
+    boundary = 1
+    while boundary < len(array):
+        if array[boundary] >= array[boundary - 1]:
+            pass
+        elif array[boundary] <= array[0]:
+            array.insert(0, array.pop(boundary))
+
+        else:
+            for i in range(boundary):
+                if array[i] <= array[boundary] <= array[i + 1]:
+                    array.insert(i + 1, array.pop(boundary))
+        boundary += 1
     return array
 
-
 # Codes for merge sort.
-def _merge(a, b):
+def merge(a, b):
     output = []
     while len(a) * len(b) != 0:
         if a[0] < b[0]:
@@ -100,8 +94,29 @@ def _merge(a, b):
 def mergesort(array):
     if len(array) < 2:
         return array
-    middle = int(len(array) / 2)
-    return _merge(mergesort(array[:middle]), mergesort(array[middle:]))
+    middle = len(array) // 2
+    return merge(mergesort(array[:middle]), mergesort(array[middle:]))
+
+def mergesort_loop(array):
+    max_len = len(array)
+    queue = [array]
+    
+    while len(queue) < max_len:
+        temp = queue.pop(0)
+        if len(temp) == 1:
+            queue.append(temp)
+            continue
+
+        divider = len(temp) // 2
+        queue.append(temp[:divider])
+        queue.append(temp[divider:])
+
+    while len(queue) > 1:
+        l1 = queue.pop(0)
+        l2 = queue.pop(0)
+        queue.append(merge(l1, l2))
+
+    return queue[0]
 
 # Codes for heap sort. Not in working order yet.
 
