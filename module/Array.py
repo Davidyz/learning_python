@@ -121,18 +121,12 @@ def mergesort_loop(array):
 # Codes for heap sort. Not in working order yet.
 
 def heapsort(array):
-    if len(array) < 2:
-        return array
-    
-    index = len(array) - 1
-    array = Heap.max_heap(array[:index + 1]) + array[index + 1:]
-
-    while index > 0:
-        array = Heap.max_heap(array[1:index + 1])
-        array.insert(index, array.pop(0))
-        index -= 1
-
-    return array
+    array = heap.MaxHeap(array)
+    array.maxify()
+    new_array = []
+    while array:
+        new_array.insert(0, array.pop_max())
+    return new_array
 
 # General purposed codes for a list.
 def is_sorted(array):

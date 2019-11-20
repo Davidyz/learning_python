@@ -2,14 +2,6 @@ import math, maths
 '''
 I did not notice the issue that python's array index start from 0 while in pseudocode it start from 1. As a result, child() and parent() must be modified as below so that the heap algorithms can work properly.
 '''
-def parent(index):
-    return math.floor((index - 1) / 2)
-
-def child(index):
-    l = (index + 1) * 2 - 1
-    r = (index + 1) * 2 
-    return l, r
-
 def is_max(heap, index=None):
     if index == None:
         index = len(heap) - 1
@@ -20,35 +12,6 @@ def is_max(heap, index=None):
         index -= 1
 
     return True
-
-def maxify(heap, index=0):
-    '''
-    Move the item specified by index to the place it should be at.
-    '''
-    l_child , r_child = child(index)
-
-    if (l_child < len(heap)) and (heap[index] < heap[l_child]):
-        largest = l_child
-    else:
-        largest = index
-
-    if (r_child < len(heap)) and (heap[largest] < heap[r_child]):
-        largest = r_child
-
-    if index != largest:
-        heap[index], heap[largest] = heap[largest], heap[index]
-        maxify(heap, largest)
-
-def max_heap(heap):
-    for i in range(parent(len(heap) - 1), -1, -1):
-        maxify(heap, i)
-    return heap
-
-def remove_max(heap):
-    item = heap[0]
-    heap[0] = heap.pop()
-    heap = maxify(heap, 0)
-    return item
 
 class Heap(list):
     def __init__(self, data=[]):
@@ -77,12 +40,13 @@ class MaxHeap(Heap):
         Heap.__init__(self, data)
     
     def is_max(self):
-        for i in range(len(self) - 1, -1, -1):
+        for i in range(len(self) - 1, 0, -1):
             if self[self.parent(i)] < self[i]:
+                print(i)
                 return False
         return True
 
-    def set_pos(self, index):
+    def set_pos(self, index):   # not fully functioning yet due to some issue in the while loops.
         '''
         bring a node to a correct position.
         '''
@@ -92,7 +56,7 @@ class MaxHeap(Heap):
             if len(child) == 1:
                 if self[index] < self[child[0]]:
                     self.switch(index, child[0])
-                    break
+                break
             else:
                 if self[child[0]] > self[child[1]]:
                     larger = child[0]
@@ -101,7 +65,7 @@ class MaxHeap(Heap):
                 if self[index] < self[larger]:
                     self.switch(index, larger)
                     index = larger
-                    child = self.children(index)
+                    child = self.children(larger)
                 else:
                     break
 
@@ -109,17 +73,15 @@ class MaxHeap(Heap):
         while self[index] > self[parent]:   # Check whether it needs to go up (compared with the parent).
             self.switch(index, parent)
             index = parent
-            parent = self.parent(index)
+            parent = self.parent(parent)
 
     def maxify(self, index=None):
         for i in range(len(self) - 1, -1, -1):
             self.set_pos(i)
 
     def pop_max(self):
-        max_item = self[0]
-        self[0] = -math.inf
-        self.set_pos(0)
-        self.pop(self.index(-math.inf))
+        max_item = self.pop(0)
+        self.maxify()
         return max_item
 
     def insert(self, item):
