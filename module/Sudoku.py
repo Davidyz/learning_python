@@ -189,8 +189,9 @@ class Board():
         '''
         for i in self.cells:
             if i.value != 0:
-                i.__weight = -1
+                i.weight(-1)
                 continue
+
             index = i.get_index()
             occured = []
             for j in self.__data[index[0]]:
@@ -204,7 +205,7 @@ class Board():
             for j in self.gen_block()[index[0] // 3 * 3 + index[1] // 3]:
                 if (not (j.value in occured)) and (j.value != 0):
                     occured.append(j.value)
-            i.weight(len(set(occured)))
+            i.weight(int(len(set(occured))))
 
     def max_weight(self):
         '''

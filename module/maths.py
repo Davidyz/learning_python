@@ -86,6 +86,7 @@ def intpow(x, n):
     """
     Return the nth power of x.
     n has to be an integer.
+    This method should work as long as n < 2 ** 1000, because Python has a maximum recursion depth of 1000.
     """
     if n % 1 != 0:
         return None
@@ -110,20 +111,6 @@ def fibonacci(n):
         a, b = b, a + b
         n -= 1
     return a
-
-def triangle(n):
-    def triangle_helper(n, result = [1, [1, 1]]):
-        if n == 2:
-            return result
-        elif n == 1:
-            return 1
-        else:
-            temp = [1, 1]
-            for i in range(len(result[-1]) - 1):
-                temp.insert(-1, result[-1][i] + result[-1][i + 1])
-            result.append(temp)
-            return triangle_helper(n - 1, result)
-    return triangle_helper(n)
 
 def binomial(n, p, start, end = None):
     """
@@ -220,7 +207,7 @@ def mean(array):
             tf += 1
     return tx / tf
 
-def moment(array, n):
+def moment(array, n=1):
     s = 0
     for i in array:
         if isinstance(i, list) or isinstance(i, tuple):
@@ -362,7 +349,10 @@ class Matrix():
         return False
 
     def __len__(self):
-        return self.dimension()[0] * self.dimension()[1]
+        return self.dimension()[0]
+
+    def __abs__(self):
+        return self.determinant()
 
     def __iter__(self):
         return iter(self.__mat)
@@ -405,13 +395,14 @@ class Matrix():
         return self + other * (-1)
     
     def __pow__(self, other):
+        '''
+        The recursive method works here and provides a higher efficiency than looping from 1 to n.
+        '''
         if int(other) == other and self.dimension()[0] == self.dimension()[1]:
-            ans = identity(self.dimension()[0])
-            for i in range(other):
-                ans.show()
-                ans = self * ans
-            return ans
-            
+            return intpow(self, int(other))
+        else:
+            raise ValueError('Check your input! the power has to be int and the matrix has to be squaral.')
+
     def __neg__(self):
         return self * (-1)
     
@@ -512,11 +503,13 @@ class Matrix():
 
     def InsertRow(self, row, n=None):
         if len(row) == self.dimension()[1]:
+            new_mat = copy.deepcopy(self.__mat)
+
             if n == None:
-                self.__mat.append(list(row))
+                new_mat.append(list(row))
             else:
-                self.__mat.insert(n, list(row))
-            return self
+                new_mat.insert(n, list(row))
+            return Matrix(new_mat)
 
         else:
             raise DimensionError('Matrix and row must have the same number of columns.')
@@ -526,9 +519,10 @@ class Matrix():
             if n == None:
                 n = self.dimension()[1] - 1
 
+            new_mat = copy.deepcopy(self.__mat)
             for i in range(self.dimension()[0]):
-                self.__mat[i].append(column[i])
-            return self
+                new_mat[i].append(column[i])
+            return Matrix(new_mat)
         else:
             raise DimensionError('Matrix and column must have the same number of rows.')
     
@@ -539,6 +533,13 @@ class Matrix():
     def SetColumn(self, column, n):
         self.PopColumn(n)
         self.InsertColumn(column, n)
+    
+    def EigenValue(self):
+        if self.dimension()[0] != self.dimension()[1]:
+            raise DimensionError('This is not a square matrix.')
+            return
+        else:
+            pass
 
 def zeros(row, column):
     return Matrix([[0 for i in range(column)] for j in range(row)])
@@ -555,12 +556,14 @@ def identity(n):
 def randmat(row, column, bits=7, const=False):
     return Matrix([[random.getrandbits(bits) for i in range(column)] for j in range(row)], const)
 
+def randvec(dim):
+    return Vector(randmat(1, dim))
+
 def rotate2(coordinates, angle):
     '''
     Rotate the coordinates anticlockwise by the angle measured in radian.
     '''
     return Matrix([[cos(angle), -sin(angle)], [sin(angle), cos(angle)]]) * coordinates
-
 
 if __name__ == '__main__':
     import sys
