@@ -296,15 +296,42 @@ class Vector():
     def __abs__(self):
         return math.sqrt(sum([i ** 2 for i in self.__vec]))
 
+    def __mod__(self, other):
+        if isinstance(other, Matrix) and min(other.dimension()) == 1:
+            return self % Vector(other)
+
+        if isinstance(other, Vector) and len(self) == len(other):
+            ratio = self[0] / other[0]
+            for i in range(len(self)):
+                if other[i] * ratio != self[i]:
+                    return False
+            return ratio
+        return False
+
+    def __eq__(self, other):
+        if isinstance(other, Vector) and len(self) == len(other):
+            for i in range(len(self)):
+                if self[i] != other[i]:
+                    return False
+            return True
+
     def __mul__(self, other):
         if isnumber(other):
+            new_vec = []
             for i in range(len(self)):
-                self[i] *= other
+                new_vec.append(self[i] * other)
+            return Vector(new_vec)
         
         if isinstance(other, Vector):
             if len(self) == len(other):
                 return sum((self[i] * other[i] for i in range(len(self))))
     
+    def normalised(self):
+        '''
+        Return the unit vector parallel to self.
+        '''
+        return self * (1 /abs(self))
+
     def show(self):
         print(self.__vec)
 
@@ -356,7 +383,7 @@ class Matrix():
 
     def __iter__(self):
         return iter(self.__mat)
-
+    
     def __mul__(self, other):
         '''
         Self post-multiplied by other.
@@ -368,7 +395,7 @@ class Matrix():
 
                 for i in range(row):
                     for j in range(column):
-                        result[i][j] = Vector(self.__mat[i]) * Vector(other.column(j))
+                        result[i][j] = self[i] * other.column(j)
                 return Matrix(result)
 
             else:
@@ -380,6 +407,10 @@ class Matrix():
                 for j in range(self.dimension()[1]):
                     newmat[i][j] *= other
             return Matrix(newmat)
+
+        elif isinstance(other, Vector) and len(other) == self.dimension()[1]:
+            other = Matrix([[i] for i in other])
+            return self * other
 
     def __add__(self, n):
         if self.dimension() == n.dimension():
@@ -407,7 +438,7 @@ class Matrix():
         return self * (-1)
     
     def __getitem__(self, x):
-        return self.__mat[x]
+        return Vector(self.__mat[x])
     
     def __setitem__(self, x, y, value):
         if not self.__const:
@@ -415,6 +446,21 @@ class Matrix():
         else:
             raise ValueError('This is a constant matrix!')
     
+    def __mod__(self, other):
+        if isinstance(other, Matrix) and self.dimension() == other.dimension():
+            if not self[0] % other[0]:
+                return False
+            else:
+                ratio = self[0] % other[0]
+
+            for i in range(self.dimension()[0]):
+                if other[i] * ratio != self[i]:
+                    other[i].show()
+                    self[i].show()
+                    return False
+            return ratio
+        return False
+
     def isConst(self):
         return self.__const
 
@@ -469,7 +515,7 @@ class Matrix():
     def columns(self):
         if self.__columns == []:
             for i in range(self.__dimension[1]):
-                self.__columns.append([j[i] for j in self.__mat])
+                self.__columns.append(Vector([j[i] for j in self.__mat]))
         return self.__columns
 
     def show(self):
@@ -534,12 +580,15 @@ class Matrix():
         self.PopColumn(n)
         self.InsertColumn(column, n)
     
-    def EigenValue(self):
-        if self.dimension()[0] != self.dimension()[1]:
-            raise DimensionError('This is not a square matrix.')
-            return
-        else:
-            pass
+    def IsEigen(self, other):
+        '''
+        Check whether 'other' is an eigenvalue or eigenvector of self.
+        If other is an eigenvector of self, the corresponding eigenvalue is returned.
+        '''
+        if isnumber(other):
+            return (self - identity(self.dimension()[0]) * other).determinant() == 0
+        elif isinstance(other, Vector) or isinstance(other, Matrix):
+            return Vector(self * other) % other
 
 def zeros(row, column):
     return Matrix([[0 for i in range(column)] for j in range(row)])
