@@ -3,7 +3,7 @@
 This is a personal module for music tagging and .lrc file processing. Mutagen integrated.
 '''
 
-import os, mutagen, mutagen.flac
+import os, mutagen, mutagen.flac, json
 from mutagen.easyid3 import EasyID3
 
 lossless = ['ape', 'wav', 'flac', 'dsd', 'dsf', 'dff']
@@ -51,10 +51,41 @@ class Music():
                     if not (i in self.info):
                         self.info[i] = ""
             if 'cover.jpg' in os.listdir(os.path.sep.join(path.split('/')[:-1])):
-                self.album_art = os.path.join(path, 'cover.jpg')
-
+                self.album_art = path.replace(self.__path[-1], 'cover.jpg')
+            else:
+                self.album_art = None
         else:
             raise InputError('\nInvalid path: {}.\nIt is a directory or is not a recognised music file.'.format(path))
+
+    def load(self, path = None):
+        '''
+        Load a json file for the album.
+        '''
+        if path == None:
+            path = os.path.sep.join(self.__path[:-1])
+
+        if 'meta.json' in os.listdir(path):
+            with open(path + '/meta.json') as fin:
+                data = json.load(fin)
+                self.info = data
+                fin.close()
+
+        elif os.path.isdir(path) and 'meta.json' in os.listdir(path):
+            path = os.path.sep.join((path, 'meta.json'))
+            data = self.load(path)
+            self.info = data
+
+        return data
+
+    def dump(self, path = None):
+        '''
+        Dump the information of the album into a json file.
+        '''
+        if path == None:
+            path = os.path.sep.join(self.__path[:-1] + ['meta.json'])
+        with open(path, 'w') as fin:
+            json.dump(self.info, fin)
+            fin.close()
 
     def set_tag(self):
         if self.form == 'flac':
@@ -62,6 +93,8 @@ class Music():
                 song = mutagen.flac.FLAC(os.path.sep.join(self.__path))
                 for i in self.info:
                     song[i] = self.info[i]
+                if self.album_art:
+                    song.add_picture(self.album_art)
                 song.save()
             except mutagen.flac.FLACNoHeaderError:
                 print('Unsupported file!')
@@ -130,7 +163,7 @@ class Lyric(Music):
         for i in self.lyric:
             print(i, self.lyric[i])
 
-    def load(self, path=None):
+    def loadLRC(self, path=None):
         """
         Read an existing lrc file and store the infomation in a dict().
         """
@@ -168,7 +201,7 @@ class Lyric(Music):
 
                 self.lyric[key] = value
 
-    def dump(self, path = None):
+    def dumpLRC(self, path = None):
         """
         Write the cached lyric information into a lrc file. Overwrite if existing.
         """
