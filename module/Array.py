@@ -20,10 +20,20 @@ def binary_search(array, item):
     return -1
 
 # Codes for quick sort
+def pivot(array):
+    pass
+
+def median3(array):
+    if len(array) == 3:
+        return 3 - array.index(max(array)) - array.index(min(array))
+
 def quicksort(array):
     if len(array) < 2:
         return array
     
+    if len(array) >= 3:
+        array[median3(array[:3])], array[-1] = array[-1], array[median3(array[:3])]
+
     pivot = array[-1]
     i = 0
     j = len(array) - 1
@@ -55,34 +65,25 @@ def bubblesort(array):
     return bubblesort(array[:-1]) + [array[-1]]
 
 # Codes for insertion sort,
-def binary_insert(array, item):
-    start = 0
-    end = len(array) - 1
-    pivot = end // 2
-    
-    while start < end:
-        pivot = (end + start) // 2
-        if array[pivot] == item:
-            return pivot
-        elif array[pivot] > item:
-            end = pivot
-        elif array[pivot] < item:
-            start = pivot + 1
-    
-    return pivot
-
 def insertionsort(array, index = 1):
-    for i in range(1, len(array)):
-        key = array[i]
-        for j in range(i - 1, -1, -1):
-            if array[i] >= array[j]:
-                array[i], array[j + 1] = array[j + 1], array[i]
-        print(array)
+    if len(array) == 1:
+        return array
+    boundary = 1
+    while boundary < len(array):
+        if array[boundary] >= array[boundary - 1]:
+            pass
+        elif array[boundary] <= array[0]:
+            array.insert(0, array.pop(boundary))
+
+        else:
+            for i in range(boundary):
+                if array[i] <= array[boundary] <= array[i + 1]:
+                    array.insert(i + 1, array.pop(boundary))
+        boundary += 1
     return array
 
-
 # Codes for merge sort.
-def _merge(a, b):
+def merge(a, b):
     output = []
     while len(a) * len(b) != 0:
         if a[0] < b[0]:
@@ -100,24 +101,39 @@ def _merge(a, b):
 def mergesort(array):
     if len(array) < 2:
         return array
-    middle = int(len(array) / 2)
-    return _merge(mergesort(array[:middle]), mergesort(array[middle:]))
+    middle = len(array) // 2
+    return merge(mergesort(array[:middle]), mergesort(array[middle:]))
+
+def mergesort_loop(array):
+    max_len = len(array)
+    queue = [array]
+    
+    while len(queue) < max_len:
+        temp = queue.pop(0)
+        if len(temp) == 1:
+            queue.append(temp)
+            continue
+
+        divider = len(temp) // 2
+        queue.append(temp[:divider])
+        queue.append(temp[divider:])
+
+    while len(queue) > 1:
+        l1 = queue.pop(0)
+        l2 = queue.pop(0)
+        queue.append(merge(l1, l2))
+
+    return queue[0]
 
 # Codes for heap sort. Not in working order yet.
 
 def heapsort(array):
-    if len(array) < 2:
-        return array
-    
-    index = len(array) - 1
-    array = Heap.max_heap(array[:index + 1]) + array[index + 1:]
-
-    while index > 0:
-        array = Heap.max_heap(array[1:index + 1])
-        array.insert(index, array.pop(0))
-        index -= 1
-
-    return array
+    array = heap.MaxHeap(array)
+    array.maxify()
+    new_array = []
+    while array:
+        new_array.insert(0, array.pop_max())
+    return new_array
 
 # General purposed codes for a list.
 def is_sorted(array):

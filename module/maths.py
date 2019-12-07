@@ -26,7 +26,7 @@ def factorial(n):
     if int(n) != n or n < 0:
         return -1
 
-    if n < 0:
+    if n <= 1:
         return 1
 
     result = 1
@@ -36,8 +36,11 @@ def factorial(n):
     
     return result
 
+def isnumber(n):
+    return isinstance(n, int) or isinstance(n, float)
+
 def isprime(n):
-    if isinstance(n, int) or isinstance(n, float):
+    if isnumber(n):
         if n - int(n) != 0 or n <= 1:
             return -1
 
@@ -83,6 +86,7 @@ def intpow(x, n):
     """
     Return the nth power of x.
     n has to be an integer.
+    This method should work as long as n < 2 ** 1000, because Python has a maximum recursion depth of 1000.
     """
     if n % 1 != 0:
         return None
@@ -107,20 +111,6 @@ def fibonacci(n):
         a, b = b, a + b
         n -= 1
     return a
-
-def triangle(n):
-    def triangle_helper(n, result = [1, [1, 1]]):
-        if n == 2:
-            return result
-        elif n == 1:
-            return 1
-        else:
-            temp = [1, 1]
-            for i in range(len(result[-1]) - 1):
-                temp.insert(-1, result[-1][i] + result[-1][i + 1])
-            result.append(temp)
-            return triangle_helper(n - 1, result)
-    return triangle_helper(n)
 
 def binomial(n, p, start, end = None):
     """
@@ -217,7 +207,7 @@ def mean(array):
             tf += 1
     return tx / tf
 
-def moment(array, n):
+def moment(array, n=1):
     s = 0
     for i in array:
         if isinstance(i, list) or isinstance(i, tuple):
@@ -306,26 +296,63 @@ class Vector():
     def __abs__(self):
         return math.sqrt(sum([i ** 2 for i in self.__vec]))
 
-    def __mul__(self, other):
-        if isinstance(other, int) or isinstance(other, float):
+    def __mod__(self, other):
+        '''
+        Return 1 if it is a zero vector divided by a zero vector.
+        '''
+        if isinstance(other, Matrix) and min(other.dimension()) == 1:
+            return self % Vector(other)
+
+        if isinstance(other, Vector) and len(self) == len(other):
             for i in range(len(self)):
-                self[i] *= other
+                if self[i] == other[i] == 0:
+                    if i == len(self) - 1:
+                        return 1
+                else:
+                    ratio = self[i] / other[i]
+                    break
+            
+            for i in range(len(self)):
+                if other[i] * ratio != self[i]:
+                    return False
+            return ratio
+        return False
+
+    def __eq__(self, other):
+        if isinstance(other, Vector) and len(self) == len(other):
+            for i in range(len(self)):
+                if self[i] != other[i]:
+                    return False
+            return True
+
+    def __mul__(self, other):
+        if isnumber(other):
+            new_vec = []
+            for i in range(len(self)):
+                new_vec.append(self[i] * other)
+            return Vector(new_vec)
         
         if isinstance(other, Vector):
             if len(self) == len(other):
                 return sum((self[i] * other[i] for i in range(len(self))))
     
+    def normalised(self):
+        '''
+        Return the unit vector parallel to self.
+        '''
+        return self * (1 /abs(self))
+
     def show(self):
         print(self.__vec)
 
 def angle(vec1, vec2):
     return acos(vec1 * vec2 / abs(vec1) / abs(vec2))
 
-def DotProduct(vect1, vect2):
-    if len(vect1) == len(vect2):
-        return sum((vect1[i] * vect2[i] for i in range(len(vect1))))
-    else:
-        raise ValueError('Vect1 and Vect2 are not with same dimensions.')
+def CrossProduct(vec1, vec2):
+    if len(vec1) == len(vec2) == 3: # only works for 3D vector now.
+        return Vector([vec1[1] * vec2[2] - vec1[2] * vec2[1],
+                       vec1[2] * vec2[0] - vec1[0] * vec2[2],
+                       vec1[0] * vec2[1] - vec1[1] * vec2[0]])
 
 class Matrix():
     """
@@ -350,48 +377,55 @@ class Matrix():
         self.__columns = []
     
     def __eq__(self, other):
-        if isinstance(other, Matrix) and other.dimension() == self.__dimension:
-            for i in range(self.__dimension[0]):
-                for j in range(self.__dimension[1]):
+        if isinstance(other, Matrix) and other.dimension() == self.dimension():
+            for i in range(self.dimension()[0]):
+                for j in range(self.dimension()[1]):
                     if self.__mat[i][j] != other.row(i)[j]:
                         return False
             return True
         return False
 
     def __len__(self):
-        return self.__dimension[0] * self.__dimension[1]
+        return self.dimension()[0]
+
+    def __abs__(self):
+        return self.determinant()
 
     def __iter__(self):
         return iter(self.__mat)
-
+    
     def __mul__(self, other):
         '''
         Self post-multiplied by other.
         '''
         if isinstance(other, Matrix):
-            if self.__dimension[1] == other.dimension()[0]:
-                result = [[0 for j in range(other.dimension()[1])] for i in range(self.__dimension[0])]
+            if self.dimension()[1] == other.dimension()[0]:
+                result = [[0 for j in range(other.dimension()[1])] for i in range(self.dimension()[0])]
                 row, column = len(result), len(result[0])
 
                 for i in range(row):
                     for j in range(column):
-                        result[i][j] = Vector(self.__mat[i]) * Vector(other.column(j))
+                        result[i][j] = self[i] * other.column(j)
                 return Matrix(result)
 
             else:
                 raise DimensionError('The matrices are not conformable!')
 
-        elif isinstance(other, int) or isinstance(other, float):
+        elif isnumber(other):
             newmat = copy.deepcopy(self.__mat)
-            for i in range(self.__dimension[0]):
-                for j in range(self.__dimension[1]):
+            for i in range(self.dimension()[0]):
+                for j in range(self.dimension()[1]):
                     newmat[i][j] *= other
             return Matrix(newmat)
 
+        elif isinstance(other, Vector) and len(other) == self.dimension()[1]:
+            other = Matrix([[i] for i in other])
+            return self * other
+
     def __add__(self, n):
-        if self.__dimension == n.dimension():
+        if self.dimension() == n.dimension():
             newmat = []
-            for i in range(self.__dimension[0]):
+            for i in range(self.dimension()[0]):
                 newmat.append(list(Vector(self.__mat[i]) + Vector(n.row(i))))
             return Matrix(newmat)
         
@@ -400,12 +434,21 @@ class Matrix():
     
     def __sub__(self, other):
         return self + other * (-1)
+    
+    def __pow__(self, other):
+        '''
+        The recursive method works here and provides a higher efficiency than looping from 1 to n.
+        '''
+        if int(other) == other and self.dimension()[0] == self.dimension()[1]:
+            return intpow(self, int(other))
+        else:
+            raise ValueError('Check your input! the power has to be int and the matrix has to be squaral.')
 
     def __neg__(self):
         return self * (-1)
     
     def __getitem__(self, x):
-        return self.__mat[x]
+        return Vector(self.__mat[x])
     
     def __setitem__(self, x, y, value):
         if not self.__const:
@@ -413,11 +456,26 @@ class Matrix():
         else:
             raise ValueError('This is a constant matrix!')
     
+    def __mod__(self, other):
+        if isinstance(other, Matrix) and self.dimension() == other.dimension():
+            if not self[0] % other[0]:
+                return False
+            else:
+                ratio = self[0] % other[0]
+
+            for i in range(self.dimension()[0]):
+                if other[i] * ratio != self[i]:
+                    other[i].show()
+                    self[i].show()
+                    return False
+            return ratio
+        return False
+
     def isConst(self):
         return self.__const
 
     def minor(self, row, column):
-        if self.__dimension[0] == self.__dimension[1]:
+        if self.dimension()[0] == self.dimension()[1]:
             min_matrix = copy.deepcopy(self.__mat)
             min_matrix.pop(row)
             for i in min_matrix:
@@ -441,7 +499,7 @@ class Matrix():
         return Matrix(self.columns())
 
     def dimension(self):
-        return self.__dimension
+        return [len(self.__mat), len(self.__mat[0])]
 
     def row(self, n):
         return self.__mat[n]
@@ -467,7 +525,7 @@ class Matrix():
     def columns(self):
         if self.__columns == []:
             for i in range(self.__dimension[1]):
-                self.__columns.append([j[i] for j in self.__mat])
+                self.__columns.append(Vector([j[i] for j in self.__mat]))
         return self.__columns
 
     def show(self):
@@ -481,8 +539,8 @@ class Matrix():
             return self.__mat.pop(n)
 
     def PopColumn(self, n):
-        if self.__dimension[1] > n:
-            self.__dimension[1] -= 1
+        if self.dimension()[1] > n:
+            self.dimension()[1] -= 1
             self.__columns = []
             return [i.pop(n) for i in self.__mat]
     
@@ -490,24 +548,81 @@ class Matrix():
         '''
         Set the minor of the (x, y)th element to be the new_minor.
         '''
-        new_minor = copy.deepcopy(list(new_minor)).insert(x, self.__mat[x])
+        new_minor = copy.deepcopy(list(new_minor))
+        new_minor.insert(x, self.__mat[x])
 
-        for i in range(self.__dimension[0]):
+        for i in range(self.dimension()[0]):
             if i != x:
                 new_minor[i].insert(y, self.__mat[i][y])
         self.__mat = new_minor
+        return self
+
+    def InsertRow(self, row, n=None):
+        if len(row) == self.dimension()[1]:
+            new_mat = copy.deepcopy(self.__mat)
+
+            if n == None:
+                new_mat.append(list(row))
+            else:
+                new_mat.insert(n, list(row))
+            return Matrix(new_mat)
+
+        else:
+            raise DimensionError('Matrix and row must have the same number of columns.')
+
+    def InsertColumn(self, column, n=None):
+        if len(column) == self.dimension()[0]:
+            if n == None:
+                n = self.dimension()[1] - 1
+
+            new_mat = copy.deepcopy(self.__mat)
+            for i in range(self.dimension()[0]):
+                new_mat[i].append(column[i])
+            return Matrix(new_mat)
+        else:
+            raise DimensionError('Matrix and column must have the same number of rows.')
+    
+    def SetRow(self, row, n):
+        self.PopRow(n)
+        self.InsertRow(row, n)
+
+    def SetColumn(self, column, n):
+        self.PopColumn(n)
+        self.InsertColumn(column, n)
+    
+    def IsEigen(self, other):
+        '''
+        Check whether 'other' is an eigenvalue or eigenvector of self.
+        If other is an eigenvector of self, the corresponding eigenvalue is returned.
+        '''
+        if isnumber(other):
+            return (self - identity(self.dimension()[0]) * other).determinant() == 0
+        elif isinstance(other, Vector) or isinstance(other, Matrix):
+            return Vector(self * other) % other
 
 def zeros(row, column):
     return Matrix([[0 for i in range(column)] for j in range(row)])
 
 def identity(n):
+    '''
+    List comprehension was not fully applied because it appeaared to be much slower than an additional for loop.
+    '''
     mat = [[0 for i in range(n)] for j in range(n)]
     for i in range(n):
         mat[i][i] = 1
     return Matrix(mat)
 
-def randmat(row, column, const=False):
-    return Matrix([[random.getrandbits(7) for i in range(column)] for j in range(row)], const)
+def randmat(row, column, bits=7, const=False):
+    return Matrix([[random.getrandbits(bits) for i in range(column)] for j in range(row)], const)
+
+def randvec(dim):
+    return Vector(randmat(1, dim))
+
+def rotate2(coordinates, angle):
+    '''
+    Rotate the coordinates anticlockwise by the angle measured in radian.
+    '''
+    return Matrix([[cos(angle), -sin(angle)], [sin(angle), cos(angle)]]) * coordinates
 
 if __name__ == '__main__':
     import sys
