@@ -23,10 +23,17 @@ def binary_search(array, item):
 def pivot(array):
     pass
 
+def median3(array):
+    if len(array) == 3:
+        return 3 - array.index(max(array)) - array.index(min(array))
+
 def quicksort(array):
     if len(array) < 2:
         return array
     
+    if len(array) >= 3:
+        array[median3(array[:3])], array[-1] = array[-1], array[median3(array[:3])]
+
     pivot = array[-1]
     i = 0
     j = len(array) - 1
