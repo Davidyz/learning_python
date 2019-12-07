@@ -40,7 +40,7 @@ def isnumber(n):
     return isinstance(n, int) or isinstance(n, float)
 
 def isprime(n):
-    if isinstance(n, int) or isinstance(n, float):
+    if isnumber(n):
         if n - int(n) != 0 or n <= 1:
             return -1
 
@@ -297,11 +297,21 @@ class Vector():
         return math.sqrt(sum([i ** 2 for i in self.__vec]))
 
     def __mod__(self, other):
+        '''
+        Return 1 if it is a zero vector divided by a zero vector.
+        '''
         if isinstance(other, Matrix) and min(other.dimension()) == 1:
             return self % Vector(other)
 
         if isinstance(other, Vector) and len(self) == len(other):
-            ratio = self[0] / other[0]
+            for i in range(len(self)):
+                if self[i] == other[i] == 0:
+                    if i == len(self) - 1:
+                        return 1
+                else:
+                    ratio = self[i] / other[i]
+                    break
+            
             for i in range(len(self)):
                 if other[i] * ratio != self[i]:
                     return False
