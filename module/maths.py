@@ -112,6 +112,9 @@ def fibonacci(n):
         n -= 1
     return a
 
+def fibonacci_1(n):
+    return (intpow((0.5 + math.sqrt(5) / 2), n) - intpow((0.5 - math.sqrt(5) / 2), n)) / math.sqrt(5)
+
 def binomial(n, p, start, end = None):
     """
     prob = probability.
@@ -209,12 +212,18 @@ def mean(array):
 
 def moment(array, n=1):
     s = 0
+    if isinstance(array[0], (list, tuple)):
+        tf = sum(i[1] for i in array)
+    else:
+        tf = len(array)
+
     for i in array:
+        
         if isinstance(i, list) or isinstance(i, tuple):
             s += i[1] * (i[0] ** n)
         else:
             s += i ** n
-    return s
+    return s / tf
 
 def StandardDeviation(array):
     return math.sqrt(moment(array, 2) - mean(array) ** 2)
@@ -512,7 +521,6 @@ class Matrix():
         if det == 0:
             return None
         else:
-
             inverse = [[0 for j in range(self.__dimension[0])] for i in range(self.__dimension[0])]
             for row in range(self.__dimension[0]):
                 for column in range(self.__dimension[1]):
