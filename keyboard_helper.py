@@ -7,7 +7,7 @@ keyboard = "usb-AKKO_AKKO_3068BT-event-kbd"
 
 while True:
     if keyboard in os.listdir("/dev/input/by-id/"):
-        os.system('xinput set-int-prop 12 "Device Enabled" 8 0')
+        os.system('xinput set-int-prop "AT Translated Set 2 keyboard" "Device Enabled" 8 0')
     else:
-        os.system('xinput set-int-prop 12 "Device Enabled" 8 1')
+        os.system('xinput set-int-prop "AT Translated Set 2 keyboard" "Device Enabled" 8 1')
     time.sleep(1)
