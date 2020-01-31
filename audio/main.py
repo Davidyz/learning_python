@@ -1,4 +1,4 @@
-#coding=utf-8
+#!/usr/bin/python3
 import os, sys, music, platform, time
 
 mode = 0 # 0 for single, 1 for batch.
