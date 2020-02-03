@@ -29,3 +29,8 @@ pool = multiprocessing.Pool(processes = 3)
 pool.starmap_async(execute, ([i, replaced, args['destination']] for i in songs)).get()
 pool.close()
 pool.join()
+
+if args['destination']:
+    lyrics = (j for j in UnixIO.listdir(args['original']) if 'lrc' in j)
+    for i in lyrics:
+        UnixIO.mv(i, args['destination'])
