@@ -28,3 +28,8 @@ def writefile(path, content):
         fin.writelines(content)
     fin.close()
 
+def mv(x, y):
+    os.system('mv "{}" "{}"'.format(x, y))
+
+def cp(x, y):
+    os.system('cp "{}" "{}"'.format(x, y))
