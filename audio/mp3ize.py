@@ -22,8 +22,10 @@ def execute(song, replace, to):
         song.format('mp3', True)
         return
     song.format('mp3', False)
-    if to:
+    if to and song.is_lossless():
         UnixIO.mv(song.path().replace(song.form, 'mp3'), to)
+    elif to and (not song.is_lossless()):
+        UnixIO.cp(song.path().replace(song.form, 'mp3'), to)
 
 pool = multiprocessing.Pool(processes = 3)
 pool.starmap_async(execute, ([i, replaced, args['destination']] for i in songs)).get()
@@ -33,4 +35,4 @@ pool.join()
 if args['destination']:
     lyrics = (j for j in UnixIO.listdir(args['original']) if 'lrc' in j)
     for i in lyrics:
-        UnixIO.mv(i, args['destination'])
+        UnixIO.cp(i, args['destination'])

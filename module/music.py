@@ -134,7 +134,7 @@ class Music():
                 self.__lossless = False
         
         path = os.path.sep.join(self.__path)
-        command = 'ffmpeg -i "{}" -q 0 "{}" -y'.format(path, path.replace(self.form, target))
+        command = 'ffmpeg -i "{}" -q 0 "{}" -y -loglevel quiet'.format(path, path.replace(self.form, target))
         os.system(command)
         if replace:
             os.system('rm "{}"'.format(path))
