@@ -124,7 +124,7 @@ class Music():
     def path(self):
         return os.path.sep.join(self.__path)
 
-    def format(self, target=None, replace=True):
+    def format(self, target=None, replace=True, bitrate=None):
         if target == None:
             if self.is_lossless():
                 target = 'flac'
@@ -135,6 +135,8 @@ class Music():
         
         path = os.path.sep.join(self.__path)
         command = 'ffmpeg -i "{}" -q 0 "{}" -y -loglevel quiet'.format(path, path.replace(self.form, target))
+        if isinstance(bitrate, int):
+            command += ' -b:a {}'.format(str(bitrate))
         os.system(command)
         if replace:
             os.system('rm "{}"'.format(path))
