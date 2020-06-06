@@ -33,3 +33,6 @@ def mv(x, y):
 
 def cp(x, y):
     os.system('cp "{}" "{}"'.format(x, y))
+
+def rm(fin):
+    os.system('rm "{}"'.format(fin))
