@@ -3,7 +3,7 @@
 This is a personal module for music tagging and .lrc file processing. Mutagen integrated.
 '''
 
-import os, mutagen, mutagen.flac, json
+import os, mutagen, mutagen.flac, json, UnixIO
 from mutagen.easyid3 import EasyID3
 
 lossless = ['ape', 'wav', 'flac', 'dsd', 'dsf', 'dff']
@@ -88,6 +88,7 @@ class Music():
             fin.close()
 
     def set_tag(self):
+        '''
         if self.form == 'flac':
             try:
                 song = mutagen.flac.FLAC(os.path.sep.join(self.__path))
@@ -117,6 +118,16 @@ class Music():
 
         else:
             pass
+        '''
+        if not self.album_art:
+            command = 'ffmpeg -i "{source}" -q 0 -y -loglevel quiet '.format(source=self.path())
+        else:
+            command = 'ffmpeg -i "{audio}" -i "{image}" -q 0 -y -map 0:0 -map 1:0 -c copy -id3v2_version 3 -metadata:s:v title="Album cover" -metadata:s:v comment="Cover (Front)" -loglevel quiet '.format(audio=self.path(), image=self.album_art)
+        for i in self.info:
+            command += '-metadata {key}="{value}" '.format(key=i, value=self.info[i])
+        command += '"' + self.path().replace(self.form, 'tmp.' + self.form) + '"'
+        os.system(command)
+        UnixIO.mv(self.path().replace(self.form, 'tmp.' + self.form), self.path())
 
     def is_lossless(self):
         return self.__lossless
@@ -134,7 +145,7 @@ class Music():
                 self.__lossless = False
         
         path = os.path.sep.join(self.__path)
-        command = 'ffmpeg -i "{}" -q 0 "{}" -y -loglevel quiet'.format(path, path.replace(self.form, target))
+        command = 'ffmpeg -i "{}" -q 0 -map_metadata 0 "{}" -y -loglevel quiet'.format(path, path.replace(self.form, target))
         if isinstance(bitrate, int):
             command += ' -b:a {}'.format(str(bitrate))
         os.system(command)
@@ -142,8 +153,8 @@ class Music():
             os.system('rm "{}"'.format(path))
 
 class Lyric(Music):
-    def __init__(self, path):
-        Music.__init__(self, path)
+    def __init__(self, path, strict_mod):
+        Music.__init__(self, path, strict_mod)
         self.lyric = {}
 
     def append(self, time, line):
