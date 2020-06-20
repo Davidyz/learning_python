@@ -147,7 +147,7 @@ class Music():
         path = os.path.sep.join(self.__path)
         command = 'ffmpeg -i "{}" -q 0 -map_metadata 0 "{}" -y -loglevel quiet'.format(path, path.replace(self.form, target))
         if isinstance(bitrate, int):
-            command += ' -b:a {}'.format(str(bitrate))
+            command += ' -b:a {}k'.format(str(bitrate))
         os.system(command)
         if replace:
             os.system('rm "{}"'.format(path))
