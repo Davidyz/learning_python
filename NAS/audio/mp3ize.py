@@ -8,8 +8,18 @@ if replaced:
     arguments.remove('-r')
 
 if '-b' in arguments:
-    bitrate = arguments.pop(arguments.index('-b') + 1)
+    bitrate = int(arguments.pop(arguments.index('-b') + 1))
     arguments.remove('-b')
+
+black_list = ('Chopin', 'Kotaro', 'Pacific', 'Vivaldi', 'Andrew')   # add keywords of songs that should not be converted to this tuple.
+def skip(song):
+    '''
+    Return True if the song should not be converted.
+    '''
+    for i in black_list:
+        if i in song:
+            return True
+    return False
 
 if len(arguments) == 3:
     for i in arguments[1:]:
@@ -21,7 +31,7 @@ if len(arguments) == 3:
 elif len(arguments) == 2 and (os.path.isfile(arguments[1]) or os.path.isdir(arguments[1])):
     args = {'original':arguments[1],'destination':False}
 
-songs = [music.Music(i) for i in UnixIO.listdir(args['original']) if music.is_music(i) and (not 'Chopin' in i) and (not 'Kotaro' in i)]
+songs = [music.Music(i) for i in UnixIO.listdir(args['original']) if music.is_music(i) and (not skip(i))]
 
 def execute(song, replace, to):
     if replace:
