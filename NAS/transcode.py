@@ -18,10 +18,10 @@ if old_path == new_path:
 else:
     tmp = False
 
-files = [i for i in UnixIO.listdir(old_path)]
+files = [i for i in UnixIO.listdir(old_path) if 'mkv' in i or 'mp4' in i or 'm4v' in i]
 
 for i in files:
-    os.system('ffmpeg -i "{source}" -c:v libx265 -c:a libfdk_aac -y -q 0 -map 0 -y "{target}"'.format(source=i, target=i.replace('264', '265').replace(old_path, new_path)))
+    os.system('ffmpeg -i "{source}" -c:v libx265 -c:a libfdk_aac -y -q 0 -y -x265-params lossless=1 "{target}"'.format(source=i, target=i.replace(old_path, new_path).replace('264', '265').replace('mkv', 'mp4').replace('m4v', 'mp4')))
 
 if tmp:
     os.system('rm -r tmp')

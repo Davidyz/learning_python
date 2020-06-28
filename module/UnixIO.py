@@ -9,7 +9,7 @@ def listdir(path):
         else:
             for i in os.listdir(candidate):
                 stack.append(os.path.join(candidate, i))
-    return output
+    return sorted(output)
 
 def readfile(path, binary=False):
     option = 'r'
