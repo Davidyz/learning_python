@@ -15,6 +15,130 @@ acos = math.acos
 atan = math.atan
 lg = math.log10
 
+class Fraction():
+    def __init__(self, numerator, denominator = None):
+        if denominator == None:
+            denominator = 1
+
+        self.__numerator = numerator
+        self.__denominator = denominator
+        self.simplify()
+
+    def __int__(self):
+        return self.numerator() // self.denominator()
+
+    def __float__(self):
+        return self.__numerator / float(self.__denominator)
+
+    def __str__(self):
+        if self.denominator() == 1:
+            return str(self.numerator())
+        return "{} / {}".format(int(self.numerator()), int(self.denominator()))
+
+    def __int__(self):
+        return self.__numerator // self.__denominator
+
+    def __add__(self, other):
+        if isinstance(other, Fraction):
+            new_denominator = self.denominator() * other.denominator()
+            new_numerator = self.numerator() * other.denominator() + self.denominator() * other.numerator()
+            factor = gcd(new_numerator, new_denominator)
+            return Fraction(new_numerator / factor, new_denominator / factor)
+        else:
+            return Fraction(other) + self
+    
+    def __sub__(self, other):
+        return self + (-other)
+
+    def __mul__(self, other):
+        if not isinstance(other):
+            other = Fraction(other)
+
+        return Fraction(self.numerator() * other.denominator(), self.denominator() * self.denominator())
+    
+    def __truediv__(self, other):
+        if not isinstance(other):
+            other = Fraction(other)
+
+        return self * other.reciprocal()
+
+    def __mod__(self, other):
+        if not isinstance(other, Fraction):
+            other = Fraction(other)
+        temp = self
+        while temp > other:
+            temp = temp - other
+        return temp
+    
+    def __neg__(self):
+        return Fraction(-self.numerator(), self.denominator())
+    
+    def __abs__(self):
+        return Fraction(self.numerator(), self.denominator())
+    
+    def __pow__(self, other):
+        if other % 1 == 0:
+            return Fraction(self.numerator() ** int(other), self.denominator() ** int(other))
+        else:
+            return float(self) ** other
+
+    def __eq__(self, other):
+        if not isinstance(other):
+            other = Fraction(other)
+        
+        self.simplify()
+        other.simplify()
+        return self.numerator() == other.numerator() and self.denominator() == other.denominator()
+    
+    def __gt__(self, other):
+        if not isinstance(other, Fraction):
+            other = Fraction
+        
+        return self.numerator() * other.denominator() > self.denominator() * other.numerator()
+
+    def __ge__(self, other):
+        return self == other or self > other
+
+    def __lt__(self, other):
+        return not self >= other
+
+    def __le__(self, other):
+        return not self > other
+
+    def __ne__(self, other):
+        return not self == other
+        
+    def reciprocal(self):
+        return Fraction(self.denominator(), self.numerator())
+
+    def simplify(self):
+        if self.__numerator * self.__denominator > 0:
+            self.__numerator, self.__denominator = abs(self.__numerator), abs(self.__denominator)
+        
+        while (self.__numerator % 1 or self.__denominator % 1):
+            self.__numerator *= 10
+            self.__denominator *= 10
+
+        factor = gcd(self.numerator(), self.denominator())
+        self.__numerator //= factor
+        self.__denominator //= factor
+        return self
+
+    def denominator(self):
+        return int(self.__denominator)
+
+    def numerator(self):
+        return int(self.__numerator)
+
+def gcd(a, b):
+    while a != b:
+        a, b = max(a, b), min(a, b)
+        a, b = a - b, b
+    return int(a)
+
+def lcm(a, b):
+    return a * b / gcd(a, b)
+
 def ln(x):
     return math.log1p(x - 1)
 
