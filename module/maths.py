@@ -19,7 +19,7 @@ class Fraction():
     def __init__(self, numerator, denominator = None):
         if denominator == None:
             denominator = 1
-
+        
         self.__numerator = numerator
         self.__denominator = denominator
         self.simplify()
@@ -40,7 +40,7 @@ class Fraction():
     def __str__(self):
         if self.denominator() == 1:
             return str(self.numerator())
-        return "{} / {}".format(int(self.numerator()), int(self.denominator()))
+        return "{}/{}".format(int(self.numerator()), int(self.denominator()))
 
     def __int__(self):
         return self.__numerator // self.__denominator
@@ -58,7 +58,7 @@ class Fraction():
         return self + (-other)
 
     def __mul__(self, other):
-        if not isinstance(other):
+        if not isinstance(other, Fraction):
             other = Fraction(other)
 
         return Fraction(self.numerator() * other.denominator(), self.denominator() * self.denominator())
@@ -81,7 +81,7 @@ class Fraction():
         return Fraction(-self.numerator(), self.denominator())
     
     def __abs__(self):
-        return Fraction(self.numerator(), self.denominator())
+        return Fraction(abs(self.numerator()), abs(self.denominator()))
     
     def __pow__(self, other):
         if other % 1 == 0:
@@ -121,6 +121,12 @@ class Fraction():
     def simplify(self):
         if self.__numerator * self.__denominator > 0:
             self.__numerator, self.__denominator = abs(self.__numerator), abs(self.__denominator)
+
+        elif self.__numerator == 0 and self.__denominator != 0:
+            return self
+
+        elif self.__denominator == 0:
+            raise ZeroDivisionError("Denominator cannot be zero.")
         
         while (self.__numerator % 1 or self.__denominator % 1):
             self.__numerator *= 10
@@ -138,10 +144,19 @@ class Fraction():
         return int(self.__numerator)
 
 def gcd(a, b):
-    while a != b:
-        a, b = max(a, b), min(a, b)
-        a, b = a - b, b
-    return int(a)
+    if a > 0 and b > 0:
+        while a != b:
+            a, b = max(a, b), min(a, b)
+            a, b = a - b, b
+        return int(a)
+    
+    elif a < 0 or b < 0:
+        return gcd(abs(a), abs(-b))
+    
+    elif a * b == 0 and a + b != 0:
+        return False
+
+    return 0
 
 def lcm(a, b):
     return a * b / gcd(a, b)
@@ -411,7 +426,7 @@ class Vector():
     """
     def __init__(self, data):
         if isinstance(data, list):
-            self.__vec = data
+            self.__vec = [Fraction(i) for i in data]
         elif isinstance(data, Matrix) and min(data.dimension()) == 1:
             if data.dimension()[1] >= data.dimension()[0]:
                 self.__vec = data.row(0)
@@ -427,7 +442,7 @@ class Vector():
         return self.__vec[n]
 
     def __setitem__(self, index, value):
-        self.__vec[index] = value
+        self.__vec[index] = Fraction(value)
 
     def __add__(self, other):
         if len(self) == len(other):
@@ -437,9 +452,6 @@ class Vector():
         return math.sqrt(sum([i ** 2 for i in self.__vec]))
 
     def __mod__(self, other):
-        '''
-        Return 1 if it is a zero vector divided by a zero vector.
-        '''
         if isinstance(other, Matrix) and min(other.dimension()) == 1:
             return self % Vector(other)
 
@@ -447,7 +459,7 @@ class Vector():
             for i in range(len(self)):
                 if self[i] == other[i] == 0:
                     if i == len(self) - 1:
-                        return 1
+                        return False
                 else:
                     ratio = self[i] / other[i]
                     break
@@ -476,6 +488,9 @@ class Vector():
             if len(self) == len(other):
                 return sum((self[i] * other[i] for i in range(len(self))))
     
+    def __repr__(self):
+        return 'Vector(' + ', '.join(str(i) for i in self.__vec) + ')'
+
     def normalised(self):
         '''
         Return the unit vector parallel to self.
@@ -499,9 +514,13 @@ class Matrix():
     To assist maths homework and practice coding.
     """
     def __init__(self, mat, constant = False):
-        for i in range(len(mat) - 1):
-            if len(mat[i]) != len(mat[i + 1]):
+        for i in range(len(mat)):
+            if len(mat[i]) != len(mat[0]):
                 raise ValueError('Not a valid matrix!')
+            else:
+                for j in range(len(mat[0])):
+                    mat[i][j] = Fraction(mat[i][j])
+
         if constant:
             for i in range(len(mat)):
                 mat[i] = tuple(mat[i])
@@ -610,6 +629,9 @@ class Matrix():
                     return False
             return ratio
         return False
+
+    def __repr__(self):
+        return '\n'.join(',\t'.join(str(j) for j in i) for i in self.__mat)
 
     def isConst(self):
         return self.__const
