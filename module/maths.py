@@ -24,6 +24,13 @@ class Fraction():
         self.__denominator = denominator
         self.simplify()
 
+    def __repr__(self):
+        if self.__numerator == 0:
+            return "0"
+        elif self.__numerator % self.__denominator == 0:
+            return str(self.__numerator // self.__denominator)
+        return "{}/{}".format(int(self.__numerator), int(self.__denominator))
+
     def __int__(self):
         return self.numerator() // self.denominator()
 
