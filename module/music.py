@@ -88,7 +88,6 @@ class Music():
             fin.close()
 
     def set_tag(self):
-        '''
         if self.form == 'flac':
             try:
                 song = mutagen.flac.FLAC(os.path.sep.join(self.__path))
@@ -128,6 +127,7 @@ class Music():
         command += '"' + self.path().replace(self.form, 'tmp.' + self.form) + '"'
         os.system(command)
         UnixIO.mv(self.path().replace(self.form, 'tmp.' + self.form), self.path())
+        '''
 
     def is_lossless(self):
         return self.__lossless
@@ -135,22 +135,32 @@ class Music():
     def path(self):
         return os.path.sep.join(self.__path)
 
-    def format(self, target=None, replace=True, bitrate=None):
+    def format(self, target=None, form=None, bitrate=320, overwrite=True):
         if target == None:
-            if self.is_lossless():
-                target = 'flac'
-                self.__lossless = True
-            else:
-                target = 'mp3'
-                self.__lossless = False
+            raise ValueError("No target directory is passed.") 
+        if form == None:
+            form = self.form
         
-        path = os.path.sep.join(self.__path)
-        command = 'ffmpeg -i "{}" -q 0 -map_metadata 0 "{}" -y -loglevel quiet'.format(path, path.replace(self.form, target))
-        if isinstance(bitrate, int):
-            command += ' -b:a {}k'.format(str(bitrate))
+        original_path = os.path.sep.join(self.__path)
+        if os.path.isdir(target):
+            target_file = os.path.sep.join([target, self.__path[-1]]).replace(self.form, form)
+        elif os.path.isfile(target) :
+            if overwrite:
+                target_file = target
+            else:
+                raise IOError("Target already exists.")
+        
+        form = target_file.split('.')[-1]
+        codec = {'flac':'',
+                 'aac':' -c:a libfdk_aac ',
+                 'mp3':' -c:a libmp3lame '}
+
+        command = 'ffmpeg -i "{}" -q 0 -map_metadata 0 "{}" -y -loglevel quiet'.format(original_path, target_file)
+        if form in codec:  
+            command += codec[form]
+        if isinstance(bitrate, int) and form=='mp3':
+            command += ' -b:a {}k '.format(str(bitrate))
         os.system(command)
-        if replace:
-            os.system('rm "{}"'.format(path))
 
 class Lyric(Music):
     def __init__(self, path, strict_mod):

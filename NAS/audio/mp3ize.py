@@ -2,16 +2,17 @@
 import music, UnixIO, sys, os, multiprocessing
 arguments = sys.argv
 
-replaced = '-r' in arguments
-bitrate = None
-if replaced:
-    arguments.remove('-r')
+overwrite = '-s' in arguments
+bitrate = 320
+if overwrite:
+    arguments.remove('-s')
 
 if '-b' in arguments:
     bitrate = int(arguments.pop(arguments.index('-b') + 1))
     arguments.remove('-b')
 
 black_list = ('Chopin', 'Kotaro', 'Pacific', 'Vivaldi', 'Andrew')   # add keywords of songs that should not be converted to this tuple.
+
 def skip(song):
     '''
     Return True if the song should not be converted.
@@ -33,18 +34,11 @@ elif len(arguments) == 2 and (os.path.isfile(arguments[1]) or os.path.isdir(argu
 
 songs = [music.Music(i) for i in UnixIO.listdir(args['original']) if music.is_music(i) and (not skip(i))]
 
-def execute(song, replace, to):
-    if replace:
-        song.format('mp3', True, bitrate)
-        return
-    song.format('mp3', False, bitrate)
-    if to and song.is_lossless():
-        UnixIO.mv(song.path().replace(song.form, 'mp3'), to)
-    elif to and (not song.is_lossless()):
-        UnixIO.cp(song.path().replace(song.form, 'mp3'), to)
+def execute(song, to, overwrite, br=320):
+    song.format(target=to, form='mp3', overwrite=overwrite, bitrate=br)
 
 pool = multiprocessing.Pool(processes = 3)
-pool.starmap_async(execute, ([i, replaced, args['destination']] for i in songs)).get()
+pool.starmap_async(execute, ([i, args['destination'], overwrite, bitrate] for i in songs)).get()
 pool.close()
 pool.join()
 
