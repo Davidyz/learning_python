@@ -3,7 +3,7 @@ This is a custom module of functions that is created in order to practice algori
 Currently support python3 only.
 """
 from __future__ import division
-import math, cmath, copy, random, integration
+import math, cmath, copy, random, integration, numba
 
 pi = math.pi
 e = math.e
@@ -16,13 +16,28 @@ atan = math.atan
 lg = math.log10
 
 class Fraction():
-    def __init__(self, numerator, denominator = None):
-        if denominator == None:
-            denominator = 1
+    def __init__(self, numerator, denominator = 1):
+        if isinstance(numerator, str) and numerator.count('/') == 1 and denominator == 1:
+            self.__numerator = float(numerator.strip().split('/')[0])
+            self.__denominator = float(numerator.strip().split('/')[1])
+
+        else:
+            if isinstance(denominator, Fraction):
+                numerator *= denominator.denominator()
+                denominator = denominator.numerator()
+
+            if isinstance(numerator, Fraction) and isinstance(denominator, (int, float)):
+                self.__denominator = numerator.denominator()
+                self.__numerator = numerator.numerator() / denominator
         
-        self.__numerator = numerator
-        self.__denominator = denominator
+            else:
+                self.__denominator = denominator
+                self.__numerator = numerator
+
         self.simplify()
+
+    def __round__(self, n):
+        return round(float(self), n)
 
     def __repr__(self):
         if self.__numerator == 0:
@@ -49,33 +64,55 @@ class Fraction():
         if isinstance(other, Fraction):
             new_denominator = self.denominator() * other.denominator()
             new_numerator = self.numerator() * other.denominator() + self.denominator() * other.numerator()
+            if new_numerator == 0:
+                return 0
             factor = gcd(new_numerator, new_denominator)
             return Fraction(new_numerator / factor, new_denominator / factor)
         else:
             return Fraction(other) + self
+
+    def __radd__(self, other):
+        return self + other
     
     def __sub__(self, other):
         return self + (-other)
+
+    def __rsub__(self, other):
+        return (-self) + other
 
     def __mul__(self, other):
         if not isinstance(other, Fraction):
             other = Fraction(other)
 
-        return Fraction(self.numerator() * other.denominator(), self.denominator() * self.denominator())
+        return Fraction(self.numerator() * other.numerator(), self.denominator() * other.denominator())
     
+    def __rmul__(self, other):
+        return self * other
+
     def __truediv__(self, other):
-        if not isinstance(other):
+        if not isinstance(other, Fraction):
             other = Fraction(other)
 
         return self * other.reciprocal()
+
+    def __rtruediv__(self, other):
+        if isinstance(other, Fraction):
+            return other / self
+        else:
+            return Fraction(other) / self
 
     def __mod__(self, other):
         if not isinstance(other, Fraction):
             other = Fraction(other)
         temp = self
-        while temp > other:
+        while temp >= other:
             temp = temp - other
         return temp
+
+    def __rmod__(self, other):
+        if not isinstance(other, Fraction):
+            other = Fraction(other)
+        return other % self
     
     def __neg__(self):
         return Fraction(-self.numerator(), self.denominator())
@@ -87,10 +124,17 @@ class Fraction():
         if other % 1 == 0:
             return Fraction(self.numerator() ** int(other), self.denominator() ** int(other))
         else:
-            return float(self) ** other
+            if not isinstance(other, Fraction):
+                other = Fraction(other)
+            return Fraction(root(self.numerator() ** other.numerator(), other.denominator()), root(self.denominator() ** other.numerator(), other.denominator()))
+
+    def __rpow__(self, other):
+        if not isinstance(other, Fraction):
+            other = Fraction(other)
+        return other ** self
 
     def __eq__(self, other):
-        if not isinstance(other):
+        if not isinstance(other, Fraction):
             other = Fraction(other)
         
         self.simplify()
@@ -99,26 +143,46 @@ class Fraction():
     
     def __gt__(self, other):
         if not isinstance(other, Fraction):
-            other = Fraction
+            other = Fraction(other)
         
         return self.numerator() * other.denominator() > self.denominator() * other.numerator()
 
     def __ge__(self, other):
+        if not isinstance(other, Fraction):
+            other = Fraction(other)
+
         return self == other or self > other
 
     def __lt__(self, other):
+        if not isinstance(other, Fraction):
+            other = Fraction(other)
         return not self >= other
 
     def __le__(self, other):
+        if not isinstance(other, Fraction):
+            other = Fraction(other)
+  
         return not self > other
 
     def __ne__(self, other):
+        if not isinstance(other, Fraction):
+            other = Fraction(other)
         return not self == other
         
     def reciprocal(self):
         return Fraction(self.denominator(), self.numerator())
 
     def simplify(self):
+        if isinstance(self.__denominator, Fraction):
+            self.__denominator.simplify()
+            self.__numerator *= self.__denominator.denominator()
+            self.__denominator = self.__denominator.numerator()
+
+        if isinstance(self.__numerator, Fraction):
+            self.__numerator.simplify()
+            self.denominator *= self.__numerator.denominator()
+            self.__numerator = self.__numerator.numerator()
+            
         if self.__numerator * self.__denominator > 0:
             self.__numerator, self.__denominator = abs(self.__numerator), abs(self.__denominator)
 
@@ -131,7 +195,7 @@ class Fraction():
         while (self.__numerator % 1 or self.__denominator % 1):
             self.__numerator *= 10
             self.__denominator *= 10
-
+        
         factor = gcd(self.numerator(), self.denominator())
         self.__numerator //= factor
         self.__denominator //= factor
@@ -144,13 +208,21 @@ class Fraction():
         return int(self.__numerator)
 
 def gcd(a, b):
-    if a > 0 and b > 0:
-        while a != b:
-            a, b = max(a, b), min(a, b)
-            a, b = a - b, b
-        return int(a)
+    if a * b > 0:
+        a = abs(a)
+        b = abs(b)
+        if a < b:
+            a, b = b, a
+
+        while a > b and (a > 0 and b > 0):
+            a, b = b, a % b
+
+        if a == b or b == 0:
+            return int(a)
+        else:
+            return 0
     
-    elif a < 0 or b < 0:
+    elif a * b < 0:
         return gcd(abs(a), abs(-b))
     
     elif a * b == 0 and a + b != 0:
@@ -183,7 +255,7 @@ def factorial(n):
     return result
 
 def isnumber(n):
-    return isinstance(n, int) or isinstance(n, float)
+    return isinstance(n, int) or isinstance(n, float) or isinstance(Fraction)
 
 def isprime(n):
     if isnumber(n):
@@ -426,7 +498,7 @@ class Vector():
     """
     def __init__(self, data):
         if isinstance(data, list):
-            self.__vec = [Fraction(i) for i in data]
+            self.__vec = data
         elif isinstance(data, Matrix) and min(data.dimension()) == 1:
             if data.dimension()[1] >= data.dimension()[0]:
                 self.__vec = data.row(0)
@@ -442,7 +514,7 @@ class Vector():
         return self.__vec[n]
 
     def __setitem__(self, index, value):
-        self.__vec[index] = Fraction(value)
+        self.__vec[index] = value
 
     def __add__(self, other):
         if len(self) == len(other):
@@ -517,10 +589,7 @@ class Matrix():
         for i in range(len(mat)):
             if len(mat[i]) != len(mat[0]):
                 raise ValueError('Not a valid matrix!')
-            else:
-                for j in range(len(mat[0])):
-                    mat[i][j] = Fraction(mat[i][j])
-
+        
         if constant:
             for i in range(len(mat)):
                 mat[i] = tuple(mat[i])
@@ -787,4 +856,4 @@ def rotate2(coordinates, angle):
 
 if __name__ == '__main__':
     import sys
-    print(newton_method(lambda x:math.cos(x) - x, lambda x:-math.sin(x) - 1, 100, 2))
+    print(isprime(101))
