@@ -67,6 +67,9 @@ class Cell():
 
     def __str__(self):
         return str(self.value)
+    
+    def __repr__(self):
+        return str(self)
 
     def __hash__(self):
         return self.value
@@ -112,6 +115,28 @@ class Board():
     
     def __copy__(self):
         return Board(self.__data)
+
+    def __eq__(self, other):
+        for i in range(9):
+            for j in range(9):
+                pass
+
+    def __getitem__(self, index):
+        return self.__data[index[0]][index[1]]
+
+    def __setitem__(self, index, value):
+        self.__data[index[0]][index[1]].value = value
+
+    def __delitem__(self, index):
+        self.__data[index[0]][index[1]].value = 0
+
+    def __repr__(self):
+        string = "+-------+-------+-------+\n"
+        for i in range(9):
+            string += "| {} {} {} | {} {} {} | {} {} {} |\n".format(*[str(j.value) for j in self.__data[i]]).replace("0"," ")
+            if (i + 1) % 3 == 0:
+                string += "+-------+-------+-------+\n"
+        return string
 
     def set_value(self, index, i):
         '''

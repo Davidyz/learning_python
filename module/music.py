@@ -3,7 +3,7 @@
 This is a personal module for music tagging and .lrc file processing. Mutagen integrated.
 '''
 
-import os, mutagen, mutagen.flac, json
+import os, mutagen, mutagen.flac, json, UnixIO
 from mutagen.easyid3 import EasyID3
 
 lossless = ['ape', 'wav', 'flac', 'dsd', 'dsf', 'dff']
@@ -117,6 +117,17 @@ class Music():
 
         else:
             pass
+        '''
+        if not self.album_art:
+            command = 'ffmpeg -i "{source}" -q 0 -y -loglevel quiet '.format(source=self.path())
+        else:
+            command = 'ffmpeg -i "{audio}" -i "{image}" -q 0 -y -map 0:0 -map 1:0 -c copy -id3v2_version 3 -metadata:s:v title="Album cover" -metadata:s:v comment="Cover (Front)" -loglevel quiet '.format(audio=self.path(), image=self.album_art)
+        for i in self.info:
+            command += '-metadata {key}="{value}" '.format(key=i, value=self.info[i])
+        command += '"' + self.path().replace(self.form, 'tmp.' + self.form) + '"'
+        os.system(command)
+        UnixIO.mv(self.path().replace(self.form, 'tmp.' + self.form), self.path())
+        '''
 
     def is_lossless(self):
         return self.__lossless
@@ -124,24 +135,36 @@ class Music():
     def path(self):
         return os.path.sep.join(self.__path)
 
-    def format(self, target=None, replace=True):
+    def format(self, target=None, form=None, bitrate=320, overwrite=True):
         if target == None:
-            if self.is_lossless():
-                target = 'flac'
-                self.__lossless = True
-            else:
-                target = 'mp3'
-                self.__lossless = False
+            raise ValueError("No target directory is passed.") 
+        if form == None:
+            form = self.form
         
-        path = os.path.sep.join(self.__path)
-        command = 'ffmpeg -i "{}" -q 0 "{}" -y'.format(path, path.replace(self.form, target))
+        original_path = os.path.sep.join(self.__path)
+        if os.path.isdir(target):
+            target_file = os.path.sep.join([target, self.__path[-1]]).replace(self.form, form)
+        elif os.path.isfile(target) :
+            if overwrite:
+                target_file = target
+            else:
+                raise IOError("Target already exists.")
+        
+        form = target_file.split('.')[-1]
+        codec = {'flac':'',
+                 'aac':' -c:a libfdk_aac ',
+                 'mp3':' -c:a libmp3lame '}
+
+        command = 'ffmpeg -i "{}" -q 0 -map_metadata 0 "{}" -y -loglevel quiet'.format(original_path, target_file)
+        if form in codec:  
+            command += codec[form]
+        if isinstance(bitrate, int) and form=='mp3':
+            command += ' -b:a {}k '.format(str(bitrate))
         os.system(command)
-        if replace:
-            os.system('rm "{}"'.format(path))
 
 class Lyric(Music):
-    def __init__(self, path):
-        Music.__init__(self, path)
+    def __init__(self, path, strict_mod):
+        Music.__init__(self, path, strict_mod)
         self.lyric = {}
 
     def append(self, time, line):
