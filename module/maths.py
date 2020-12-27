@@ -236,6 +236,20 @@ def lcm(a, b):
 def ln(x):
     return math.log1p(x - 1)
 
+def sum(array):
+    s = 0
+    while array:
+        if isinstance(array[0], (int, float, Fraction)):
+            s += array.pop(0)
+        elif isinstance(array[0], (list, tuple)):
+            array += list(array.pop(0))
+        elif isinstance(array[0], dict):
+            s += sum_dict(array.pop(0))
+    return s
+
+def sum_dict(dictionary):
+    return sum([dictionary[i] for i in dictionary])
+
 def factorial(n):
     """
     Return n!.
