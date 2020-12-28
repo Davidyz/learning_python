@@ -39,23 +39,64 @@ class Music():
         if is_music(path):
             self.__path = path.split(os.path.sep)
             self.__rawinfo = self.__path[self.__path.index('Music') + 1:]
-            
-            self.info = {'title':''.join(self.__rawinfo[-1].split('.')[:-1])}
-            if len(self.__rawinfo) >= 2:
-                self.info['artist'] = self.__rawinfo[0]
-            if len(self.__rawinfo) >= 3:
-                self.info['album'] = self.__rawinfo[1]
-            
-            if self.__strict_mod:
-                for i in ['artist', 'album']:
-                    if not (i in self.info):
-                        self.info[i] = ""
+
+            if not self.form in ('mp3', 'flac') or self.__strict_mod:
+                self.parse_path()
+            else:
+                if not self.parse_tag():
+                    self.parse_path()
+
             if 'cover.jpg' in os.listdir(os.path.sep.join(path.split('/')[:-1])):
                 self.album_art = path.replace(self.__path[-1], 'cover.jpg')
             else:
                 self.album_art = None
         else:
             raise InputError('\nInvalid path: {}.\nIt is a directory or is not a recognised music file.'.format(path))
+    
+    def __str__(self):
+        return os.path.sep.join(self.__path)
+
+    def __repr__(self):
+        return str(self)
+
+    def __getitem__(self, key):
+        return self.info[key]
+
+    def __setitem__(self, key, value):
+        self.info[key] = value
+
+    def __iter__(self):
+        for i in self.info:
+            yield i
+
+    def __dict__(self):
+        return self.info
+
+    def parse_path(self):
+        self.info = {'title':''.join(self.__rawinfo[-1].split('.')[:-1])}
+        if len(self.__rawinfo) >= 2:
+            self.info['artist'] = self.__rawinfo[0]
+        if len(self.__rawinfo) >= 3:
+            self.info['album'] = self.__rawinfo[1]
+       
+        if self.__strict_mod:
+            for i in ['artist', 'album']:
+                if not (i in self.info):
+                    self.info[i] = ""
+        return self.info
+
+    def parse_tag(self):
+        if self.form == 'flac':
+            try:
+                song = mutagen.flac.FLAC(self.path())
+                self.info = dict(song)
+            except mutagen.flac.FLACNoHeaderError:
+                print('Unsupported file!')
+                return False
+            return self.info
+        elif self.form == 'mp3':
+            pass
+        return False
 
     def load(self, path = None):
         '''
@@ -117,17 +158,6 @@ class Music():
 
         else:
             pass
-        '''
-        if not self.album_art:
-            command = 'ffmpeg -i "{source}" -q 0 -y -loglevel quiet '.format(source=self.path())
-        else:
-            command = 'ffmpeg -i "{audio}" -i "{image}" -q 0 -y -map 0:0 -map 1:0 -c copy -id3v2_version 3 -metadata:s:v title="Album cover" -metadata:s:v comment="Cover (Front)" -loglevel quiet '.format(audio=self.path(), image=self.album_art)
-        for i in self.info:
-            command += '-metadata {key}="{value}" '.format(key=i, value=self.info[i])
-        command += '"' + self.path().replace(self.form, 'tmp.' + self.form) + '"'
-        os.system(command)
-        UnixIO.mv(self.path().replace(self.form, 'tmp.' + self.form), self.path())
-        '''
 
     def is_lossless(self):
         return self.__lossless

@@ -7,6 +7,7 @@ bitrate = 320
 if overwrite:
     arguments.remove('-s')
 
+
 if '-b' in arguments:
     bitrate = int(arguments.pop(arguments.index('-b') + 1))
     arguments.remove('-b')
@@ -35,6 +36,14 @@ elif len(arguments) == 2 and (os.path.isfile(arguments[1]) or os.path.isdir(argu
 songs = [music.Music(i) for i in UnixIO.listdir(args['original']) if music.is_music(i) and (not skip(i))]
 
 def execute(song, to, overwrite, br=320):
+    if os.path.isfile(to) and (not overwrite):
+        # when 'to' is a file
+        return
+
+    elif os.path.isfile(to) and (not overwrite) and (song.path.split('/')[-1].replace(song.form, 'mp3') in os.listdir(to)):
+        # when 'to' is a directory
+        return
+    print('Converting {}'.format(str(song)))
     song.format(target=to, form='mp3', overwrite=overwrite, bitrate=br)
 
 pool = multiprocessing.Pool(processes = 3)
