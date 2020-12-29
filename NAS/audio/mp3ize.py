@@ -46,10 +46,8 @@ def execute(song, to, overwrite, br=320):
     print('Converting {}'.format(str(song)))
     song.format(target=to, form='mp3', overwrite=overwrite, bitrate=br)
 
-pool = multiprocessing.Pool(processes = 3)
-pool.starmap_async(execute, ([i, args['destination'], overwrite, bitrate] for i in songs)).get()
-pool.close()
-pool.join()
+for song in songs:
+    execute(song, args['destination'], overwrite, bitrate)
 
 if args['destination']:
     lyrics = (j for j in UnixIO.listdir(args['original']) if 'lrc' in j)
