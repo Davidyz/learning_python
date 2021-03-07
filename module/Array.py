@@ -17,34 +17,64 @@ def binary_search(array, item):
             end = pivot
         elif array[pivot] < item:
             start = pivot + 1
-    return -1
+    return None
 
 # Codes for quick sort
-def pivot(array):
-    pass
+def swap(array, a, b):
+    if a != b:
+        array[a], array[b] = array[b], array[a]
 
-def median3(array):
-    if len(array) == 3:
-        return 3 - array.index(max(array)) - array.index(min(array))
+def find_pivot(array, l, h):
+    '''
+    Find a better pivot by median of 3 method to avoid the worst case of quicksort.
+    '''
+    if h - l < 3:
+        return l
+    if (array[l] <= array[l + 1] and array[l + 1] <= array[l + 2]) or (array[l] > array[l + 1] and array[l + 1] > array[l + 2]):
+        swap(array, l, l + 1)
+    else:
+        if array[l + 1] == max(array[l:l+3]):
+            if array[l + 2] > array[l]:
+                swap(array, l, l + 2)
+        elif array[l + 1] == min(array[l:l + 3]):
+            if array[l + 2] < array[l]:
+                swap(array, l, l + 2)
+    return l
+ 
+def partition(array, l, h):
+    '''
+    Auxiliary function of quicksort that moves smaller items to the front of the array, 
+    and larger items to the end.
+    Return the index of the pivot.
+    l and h (inclusive) are the start and end of the sub-array to be partitioned.
+    '''
+    if l == h:
+        return l
+    bound = l   # the last item in low
+    find_pivot(array, l, h)
+    for i in range(l + 1, h + 1):
+        if array[i] <= array[l]:
+            bound += 1
+            swap(array, i, bound)
 
+    swap(array, bound, l)
+    return bound
+   
 def quicksort(array):
-    if len(array) < 2:
-        return array
-    
-    if len(array) >= 3:
-        array[median3(array[:3])], array[-1] = array[-1], array[median3(array[:3])]
-
-    pivot = array[-1]
-    i = 0
-    j = len(array) - 1
-    
-    while i < j:
-        if array[i] <= pivot:
-            i += 1
-        elif array[i] > pivot:
-            array.insert(-1, array.pop(i))
-            j -= 1
-    return quicksort(array[:j]) + [pivot] + quicksort(array[j:len(array) - 1])
+    stack = [0, len(array) - 1]
+    while stack:
+        h, l = stack.pop(-1), stack.pop(-1)
+        if l > h:
+            l, h = h, l
+        
+        pivot = partition(array, l, h)
+        if pivot > l:
+            stack.append(l)
+            stack.append(pivot - 1)
+        if pivot < h:
+            stack.append(pivot + 1)
+            stack.append(h)
+    return array
 
 # Codes for bubble sort.
 def switch(ls, index = 0):
@@ -56,15 +86,62 @@ def switch(ls, index = 0):
 
     return switch(ls, index + 1)
 
-def bubblesort(array):
-    if len(array) < 2:
+def shellsort(array, factor = None):
+    step = len(array) - 1
+    if step == 0 or len(array) <= 1:
         return array
 
-    switch(array)
+    if factor == None:
+        factor = 1/2
 
-    return bubblesort(array[:-1]) + [array[-1]]
+    while True:
+        i = 0
+        unswaped = True
+        while i + step < len(array): 
+            
+            if array[i] > array[i + step]:
+                array[i], array[i + step] = array[i + step], array[i]
+                unswaped = False
+            
+            i += 1
 
-# Codes for insertion sort,
+        if unswaped and step > 1:
+            step = int(factor * step)
+        elif step <= 1 and unswaped:
+            break
+
+    return array
+
+def bubblesort(array):
+    end = len(array)
+
+    while end != 0:
+        for i in range(end - 1):
+            if array[i] > array[i + 1]:
+                array[i], array[i + 1] = array[i + 1], array[i]
+
+        end -= 1
+    return array
+
+# Codes for insertion sort.
+def binary_insert(array, end, item):
+    '''
+    Return the index to insert the item.
+    '''
+    start = 0
+
+    while start != end:
+        middle = (start + end) // 2
+        if array[middle] >= item:
+            end = middle - 1
+        elif array[middle] < item:
+            start = middle + 1
+    
+    if item < array[start]:
+        return start
+    else:
+        return start + 1
+
 def insertionsort(array, index = 1):
     if len(array) == 1:
         return array
