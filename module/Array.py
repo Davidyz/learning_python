@@ -5,6 +5,22 @@ Recursion is widely used.
 """
 from math import ceil
 import heap
+import time
+
+def insert(array, source, target):
+    if source > target:
+        item = array[source]
+        for i in range(source, target - 1, -1):
+            array[i] = array[i - 1]
+        array[target] = item
+    elif source < target:
+        item = array[source]
+        for i in range(source, target + 1):
+            array[i] = array[i + 1]
+        array[target] = item
+    else:
+        pass
+    return array
 
 def binary_search(array, item):
     start = 0
@@ -60,7 +76,12 @@ def partition(array, l, h):
     swap(array, bound, l)
     return bound
    
-def quicksort(array):
+def quicksort(array, heuristics=False):
+    '''
+    Implemented with stack and while loop, so that this is an in-place and non-recursive function.
+    heuristics: use is_sorted to check whether the subarray is already sorted.
+    Should improve the performance on already-sorted arrays.
+    '''
     stack = [0, len(array) - 1]
     while stack:
         h, l = stack.pop(-1), stack.pop(-1)
@@ -68,6 +89,8 @@ def quicksort(array):
             l, h = h, l
         
         pivot = partition(array, l, h)
+        if heuristics and is_sorted(array[l:h + 1]):
+            continue
         if pivot > l:
             stack.append(l)
             stack.append(pivot - 1)
@@ -77,15 +100,6 @@ def quicksort(array):
     return array
 
 # Codes for bubble sort.
-def switch(ls, index = 0):
-    if index >= len(ls) - 1:
-        return ls
-
-    elif ls[index] > ls[index + 1]:
-        ls[index], ls[index + 1] = ls[index + 1], ls[index]
-
-    return switch(ls, index + 1)
-
 def shellsort(array, factor = None):
     step = len(array) - 1
     if step == 0 or len(array) <= 1:
@@ -124,13 +138,14 @@ def bubblesort(array):
     return array
 
 # Codes for insertion sort.
-def binary_insert(array, end, item):
+def binary_insert(array, tail, item):
     '''
     Return the index to insert the item.
     '''
     start = 0
+    end = tail
 
-    while start != end:
+    while start < end:
         middle = (start + end) // 2
         if array[middle] >= item:
             end = middle - 1
@@ -140,27 +155,35 @@ def binary_insert(array, end, item):
     if item < array[start]:
         return start
     else:
-        return start + 1
+        return min(start + 1, tail)
 
-def insertionsort(array, index = 1):
+def insertionsort(array, index = 1, binary=True):
     if len(array) == 1:
         return array
     boundary = 1
     while boundary < len(array):
         if array[boundary] >= array[boundary - 1]:
             pass
-        elif array[boundary] <= array[0]:
-            array.insert(0, array.pop(boundary))
+        elif binary:
+            index = binary_insert(array, boundary - 1, array[boundary])                                        
+            array.insert(index, array.pop(boundary))
 
         else:
-            for i in range(boundary):
-                if array[i] <= array[boundary] <= array[i + 1]:
-                    array.insert(i + 1, array.pop(boundary))
+            if array[boundary] <= array[0]:
+                array.insert(0, array.pop(boundary))
+            else:
+                for i in range(boundary):
+                    if array[i] <= array[boundary] <= array[i + 1]:
+                        array.insert(i + 1, array.pop(boundary))
         boundary += 1
     return array
 
 # Codes for merge sort.
 def merge(a, b):
+    if not isinstance(a, list):
+        a = [a]
+    if not isinstance(b, list):
+        b = [b]
     output = []
     while len(a) * len(b) != 0:
         if a[0] < b[0]:
@@ -181,26 +204,53 @@ def mergesort(array):
     middle = len(array) // 2
     return merge(mergesort(array[:middle]), mergesort(array[middle:]))
 
+def merge_loop(array, l, m, h):
+    '''
+    The in_place vertion of merge()
+    l is the index of the first item of the first array.
+    m is the the index of the first item of the second array.
+    h is 1 + the index after the last item of the second array.
+    '''
+    if not (l < m < h):
+        return array
+
+    while l < m and m < h:
+        if array[l] > array[m]:
+            insert(array, m, l)
+            l += 1
+            m += 1
+        elif array[l] == array[m]:
+            insert(array, m, l + 1)
+            l += 2
+            m += 1
+        else:
+            l += 1
+
+    return array
+
 def mergesort_loop(array):
     max_len = len(array)
-    queue = [array]
-    
-    while len(queue) < max_len:
-        temp = queue.pop(0)
-        if len(temp) == 1:
-            queue.append(temp)
-            continue
+    queue = []
+    t = 0
+    start = time.time()
 
-        divider = len(temp) // 2
-        queue.append(temp[:divider])
-        queue.append(temp[divider:])
+    for i in range(len(array)):
+        queue += [i, i + 1]
 
-    while len(queue) > 1:
-        l1 = queue.pop(0)
-        l2 = queue.pop(0)
-        queue.append(merge(l1, l2))
+    while len(queue) > 2:
+        l = queue.pop(0)
+        m = queue.pop(0)
+        if m == queue[0]:
+            queue.pop(0)
+            h = queue.pop(0)
+            t -= time.time()
+            merge_loop(array, l, m, h)
+            t += time.time()
+            queue += [l, h]
+        else:
+            queue += [l, m]
 
-    return queue[0]
+    return array, t, time.time() - start
 
 # Codes for heap sort. Not in working order yet.
 
@@ -232,11 +282,16 @@ def clear_item(array, item):
 
 if __name__ == '__main__':
     # for function tests.
-    import random
-    array = list(i for i in range(100))
+    import random, sys
+    
+    if sys.argv == []:
+        n = 100
+    else:
+        n = int(sys.argv[1])
+    array = list(i for i in range(n))
     random.shuffle(array)
     print(array)
     print('=' * 100)
-    array = heapsort(array)
+    array = mergesort_loop(array)
     print(array)
     print(is_sorted(array))
