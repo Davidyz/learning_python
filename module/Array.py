@@ -5,7 +5,10 @@ Recursion is widely used.
 """
 from math import ceil
 import heap
-import time
+import time, collections, random
+
+class SortingError(Exception):
+    pass
 
 def insert(array, source, target):
     if source > target:
@@ -22,9 +25,11 @@ def insert(array, source, target):
         pass
     return array
 
-def binary_search(array, item):
+def binary_search(array, item, start=0, end=None):
     start = 0
-    end = len(array) - 1
+    if end == None:
+        end = len(array) - 1
+
     while start < end:
         pivot = (end + start) // 2
         if array[pivot] == item:
@@ -82,11 +87,12 @@ def quicksort(array, heuristics=False):
     heuristics: use is_sorted to check whether the subarray is already sorted.
     Should improve the performance on already-sorted arrays.
     '''
-    stack = [0, len(array) - 1]
+    stack = collections.deque()
+    stack.append(0)
+    stack.append(len(array) - 1)
+
     while stack:
-        h, l = stack.pop(-1), stack.pop(-1)
-        if l > h:
-            l, h = h, l
+        h, l = stack.pop(), stack.pop()
         
         pivot = partition(array, l, h)
         if heuristics and is_sorted(array[l:h + 1]):
@@ -100,13 +106,10 @@ def quicksort(array, heuristics=False):
     return array
 
 # Codes for bubble sort.
-def shellsort(array, factor = None):
+def shellsort(array, factor = 1/2):
     step = len(array) - 1
     if step == 0 or len(array) <= 1:
         return array
-
-    if factor == None:
-        factor = 1/2
 
     while True:
         i = 0
@@ -138,9 +141,10 @@ def bubblesort(array):
     return array
 
 # Codes for insertion sort.
-def binary_insert(array, tail, item):
+def binary_insert(array, start, tail, item):
     '''
     Return the index to insert the item.
+    start and end are both inclusive.
     '''
     start = 0
     end = tail
@@ -165,7 +169,7 @@ def insertionsort(array, index = 1, binary=True):
         if array[boundary] >= array[boundary - 1]:
             pass
         elif binary:
-            index = binary_insert(array, boundary - 1, array[boundary])                                        
+            index = binary_insert(array, 0, boundary - 1, array[boundary])                                        
             array.insert(index, array.pop(boundary))
 
         else:
@@ -215,42 +219,49 @@ def merge_loop(array, l, m, h):
         return array
 
     while l < m and m < h:
-        if array[l] > array[m]:
-            insert(array, m, l)
-            l += 1
-            m += 1
-        elif array[l] == array[m]:
-            insert(array, m, l + 1)
-            l += 2
-            m += 1
-        else:
-            l += 1
+        # iterate through the second sub-array from the head and insert items into the first array.
+        if array[m] < array[m - 1]:
+            array.insert(binary_insert(array, l, m - 1, array[m]), array.pop(m))
+        m += 1
 
     return array
 
-def mergesort_loop(array):
+def mergesort_loop(array, heuristics=True):
     max_len = len(array)
-    queue = []
-    t = 0
-    start = time.time()
+    queue = collections.deque()
+    
+    i = 0
+    while i < len(array):
+        # generate a queue of indices of the starts and ends of sorted sub_arrays.
+        start = i
+        queue.append(i)
+        if heuristics and i < len(array) - 1:
+            if array[i] <= array[i + 1]:
+                while i < len(array) - 1 and array[i] <= array[i + 1]:
+                    i += 1
+            elif i < len(array) - 1 and array[i] < array[i + 1]:
+                while array[i] <= array[i + 1]:
+                    i += 1
+                reversed_list(array, start, i, in_place=True)
 
-    for i in range(len(array)):
-        queue += [i, i + 1]
+        queue.append(i + 1)
+        i += 1
 
     while len(queue) > 2:
-        l = queue.pop(0)
-        m = queue.pop(0)
+        # merge the sub_arrays
+        l = queue.popleft()
+        m = queue.popleft()
         if m == queue[0]:
-            queue.pop(0)
-            h = queue.pop(0)
-            t -= time.time()
+            queue.popleft()
+            h = queue.popleft()
             merge_loop(array, l, m, h)
-            t += time.time()
-            queue += [l, h]
+            queue.append(l)
+            queue.append(h)
         else:
-            queue += [l, m]
+            queue.append(l)
+            queue.append(m)
 
-    return array, t, time.time() - start
+    return array
 
 # Codes for heap sort. Not in working order yet.
 
@@ -269,8 +280,15 @@ def is_sorted(array):
             return False
     return True
 
-def reversed(array):
-    return list(array[i] for i in range(len(array) - 1, -1, -1))
+def reversed_list(array, start=0, end=None, in_place=False):
+    if end == None:
+        end = len(array)
+    if not in_place:
+        return list(array[i] for i in range(end - 1, start - 1, -1))
+    else:
+        for i in range(start, start + (end - start) // 2):
+            swap(array, i, end - (i - start) - 1)
+        return array
 
 def clear_item(array, item):
     '''
@@ -280,18 +298,35 @@ def clear_item(array, item):
         array.remove(item)
     return array
 
+def randtest(func, length=1000, repeat=5, typ = int, extra_args=[], ordered=False):
+    '''
+    Pass any extra arguments by setting the parameter extra_args as a list.
+    the ordered parameter allows testing with sorted array, which, in some cases, can be used as a worst-case test.
+    '''
+    l = [typ(i) for i in range(length)]
+    
+    time_accu = 0
+    for i in range(repeat):
+        temp_list = l.copy()
+
+        if not ordered:
+            random.shuffle(temp_list)
+
+        time_accu -= time.time()
+        sorted_array = func(temp_list, *extra_args)
+        time_accu += time.time()
+
+        if not is_sorted(sorted_array):
+            raise SortingError("The list is not sorted.")
+
+    return time_accu / repeat
+
 if __name__ == '__main__':
     # for function tests.
     import random, sys
-    
-    if sys.argv == []:
-        n = 100
-    else:
-        n = int(sys.argv[1])
-    array = list(i for i in range(n))
-    random.shuffle(array)
-    print(array)
-    print('=' * 100)
-    array = mergesort_loop(array)
-    print(array)
-    print(is_sorted(array))
+
+    length = 1000000
+    mergesort_time = randtest(mergesort_loop, length, repeat=10, extra_args=[True])
+    insertionsort_time = randtest(insertionsort, length, repeat=10, extra_args=[False])
+    print("MergeSort:\t", mergesort_time)
+    print("InsertionSort:\t", insertionsort_time)
