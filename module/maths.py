@@ -3,7 +3,7 @@ This is a custom module of functions that is created in order to practice algori
 Currently support python3 only.
 """
 from __future__ import division
-import math, cmath, copy, random, integration, numba
+import math, cmath, copy, random, integration
 
 pi = math.pi
 e = math.e
@@ -122,7 +122,7 @@ class Fraction():
     
     def __pow__(self, other):
         if other % 1 == 0:
-            return Fraction(self.numerator() ** int(other), self.denominator() ** int(other))
+            return Fraction(intpow(self.numerator(), int(other)), intpow(self.denominator(), int(other)))
         else:
             if not isinstance(other, Fraction):
                 other = Fraction(other)
@@ -250,14 +250,14 @@ def sum(array):
 def sum_dict(dictionary):
     return sum([dictionary[i] for i in dictionary])
 
+__fact_cache = {0:1}
 def factorial(n):
     """
     Return n!.
     Return -1 if input is not valid (not a natural number).
     """
-    if int(n) != n or n < 0:
-        return -1
-
+    if n % 1 or n < 0:
+        raise ValueError("Invalid input:", n)
     if n <= 1:
         return 1
 
@@ -269,40 +269,32 @@ def factorial(n):
     return result
 
 def isnumber(n):
-    return isinstance(n, int) or isinstance(n, float) or isinstance(Fraction)
+    return isinstance(n, int) or isinstance(n, float) or isinstance(n, Fraction)
 
 def isprime(n):
-    if isnumber(n):
-        if n - int(n) != 0 or n <= 1:
-            return -1
+    return n in gen_prime(n)
 
-        if n == 2:
-            return True
-    
-        elif n % 2 == 0:
-            return False
+__validated_prime = [2]
+def gen_prime(n):
+    if __validated_prime[-1] >= n:
+        return __validated_prime
 
-        elif n % 2 != 0:
-            factor = 3
-            while True:
-                if factor <= math.sqrt(n) + 1:
-                    if n % factor == 0:
-                        return False
-                else:
-                    break
-                factor += 2
-        return True
-    else:
-        return -1
+    for number in range(3, n + 1):
+        prime = True
+        for i in __validated_prime:
+            if not (number % i):
+                prime = False
+                break
+        if prime:
+            __validated_prime.append(number)
+    return __validated_prime
 
 def choose(n, r):
     """
     The formula used in combination.
     """
-    if not (int(r) == r and int(n) == n):
-        return -1
-    if r > n:
-        return -1
+    if not (int(r) == r and int(n) == n) or r > n:
+        raise ValueError("Invalid values: {}, {}.".format(n, r))
     if n == r:
         return 1
     elif r == 0:
@@ -314,24 +306,29 @@ def choose(n, r):
     else:
         return
 
-def intpow(x, n):
+def intpow(n, p):
     """
     Return the nth power of x.
-    n has to be an integer.
-    This method should work as long as n < 2 ** 1000, because Python has a maximum recursion depth of 1000.
+    p has to be an integer.
     """
-    if n % 1 != 0:
-        return None
-    elif n < 0:
-        return 1 / intpow(x, -n)
-    if n == 0:
-        return 1
-    elif n == 1:
-        return x
-    if n % 2 == 0:
-        return intpow(x * x, n // 2)
-    else:
-        return intpow(x * x, (n - 1) // 2) * x
+    if p % 1:
+        raise ValueError("p must be an integer.")
+    p = int(p)
+    cache = {0: 1, 1: n}
+    toCompute = [p]
+    while len(toCompute):
+        candidate = toCompute.pop(-1)
+        if cache.get(candidate // 2) != None:
+            square = cache.get(candidate // 2) * cache.get(candidate // 2)
+            if candidate % 2:
+                cache[candidate] = square * n
+            else:
+                cache[candidate] = square
+        else:
+            toCompute.append(candidate)
+            toCompute.append(candidate // 2)
+
+    return cache[p]
 
 def fibonacci(n):
     """
