@@ -263,15 +263,58 @@ def mergesort_loop(array, heuristics=True):
 
     return array
 
-# Codes for heap sort. Not in working order yet.
+# Codes for heap sort.
+def parent(n):
+    '''
+    return the index of the parent node.
+    '''
+    if n == 0:
+        return 0
+    return (n - 1) // 2
+
+def child(n):
+    '''
+    return the indices of the child nodes.
+    '''
+    first = 2 * n + 1
+    return first, first + 1
+
+def maxify(array, end):
+    '''
+    end: the index of the last item in the array, also the item to be added in the heap.
+    '''
+    index = end
+    while index != 0:
+        if index == 0:
+            break
+        if array[index] > array[parent(index)]:
+            array[index], array[parent(index)] = array[parent(index)], array[index]
+            index = parent(index)
+        else:
+            break
+    return array
 
 def heapsort(array):
-    array = heap.MaxHeap(array)
-    array.maxify()
-    new_array = []
-    while array:
-        new_array.insert(0, array.pop_max())
-    return new_array
+    for i in range(len(array)):
+        array = maxify(array, i)
+
+    for end in range(len(array) - 1, -1, -1):
+        array[end], array[0] = array[0], array[end]
+        index = 0
+        while True:
+            indices = [i for i in child(index) if i < end]
+            if len(indices) != 0:
+                child_node = indices[0]
+                if len(indices) == 2 and array[indices[1]] > array[child_node]:
+                    child_node = indices[1]
+                if array[child_node] > array[index]:
+                    array[child_node], array[index] = array[index], array[child_node]
+                    index = child_node
+                else:
+                    break
+            else:
+                break
+    return array
 
 # General purposed codes for a list.
 def is_sorted(array):
@@ -320,6 +363,19 @@ def randtest(func, length=1000, repeat=5, typ = int, extra_args=[], ordered=Fals
             raise SortingError("The list is not sorted.")
 
     return time_accu / repeat
+
+def entropy(array):
+    '''
+    Return a number that measure how sorted the array is. 0 for sorted.
+    '''
+    count_p = 0
+    count_n = 0
+
+    for i in range(len(array) - 1):
+        count_p += int(array[i] <= array[i + 1])
+        count_n += int(array[i] >= array[i + 1])
+
+    return 1 - max(count_p, count_n) / (len(array) - 1)
 
 if __name__ == '__main__':
     # for function tests.
