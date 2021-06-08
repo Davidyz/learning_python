@@ -3,7 +3,7 @@
 This is a personal module for music tagging and .lrc file processing. Mutagen integrated.
 '''
 
-import os, mutagen, mutagen.flac, json, UnixIO
+import os, mutagen, mutagen.flac, json
 from mutagen.easyid3 import EasyID3
 
 lossless = ['ape', 'wav', 'flac', 'dsd', 'dsf', 'dff']
@@ -116,6 +116,9 @@ class Music():
             data = self.load(path)
             self.info = data
 
+        else:
+            raise FileNotFoundError("No json file is found.")
+
         return data
 
     def dump(self, path = None):
@@ -133,7 +136,14 @@ class Music():
             try:
                 song = mutagen.flac.FLAC(os.path.sep.join(self.__path))
                 for i in self.info:
-                    song[i] = self.info[i]
+                    if not isinstance(self.info[i], list):
+                        if self.info[i] == None:
+                            song[i] = []
+                        else:
+                            song[i] = [song[i]]
+                    else:
+                        song[i] += [j for j in self.info[i] if not j in song[i]]
+
                 if self.album_art:
                     song.add_picture(self.album_art)
                 song.save()
@@ -165,7 +175,7 @@ class Music():
     def path(self):
         return os.path.sep.join(self.__path)
 
-    def format(self, target=None, form=None, bitrate=320, overwrite=True):
+    def format(self, target=None, form=None, bitrate=320, overwrite=True, bt_protocal='aac'):
         if target == None:
             raise ValueError("No target directory is passed.") 
         if form == None:
@@ -174,11 +184,13 @@ class Music():
         original_path = os.path.sep.join(self.__path)
         if os.path.isdir(target):
             target_file = os.path.sep.join([target, self.__path[-1]]).replace(self.form, form)
-        elif os.path.isfile(target) :
+        elif os.path.isfile(target):
             if overwrite:
                 target_file = target
             else:
                 raise IOError("Target already exists.")
+        else:
+            raise FileNotFoundError("No such directory.")
         
         form = target_file.split('.')[-1]
         codec = {'flac':'',
@@ -186,10 +198,14 @@ class Music():
                  'mp3':' -c:a libmp3lame '}
 
         command = 'ffmpeg -i "{}" -q 0 -map_metadata 0 "{}" -y -loglevel quiet'.format(original_path, target_file)
-        if form in codec:  
+        if codec.get(form) != None:  
             command += codec[form]
         if isinstance(bitrate, int) and form=='mp3':
             command += ' -b:a {}k '.format(str(bitrate))
+
+        if form == 'mp3' and bt_protocal == 'aac':
+            # aac supports sample rates up to 44.1kHz. do this on conversion to avoid resampling and extra computation on playback.
+            command += ' -ar 44100 '
         os.system(command)
 
 class Lyric(Music):

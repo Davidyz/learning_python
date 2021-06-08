@@ -1,12 +1,16 @@
 #!/usr/bin/python3
-import music, UnixIO, sys, os, multiprocessing
+import music, UnixIO, sys, os
 arguments = sys.argv
 
 overwrite = '-s' in arguments
+verbose = '-v' in arguments
 bitrate = 320
+args = {'original': None, 'destination': None}
 if overwrite:
     arguments.remove('-s')
 
+if verbose:
+    arguments.remove('-v')
 
 if '-b' in arguments:
     bitrate = int(arguments.pop(arguments.index('-b') + 1))
