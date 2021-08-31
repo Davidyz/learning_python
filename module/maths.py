@@ -272,7 +272,7 @@ def isnumber(n):
     return isinstance(n, int) or isinstance(n, float) or isinstance(n, Fraction)
 
 def isprime(n):
-    return n in gen_prime(n)
+    return n in gen_prime(int(math.sqrt(n)) + 1)
 
 __validated_prime = [2]
 def gen_prime(n):
