@@ -1,7 +1,7 @@
 import os
 from typing import Iterator
 
-def listdir(path: str) -> Iterator[str]:
+def listdir(path: str = '.') -> Iterator[str]:
     stack = [os.path.join(path, i) for i in os.listdir(path)]
     while stack:
         candidate = stack.pop(-1)
