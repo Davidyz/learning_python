@@ -1,17 +1,18 @@
 import os
-def listdir(path):
+from typing import Iterator
+
+def listdir(path: str) -> Iterator[str]:
     stack = [os.path.join(path, i) for i in os.listdir(path)]
-    output = []
     while stack:
         candidate = stack.pop(-1)
         if os.path.isfile(candidate):
-            output.append(candidate)
+            yield os.path.realpath(candidate)
         else:
             for i in os.listdir(candidate):
                 stack.append(os.path.join(candidate, i))
-    return sorted(output)
 
-def readfile(path, binary=False):
+
+def readfile(path: str, binary=False) -> list[str]:
     option = 'r'
     if binary:
         option += 'b'
@@ -23,7 +24,7 @@ def readfile(path, binary=False):
 def writefile(path, content):
     fin = open(path, 'w')
     if isinstance(content, str):
-        fin.writeline(content)
+        fin.writelines(content)
     elif isinstance(content, list):
         fin.writelines(content)
     fin.close()
