@@ -1,5 +1,5 @@
 import os
-from typing import Iterator
+from typing import Iterator, List
 
 def listdir(path: str = '.') -> Iterator[str]:
     stack = [os.path.join(path, i) for i in os.listdir(path)]
@@ -12,7 +12,7 @@ def listdir(path: str = '.') -> Iterator[str]:
                 stack.append(os.path.join(candidate, i))
 
 
-def readfile(path: str, binary=False) -> list[str]:
+def readfile(path: str, binary=False) -> List[str]:
     option = 'r'
     if binary:
         option += 'b'
