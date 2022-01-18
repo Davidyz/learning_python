@@ -250,7 +250,6 @@ def sum(array):
 def sum_dict(dictionary):
     return sum([dictionary[i] for i in dictionary])
 
-__fact_cache = {0:1}
 def factorial(n):
     """
     Return n!.
@@ -288,6 +287,26 @@ def gen_prime(n):
         if prime:
             __validated_prime.append(number)
     return __validated_prime
+
+def factorise(n: int) -> dict[int, int]:
+    if n == 1:
+        return {1:1}
+    primes = gen_prime(n)
+    factors = {}
+    original = n
+    for i in primes:
+        if n == 1:
+            break
+        if i > original:
+            break
+        while n % i == 0:
+            if factors.get(i) is None:
+                factors[i] = 1
+            else:
+                factors[i] += 1
+            n = n // i
+
+    return factors
 
 def choose(n, r):
     """
