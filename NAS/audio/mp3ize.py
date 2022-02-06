@@ -1,59 +1,80 @@
 #!/usr/bin/python3
 import music, UnixIO, sys, os
+
 arguments = sys.argv
 
-overwrite = '-s' in arguments
-verbose = '-v' in arguments
+overwrite = "-s" in arguments
+verbose = "-v" in arguments
 bitrate = 320
-args = {'original': None, 'destination': None}
+args = {"original": None, "destination": None}
 if overwrite:
-    arguments.remove('-s')
+    arguments.remove("-s")
 
 if verbose:
-    arguments.remove('-v')
+    arguments.remove("-v")
 
-if '-b' in arguments:
-    bitrate = int(arguments.pop(arguments.index('-b') + 1))
-    arguments.remove('-b')
+if "-b" in arguments:
+    bitrate = int(arguments.pop(arguments.index("-b") + 1))
+    arguments.remove("-b")
 
-black_list = ('Chopin', 'Kotaro', 'Pacific', 'Vivaldi', 'Andrew')   # add keywords of songs that should not be converted to this tuple.
+black_list = (
+    "Chopin",
+    "Kotaro",
+    "Pacific",
+    "Vivaldi",
+    "Andrew",
+)  # add keywords of songs that should not be converted to this tuple.
+
 
 def skip(song):
-    '''
+    """
     Return True if the song should not be converted.
-    '''
+    """
     for i in black_list:
         if i in song:
             return True
     return False
 
+
 if len(arguments) == 3:
     for i in arguments[1:]:
         if (not os.path.isfile(i)) and (not os.path.isdir(i)):
-            raise music.InputError('The input {} is not valid!'.format(i))
+            raise music.InputError("The input {} is not valid!".format(i))
 
-    args = {'original':arguments[1],'destination':arguments[2]}
+    args = {"original": arguments[1], "destination": arguments[2]}
 
-elif len(arguments) == 2 and (os.path.isfile(arguments[1]) or os.path.isdir(arguments[1])):
-    args = {'original':arguments[1],'destination':False}
+elif len(arguments) == 2 and (
+    os.path.isfile(arguments[1]) or os.path.isdir(arguments[1])
+):
+    args = {"original": arguments[1], "destination": False}
 
-songs = [music.Music(i) for i in UnixIO.listdir(args['original']) if music.is_music(i) and (not skip(i))]
+songs = [
+    music.Music(i)
+    for i in UnixIO.listdir(args["original"])
+    if music.is_music(i) and (not skip(i))
+]
+
 
 def execute(song, to, overwrite, br=320):
     if os.path.isfile(to) and (not overwrite):
         # when 'to' is a file
         return
 
-    elif os.path.isfile(to) and (not overwrite) and (song.path.split('/')[-1].replace(song.form, 'mp3') in os.listdir(to)):
+    elif (
+        os.path.isfile(to)
+        and (not overwrite)
+        and (song.path.split("/")[-1].replace(song.form, "mp3") in os.listdir(to))
+    ):
         # when 'to' is a directory
         return
-    print('Converting {}'.format(str(song)))
-    song.format(target=to, form='mp3', overwrite=overwrite, bitrate=br)
+    print("Converting {}".format(str(song)))
+    song.format(target=to, form="mp3", overwrite=overwrite, bitrate=br)
+
 
 for song in songs:
-    execute(song, args['destination'], overwrite, bitrate)
+    execute(song, args["destination"], overwrite, bitrate)
 
-if args['destination']:
-    lyrics = (j for j in UnixIO.listdir(args['original']) if 'lrc' in j)
+if args["destination"]:
+    lyrics = (j for j in UnixIO.listdir(args["original"]) if "lrc" in j)
     for i in lyrics:
-        UnixIO.cp(i, args['destination'])
+        UnixIO.cp(i, args["destination"])

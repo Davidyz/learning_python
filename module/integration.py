@@ -1,23 +1,27 @@
 #!/usr/bin/python3
 from math import *
 import maths
+
 """
 A set of functions for numerical integration, giving the results as float.
 You should always specify the number of intervals though it is not necessary, because a fixed number of strips won't work efficiently. Eg, when the range is big, the number of strips should be increased as well, and vice versa (for less time and resource consumption).
 """
+
+
 def mapping(f, start_point, end_point, num):
     """
     Map the function into a dictionary.
     """
-    res = {start_point:f(start_point)}
+    res = {start_point: f(start_point)}
     interval = (end_point - start_point) / float(num)
 
     for i in range(int(num) + 1):
         res[start_point + interval * i] = f(start_point + i * interval)
-    
+
     return res
 
-def mid_point(f, start_point, end_point, num=10000, table = None):
+
+def mid_point(f, start_point, end_point, num=10000, table=None):
     """
     Using the mid-point rule of integration.
     Re-written with mapping().
@@ -26,7 +30,9 @@ def mid_point(f, start_point, end_point, num=10000, table = None):
     interval = (end_point - start_point) / float(num)
 
     if table == None:
-        critical_values = mapping(f, start_point + interval / 2, end_point - interval / 2, num - 1)
+        critical_values = mapping(
+            f, start_point + interval / 2, end_point - interval / 2, num - 1
+        )
     else:
         critical_values = table
     index = tuple(critical_values.keys())
@@ -36,14 +42,15 @@ def mid_point(f, start_point, end_point, num=10000, table = None):
 
     return total_area
 
-def trapezium(f, start_point, end_point, num=10000, table = None):
+
+def trapezium(f, start_point, end_point, num=10000, table=None):
     """
     Using trapezoidal rule of integration.
     Re-written with mapping().
     """
     total_area = 0
     interval = (end_point - start_point) / float(num)
-    
+
     if table == None:
         critical_values = mapping(f, start_point, end_point, num)
     else:
@@ -53,10 +60,11 @@ def trapezium(f, start_point, end_point, num=10000, table = None):
     for i in range(len(index)):
         total_area += 2 * critical_values[index[i]]
 
-    total_area -= (critical_values[index[0]] + critical_values[index[-1]])
+    total_area -= critical_values[index[0]] + critical_values[index[-1]]
     total_area = total_area * interval / 2
 
     return total_area
+
 
 def simpson(f, start_point, end_point, num=10000):
     """
@@ -72,15 +80,17 @@ def simpson(f, start_point, end_point, num=10000):
             if i % 2:
                 integral += 4 * table[keys[i]]
             else:
-                integral += 2 * table[keys[i]] 
-        integral -= (table[keys[0]] + table[keys[-1]])
+                integral += 2 * table[keys[i]]
+        integral -= table[keys[0]] + table[keys[-1]]
         return integral * interval / 3
 
     else:
         raise ValueError("num must be an even number!")
 
-def LocalStationary(f, a, b, accu = 5):
+
+def LocalStationary(f, a, b, accu=5):
     import random
+
     a, b = min(a, b), max(a, b)
     data = {}
     for i in range(int((b - a) // 10 ** (-accu))):
@@ -99,8 +109,10 @@ def LocalStationary(f, a, b, accu = 5):
 
     return (round(minimum[1], accu), round(maximum[1], accu))
 
+
 def MonteCarlo(f, a, b, accu=5):
     import random
+
     a, b = min(a, b), max(a, b)
     count_total = 0
     count_valid = 0
@@ -119,11 +131,13 @@ def MonteCarlo(f, a, b, accu=5):
             count_valid += 1
 
     return round(count_valid / count_total * rect, accu)
-    
+
+
 if __name__ == "__main__":
+
     def f(x):
-        return e ** (- x ** 2 / 2)
-    
+        return e ** (-(x**2) / 2)
+
     start_point = -100
     end_point = 100
     num = 500

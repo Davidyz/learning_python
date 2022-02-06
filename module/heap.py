@@ -1,7 +1,10 @@
 import math, maths
-'''
+
+"""
 I did not notice the issue that python's array index start from 0 while in pseudocode it start from 1. As a result, child() and parent() must be modified as below so that the heap algorithms can work properly.
-'''
+"""
+
+
 def is_max(heap, index=None):
     if index == None:
         index = len(heap) - 1
@@ -13,10 +16,11 @@ def is_max(heap, index=None):
 
     return True
 
+
 class Heap(list):
     def __init__(self, data=[]):
         list.__init__(self, data)
-    
+
     def __str__(self):
         return str(list(self))
 
@@ -26,13 +30,13 @@ class Heap(list):
             return string
 
         for i in range(depth):
-            string += '|   '
-        string += str(self[index]) + '\n'
+            string += "|   "
+        string += str(self[index]) + "\n"
         for i in self.children(index):
             string += self.__repr__(i, depth + 1)
 
         return string
-    
+
     def height(self):
         for i in range(len(self) - 1, -1, -1):
             if self[i] != None:
@@ -41,23 +45,23 @@ class Heap(list):
 
     def parent(self, index):
         return math.floor((index - 1) / 2)
-    
+
     def children(self, index):
         l = (index + 1) * 2 - 1
         r = (index + 1) * 2
         return tuple(i for i in (l, r) if i < len(self))
 
     def switch(self, a, b):
-        '''
+        """
         Switch the nodes with index a and b.
-        '''
+        """
         if 0 <= a < len(self) and 0 <= b < len(self):
             self[a], self[b] = self[b], self[a]
-    
+
     def add_child(self, index, value):
         if not index < len(self):
             raise IndexError("Adding child to a non-existing node.")
-    
+
         target_index = 2 * index + 1
         if target_index < len(self):
             if self[target_index] != None:
@@ -73,6 +77,7 @@ class Heap(list):
             self.append(None)
         self[target_index] = value
         return self
+
 
 class MaxHeap(Heap):
     def __init__(self, data=[]):
@@ -99,7 +104,7 @@ class MaxHeap(Heap):
         if index != 0 and self[index] > self[self.parent(index)]:
             self.switch(index, self.parent(index))
             self.make_max(self.parent(index))
-        
+
         max_leaf = self.max_child(index)
 
         if max_leaf != None and self[index] < self[self.max_child(index)]:
@@ -125,6 +130,7 @@ class MaxHeap(Heap):
         # arbitary addition not allowed. using max_heap addition to maintain max_heap structure.
         self.add(value)
 
+
 def heap_sort(array):
     heap = MaxHeap(array)
     array = []
@@ -132,13 +138,15 @@ def heap_sort(array):
         array.insert(0, heap.pop_max())
     return array
 
+
 def pprint(heap, index=0, depth=0):
     if index >= len(heap):
         return 0
-    print('  ' * depth + str(heap[index]))
+    print("  " * depth + str(heap[index]))
     for i in heap.children(index):
         pprint(heap, i, depth + 1)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     h = MaxHeap(range(50))
     print(h)

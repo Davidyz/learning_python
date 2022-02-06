@@ -25,7 +25,6 @@ from random import randint
 
 
 class Vector(object):
-
     def __init__(self, x, y):
         super(Vector, self).__init__()
         self.x, self.y = x, y
@@ -45,7 +44,7 @@ class Vector(object):
 
     @property
     def length(self):
-        return sqrt(self.x ** 2 + self.y ** 2)
+        return sqrt(self.x**2 + self.y**2)
 
     def normalize(self):
         _length = self.length
@@ -54,7 +53,6 @@ class Vector(object):
 
 
 class Sprite(object):
-
     def __init__(self, shape):
         self.shape = shape
         self.pos = Vector(0, 0)
@@ -90,10 +88,12 @@ class Sprite(object):
     def collide(self, obstacles=None):
         obstacles = obstacles or list()
         for o in obstacles:
-            condx = all([self.pos.x + self.bbox.x > o.pos.x,
-                         self.pos.x < o.pos.x + o.bbox.x])
-            condy = all([self.pos.y + self.bbox.y > o.pos.y,
-                         self.pos.y < o.pos.y + o.bbox.y])
+            condx = all(
+                [self.pos.x + self.bbox.x > o.pos.x, self.pos.x < o.pos.x + o.bbox.x]
+            )
+            condy = all(
+                [self.pos.y + self.bbox.y > o.pos.y, self.pos.y < o.pos.y + o.bbox.y]
+            )
             if condx and condy:
                 return True
         return False
@@ -104,9 +104,9 @@ class Sprite(object):
         for i, s in enumerate(self.shape.split("\n")):
             x = BG[i + self.pos.y]
             if self.pos.x >= 0:
-                x = x[:self.pos.x] + s + x[self.pos.x + len(s):]
+                x = x[: self.pos.x] + s + x[self.pos.x + len(s) :]
             else:
-                x = s[abs(self.pos.x):] + x[self.pos.x + len(s):] + (" " * 79)
+                x = s[abs(self.pos.x) :] + x[self.pos.x + len(s) :] + (" " * 79)
             BG[i + self.pos.y] = x
         return "\n".join([ch[:79] for ch in BG][:25])
 
@@ -114,29 +114,32 @@ class Sprite(object):
 def is_data():
     return select.select([sys.stdin], [], [], 0) == ([sys.stdin], [], [])
 
+
 def write_list(array, target):
-    while '\n' in array:
-        array.remove('\n')
+    while "\n" in array:
+        array.remove("\n")
     for i in array:
         target.write(str(i))
-        target.write('\n')
+        target.write("\n")
+
 
 def print_the_max():
-    scores = open('FlappyBird/scores')
+    scores = open("FlappyBird/scores")
     temp = scores.readlines()
-    while '\n' in temp:
-        temp.remove('\n')
+    while "\n" in temp:
+        temp.remove("\n")
     for i in temp:
-        i = int(i.split('\\')[0])
+        i = int(i.split("\\")[0])
     scores.close()
     try:
-        print('Your highest score ever is {}.'.format(max(temp)))
+        print("Your highest score ever is {}.".format(max(temp)))
     except Exception:
         pass
 
+
 def main():
     global KEY_PRESSED
-    source = open('FlappyBird/scores', 'r')
+    source = open("FlappyBird/scores", "r")
     records = source.readlines()
     source.close()
     SCORE = 0
@@ -147,8 +150,7 @@ def main():
 
     BG = (" " * TERMINAL_SIZE.x + "\n") * TERMINAL_SIZE.y
     TUBES = list()
-    GROUND = ("=" * TERMINAL_SIZE.x + "\n") + \
-        ("." * TERMINAL_SIZE.x + "\n") * 3
+    GROUND = ("=" * TERMINAL_SIZE.x + "\n") + ("." * TERMINAL_SIZE.x + "\n") * 3
     GROUND = Sprite(GROUND)
     GROUND.pos = Vector(0, 21)
     BIRD = Sprite(("== (.\n \___\\", " / (./\n===_/"))
@@ -167,8 +169,8 @@ def main():
             ch = sys.stdin.read(1)
             if ch == " ":
                 KEY_PRESSED = True
-        #else:
-            #print("false")
+        # else:
+        # print("false")
 
         # if this setence in the game over, graph not right
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
@@ -181,8 +183,7 @@ def main():
             TUBES.append(up)
             dn = Sprite("--------\n" * 2 + "|      |\n" * (8 - pipe_height))
             dn.shape = dn.shape[:-1]  # remove last \n
-            dn.pos = Vector(TERMINAL_SIZE.x,
-                            TERMINAL_SIZE.y + pipe_height - 8 - 6)
+            dn.pos = Vector(TERMINAL_SIZE.x, TERMINAL_SIZE.y + pipe_height - 8 - 6)
             TUBES.append(dn)
             TUBES = [x for x in TUBES if x.pos.x > -7]  # cleanup
         f = Vector(-1, 0)
@@ -223,10 +224,11 @@ def main():
             print("GAME OVER")
             print("SCORE:", SCORE)
             records.append(SCORE)
-            source = open('FlappyBird/scores', 'w')
+            source = open("FlappyBird/scores", "w")
             write_list(records, source)
             source.close()
             return
+
 
 if __name__ == "__main__":
     KEY_PRESSED = False
@@ -234,5 +236,5 @@ if __name__ == "__main__":
     while proceed:
         main()
         print_the_max()
-        if 'n' in raw_input('Do you want to play again? (y/n): '):
+        if "n" in raw_input("Do you want to play again? (y/n): "):
             proceed = False

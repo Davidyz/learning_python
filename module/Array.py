@@ -7,8 +7,10 @@ from math import ceil
 import heap
 import time, collections, random
 
+
 class SortingError(Exception):
     pass
+
 
 def insert(array, source, target):
     if source > target:
@@ -25,6 +27,7 @@ def insert(array, source, target):
         pass
     return array
 
+
 def binary_search(array, item, start=0, end=None):
     start = 0
     if end == None:
@@ -40,38 +43,43 @@ def binary_search(array, item, start=0, end=None):
             start = pivot + 1
     return None
 
+
 # Codes for quick sort
 def swap(array, a, b):
     if a != b:
         array[a], array[b] = array[b], array[a]
 
+
 def find_pivot(array, l, h):
-    '''
+    """
     Find a better pivot by median of 3 method to avoid the worst case of quicksort.
-    '''
+    """
     if h - l < 3:
         return l
-    if (array[l] <= array[l + 1] and array[l + 1] <= array[l + 2]) or (array[l] > array[l + 1] and array[l + 1] > array[l + 2]):
+    if (array[l] <= array[l + 1] and array[l + 1] <= array[l + 2]) or (
+        array[l] > array[l + 1] and array[l + 1] > array[l + 2]
+    ):
         swap(array, l, l + 1)
     else:
-        if array[l + 1] == max(array[l:l+3]):
+        if array[l + 1] == max(array[l : l + 3]):
             if array[l + 2] > array[l]:
                 swap(array, l, l + 2)
-        elif array[l + 1] == min(array[l:l + 3]):
+        elif array[l + 1] == min(array[l : l + 3]):
             if array[l + 2] < array[l]:
                 swap(array, l, l + 2)
     return l
- 
+
+
 def partition(array, l, h):
-    '''
-    Auxiliary function of quicksort that moves smaller items to the front of the array, 
+    """
+    Auxiliary function of quicksort that moves smaller items to the front of the array,
     and larger items to the end.
     Return the index of the pivot.
     l and h (inclusive) are the start and end of the sub-array to be partitioned.
-    '''
+    """
     if l == h:
         return l
-    bound = l   # the last item in low
+    bound = l  # the last item in low
     find_pivot(array, l, h)
     for i in range(l + 1, h + 1):
         if array[i] <= array[l]:
@@ -80,22 +88,23 @@ def partition(array, l, h):
 
     swap(array, bound, l)
     return bound
-   
+
+
 def quicksort(array, heuristics=False):
-    '''
+    """
     Implemented with stack and while loop, so that this is an in-place and non-recursive function.
     heuristics: use is_sorted to check whether the subarray is already sorted.
     Should improve the performance on already-sorted arrays.
-    '''
+    """
     stack = collections.deque()
     stack.append(0)
     stack.append(len(array) - 1)
 
     while stack:
         h, l = stack.pop(), stack.pop()
-        
+
         pivot = partition(array, l, h)
-        if heuristics and is_sorted(array[l:h + 1]):
+        if heuristics and is_sorted(array[l : h + 1]):
             continue
         if pivot > l:
             stack.append(l)
@@ -105,8 +114,9 @@ def quicksort(array, heuristics=False):
             stack.append(h)
     return array
 
+
 # Codes for bubble sort.
-def shellsort(array, factor = 1/2):
+def shellsort(array, factor=1 / 2):
     step = len(array) - 1
     if step == 0 or len(array) <= 1:
         return array
@@ -114,12 +124,12 @@ def shellsort(array, factor = 1/2):
     while True:
         i = 0
         unswaped = True
-        while i + step < len(array): 
-            
+        while i + step < len(array):
+
             if array[i] > array[i + step]:
                 array[i], array[i + step] = array[i + step], array[i]
                 unswaped = False
-            
+
             i += 1
 
         if unswaped and step > 1:
@@ -128,6 +138,7 @@ def shellsort(array, factor = 1/2):
             break
 
     return array
+
 
 def bubblesort(array):
     end = len(array)
@@ -140,12 +151,13 @@ def bubblesort(array):
         end -= 1
     return array
 
+
 # Codes for insertion sort.
 def binary_insert(array, start, tail, item):
-    '''
+    """
     Return the index to insert the item.
     start and end are both inclusive.
-    '''
+    """
     start = 0
     end = tail
 
@@ -155,13 +167,14 @@ def binary_insert(array, start, tail, item):
             end = middle - 1
         elif array[middle] < item:
             start = middle + 1
-    
+
     if item < array[start]:
         return start
     else:
         return min(start + 1, tail)
 
-def insertionsort(array, index = 1, binary=True):
+
+def insertionsort(array, index=1, binary=True):
     if len(array) == 1:
         return array
     boundary = 1
@@ -169,7 +182,7 @@ def insertionsort(array, index = 1, binary=True):
         if array[boundary] >= array[boundary - 1]:
             pass
         elif binary:
-            index = binary_insert(array, 0, boundary - 1, array[boundary])                                        
+            index = binary_insert(array, 0, boundary - 1, array[boundary])
             array.insert(index, array.pop(boundary))
 
         else:
@@ -182,6 +195,7 @@ def insertionsort(array, index = 1, binary=True):
         boundary += 1
     return array
 
+
 # Codes for merge sort.
 def merge(a, b):
     if not isinstance(a, list):
@@ -192,15 +206,16 @@ def merge(a, b):
     while len(a) * len(b) != 0:
         if a[0] < b[0]:
             output.append(a.pop(0))
-        
+
         else:
             output.append(b.pop(0))
-    
+
     for i in a:
         output.append(i)
     for i in b:
         output.append(i)
     return output
+
 
 def mergesort(array):
     if len(array) < 2:
@@ -208,13 +223,14 @@ def mergesort(array):
     middle = len(array) // 2
     return merge(mergesort(array[:middle]), mergesort(array[middle:]))
 
+
 def merge_loop(array, l, m, h):
-    '''
+    """
     The in_place vertion of merge()
     l is the index of the first item of the first array.
     m is the the index of the first item of the second array.
     h is 1 + the index after the last item of the second array.
-    '''
+    """
     if not (l < m < h):
         return array
 
@@ -226,10 +242,11 @@ def merge_loop(array, l, m, h):
 
     return array
 
+
 def mergesort_loop(array, heuristics=True):
     max_len = len(array)
     queue = collections.deque()
-    
+
     i = 0
     while i < len(array):
         # generate a queue of indices of the starts and ends of sorted sub_arrays.
@@ -263,26 +280,29 @@ def mergesort_loop(array, heuristics=True):
 
     return array
 
+
 # Codes for heap sort.
 def parent(n):
-    '''
+    """
     return the index of the parent node.
-    '''
+    """
     if n == 0:
         return 0
     return (n - 1) // 2
 
+
 def child(n):
-    '''
+    """
     return the indices of the child nodes.
-    '''
+    """
     first = 2 * n + 1
     return first, first + 1
 
+
 def maxify(array, end):
-    '''
+    """
     end: the index of the last item in the array, also the item to be added in the heap.
-    '''
+    """
     index = end
     while index != 0:
         if index == 0:
@@ -293,6 +313,7 @@ def maxify(array, end):
         else:
             break
     return array
+
 
 def heapsort(array):
     for i in range(len(array)):
@@ -316,12 +337,14 @@ def heapsort(array):
                 break
     return array
 
+
 # General purposed codes for a list.
 def is_sorted(array):
     for i in range(len(array) - 1):
         if array[i + 1] < array[i]:
             return False
     return True
+
 
 def reversed_list(array, start=0, end=None, in_place=False):
     if end == None:
@@ -333,21 +356,23 @@ def reversed_list(array, start=0, end=None, in_place=False):
             swap(array, i, end - (i - start) - 1)
         return array
 
+
 def clear_item(array, item):
-    '''
+    """
     Clear however many of an item from the array.
-    '''
+    """
     for i in range(array.count(item)):
         array.remove(item)
     return array
 
-def randtest(func, length=1000, repeat=5, typ = int, extra_args=[], ordered=False):
-    '''
+
+def randtest(func, length=1000, repeat=5, typ=int, extra_args=[], ordered=False):
+    """
     Pass any extra arguments by setting the parameter extra_args as a list.
     the ordered parameter allows testing with sorted array, which, in some cases, can be used as a worst-case test.
-    '''
+    """
     l = [typ(i) for i in range(length)]
-    
+
     time_accu = 0
     for i in range(repeat):
         temp_list = l.copy()
@@ -364,10 +389,11 @@ def randtest(func, length=1000, repeat=5, typ = int, extra_args=[], ordered=Fals
 
     return time_accu / repeat
 
+
 def entropy(array):
-    '''
+    """
     Return a number that measure how sorted the array is. 0 for sorted.
-    '''
+    """
     count_p = 0
     count_n = 0
 
@@ -377,7 +403,8 @@ def entropy(array):
 
     return 1 - max(count_p, count_n) / (len(array) - 1)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # for function tests.
     import random, sys
 

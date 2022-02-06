@@ -1,7 +1,9 @@
 import random, math
 
+
 def get_digit(n, base=10):
     return math.floor(math.log(n, base)) + 1
+
 
 class Board:
     def __init__(self, x=4, y=None, shell=True):
@@ -11,9 +13,9 @@ class Board:
         self.empty = []
         self.filled = []
         self.gen_empty()
-        self.probability_4 = 0.1 # the probability of generating a 4 as new number
+        self.probability_4 = 0.1  # the probability of generating a 4 as new number
         self.game_over = False
-        self.shell = shell # True when being tested in ipython or python intepreter. show board after each motion.
+        self.shell = shell  # True when being tested in ipython or python intepreter. show board after each motion.
         self.new_number()
 
     def gen_empty(self):
@@ -24,7 +26,7 @@ class Board:
                     self.empty.append((i, j))
 
     def __str__(self):
-        '''
+        """
         string = "+" + "--" * len(self.grid[0]) + '-+\n'
         for i in self.grid:
             string += '|'
@@ -36,21 +38,34 @@ class Board:
                     string += str(j)
             string += ' |\n'
         string += '+' + '--' * len(self.grid[0]) + '-+'
-        '''
+        """
         string = []
-        widths = [max([get_digit(self.grid[row][column]) if self.grid[row][column] != 0 else 0 for row in range(len(self.grid))]) for column in range(len(self.grid[0]))]
+        widths = [
+            max(
+                [
+                    get_digit(self.grid[row][column])
+                    if self.grid[row][column] != 0
+                    else 0
+                    for row in range(len(self.grid))
+                ]
+            )
+            for column in range(len(self.grid[0]))
+        ]
         for row in range(len(self.grid)):
-            cache = ['|']
+            cache = ["|"]
             for column in range(len(self.grid[0])):
                 if self.grid[row][column]:
-                    cache.append(' ' * (widths[column] - get_digit(self.grid[row][column]) + 1) + str(self.grid[row][column]))
+                    cache.append(
+                        " " * (widths[column] - get_digit(self.grid[row][column]) + 1)
+                        + str(self.grid[row][column])
+                    )
                 else:
-                    cache.append(' ' * widths[column] + ' ')
-            cache.append(' |')
-            string.append(''.join(cache))
-        string.insert(0, '+' + '-' * (len(string[-1]) - 2) + '+')
-        string.append('+' + '-' * (len(string[-1]) - 2) + '+')
-        return '\n'.join(string)
+                    cache.append(" " * widths[column] + " ")
+            cache.append(" |")
+            string.append("".join(cache))
+        string.insert(0, "+" + "-" * (len(string[-1]) - 2) + "+")
+        string.append("+" + "-" * (len(string[-1]) - 2) + "+")
+        return "\n".join(string)
 
     def __repr__(self):
         return str(self)
@@ -77,10 +92,16 @@ class Board:
                 modified = False
                 for index in range(len(self.grid[i]) - 1):
                     if self.grid[i][index] == 0 and self.grid[i][index + 1] != 0:
-                        self.grid[i][index], self.grid[i][index + 1] = self.grid[i][index + 1], self.grid[i][index]
+                        self.grid[i][index], self.grid[i][index + 1] = (
+                            self.grid[i][index + 1],
+                            self.grid[i][index],
+                        )
                         done = False
                         modified = True
-                    elif self.grid[i][index] and self.grid[i][index] == self.grid[i][index + 1]:
+                    elif (
+                        self.grid[i][index]
+                        and self.grid[i][index] == self.grid[i][index + 1]
+                    ):
                         modified = True
                         self.grid[i][index] *= 2
                         self.grid[i][index + 1] = 0
@@ -99,10 +120,16 @@ class Board:
                 modified = False
                 for index in range(len(self.grid[i]) - 1):
                     if self.grid[i][index + 1] == 0 and self.grid[i][index] != 0:
-                        self.grid[i][index], self.grid[i][index + 1] = self.grid[i][index + 1], self.grid[i][index]
+                        self.grid[i][index], self.grid[i][index + 1] = (
+                            self.grid[i][index + 1],
+                            self.grid[i][index],
+                        )
                         done = False
                         modified = True
-                    elif self.grid[i][index] and self.grid[i][index] == self.grid[i][index + 1]:
+                    elif (
+                        self.grid[i][index]
+                        and self.grid[i][index] == self.grid[i][index + 1]
+                    ):
                         modified = True
                         self.grid[i][index + 1] *= 2
                         self.grid[i][index] = 0
@@ -121,10 +148,16 @@ class Board:
                 modified = False
                 for index in range(len(self.grid) - 1):
                     if self.grid[index][i] == 0 and self.grid[index + 1][i] != 0:
-                        self.grid[index][i], self.grid[index + 1][i] = self.grid[index + 1][i], self.grid[index][i]
+                        self.grid[index][i], self.grid[index + 1][i] = (
+                            self.grid[index + 1][i],
+                            self.grid[index][i],
+                        )
                         done = False
                         modified = True
-                    elif self.grid[index][i] and self.grid[index][i] == self.grid[index + 1][i]:
+                    elif (
+                        self.grid[index][i]
+                        and self.grid[index][i] == self.grid[index + 1][i]
+                    ):
                         modified = True
                         self.grid[index][i] *= 2
                         self.grid[index + 1][i] = 0
@@ -143,10 +176,16 @@ class Board:
                 modified = False
                 for index in range(len(self.grid) - 1):
                     if self.grid[index][i] != 0 and self.grid[index + 1][i] == 0:
-                        self.grid[index][i], self.grid[index + 1][i] = self.grid[index + 1][i], self.grid[index][i]
+                        self.grid[index][i], self.grid[index + 1][i] = (
+                            self.grid[index + 1][i],
+                            self.grid[index][i],
+                        )
                         done = False
                         modified = True
-                    elif self.grid[index][i] and self.grid[index][i] == self.grid[index + 1][i]:
+                    elif (
+                        self.grid[index][i]
+                        and self.grid[index][i] == self.grid[index + 1][i]
+                    ):
                         modified = True
                         self.grid[index + 1][i] *= 2
                         self.grid[index][i] = 0

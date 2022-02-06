@@ -1,15 +1,18 @@
 def check_number(array, index, n=25):
     if index <= 24:
         return False
-    preamble = array[index - n:index]
+    preamble = array[index - n : index]
     for i in preamble:
         if (array[index] - i) in preamble:
-            if (i * 2 == array[index] and preamble.count(i) >= 2) or (i * 2 != array[index]):
+            if (i * 2 == array[index] and preamble.count(i) >= 2) or (
+                i * 2 != array[index]
+            ):
                 return True
     return False
 
-with open('input.txt') as fin:
-    numbers = [int(i.replace('\n', '')) for i in fin.readlines()]
+
+with open("input.txt") as fin:
+    numbers = [int(i.replace("\n", "")) for i in fin.readlines()]
 
 for i in range(25, len(numbers)):
     if not check_number(numbers, i):

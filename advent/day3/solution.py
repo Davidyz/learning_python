@@ -1,6 +1,8 @@
 from functools import reduce
-fin = open('maze.txt')
-content = [i.replace("\n", '') for i in fin.readlines()]
+
+fin = open("maze.txt")
+content = [i.replace("\n", "") for i in fin.readlines()]
+
 
 def travel(x_step, y_step):
     x = 0
@@ -12,7 +14,8 @@ def travel(x_step, y_step):
         y += y_step
     return count
 
-steps = [[1,1], [3,1], [5,1], [7,1], [1,2]]
+
+steps = [[1, 1], [3, 1], [5, 1], [7, 1], [1, 2]]
 for i in steps:
     i.append(travel(i[0], i[1]))
 

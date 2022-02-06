@@ -1,11 +1,12 @@
-#ball collisions using class
+# ball collisions using class
 import turtle, time, math, random
 
 window = turtle.Screen()
-window.tracer(0,0)
+window.tracer(0, 0)
 
 width = 600
 height = 400
+
 
 class Ball(turtle.Turtle):
     def __init__(self, color, v_x, v_y):
@@ -16,8 +17,8 @@ class Ball(turtle.Turtle):
         self.speed(0)
 
         self.velocity = [v_x, v_y]
-        self.new_coordinates = [0,0]
-        #perhaps will use later, keep default for now
+        self.new_coordinates = [0, 0]
+        # perhaps will use later, keep default for now
         self.mass = 1
         self.radius = 10
 
@@ -28,13 +29,14 @@ class Ball(turtle.Turtle):
     def move_ball(self):
         self.goto(self.new_coordinates[0], self.new_coordinates[1])
 
-#make border
+
+# make border
 border = turtle.Turtle()
 border.hideturtle()
 border.speed(0)
 border.pensize(3)
 border.penup()
-border.goto(-width/2,-height/2)
+border.goto(-width / 2, -height / 2)
 border.pendown()
 for i in range(2):
     border.forward(width)
@@ -42,23 +44,24 @@ for i in range(2):
     border.forward(height)
     border.left(90)
 
-#check boundary
+# check boundary
 def checkboundary(ball):
     ball.calculate_new_coordinates()
-    x = ball.new_coordinates[0]  #save writing this again
+    x = ball.new_coordinates[0]  # save writing this again
     y = ball.new_coordinates[1]
     r = ball.radius
-    if x+r > width/2 or x-r < -width/2:
-        ball.velocity[0] = -1*ball.velocity[0]
+    if x + r > width / 2 or x - r < -width / 2:
+        ball.velocity[0] = -1 * ball.velocity[0]
         ball.calculate_new_coordinates()
 
-    if y+r > height/2 or y-r < -height/2:
-        ball.velocity[1] = -1*ball.velocity[1]
+    if y + r > height / 2 or y - r < -height / 2:
+        ball.velocity[1] = -1 * ball.velocity[1]
         ball.calculate_new_coordinates()
+
 
 def check_ball_collision(ball1, ball2):
-    dx = (ball2.xcor() - ball1.xcor())
-    dy = (ball2.ycor() - ball1.ycor())
+    dx = ball2.xcor() - ball1.xcor()
+    dy = ball2.ycor() - ball1.ycor()
     distance = math.sqrt(dx**2 + dy**2)
     R = ball1.radius + ball2.radius
     u1x = ball1.velocity[0]
@@ -80,18 +83,18 @@ def check_ball_collision(ball1, ball2):
         ball2.velocity = [u1x, u1y]
         ball1.calculate_new_coordinates()
         ball2.calculate_new_coordinates()
-        
+
 
 ball_1 = Ball("red", 2, 1)
-ball_1.goto(-width/4, -5) 
+ball_1.goto(-width / 4, -5)
 
 ball_2 = Ball("blue", 2, 3)
-ball_2.goto(width/4, 0)
+ball_2.goto(width / 4, 0)
 
 ball_3 = Ball("green", 1, 1)
 
 ball_4 = Ball("orange", 1, 3)
-ball_4.goto(0, height/4)
+ball_4.goto(0, height / 4)
 
 while True:
     ball_1.calculate_new_coordinates()
@@ -113,7 +116,6 @@ while True:
     ball_3.move_ball()
     ball_4.move_ball()
 
-
     window.update()
 
-    time.sleep(1/120)
+    time.sleep(1 / 120)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import itertools, sys
 
-fin = open('wordplay/google-10000-english.txt', 'r')
+fin = open("wordplay/google-10000-english.txt", "r")
 wordlist = fin.readlines()
 fin.close()
 wordlist = list(i[:-1].lower() for i in wordlist)
@@ -9,10 +9,11 @@ wordlist = list(i[:-1].lower() for i in wordlist)
 if len(sys.argv) == 2:
     letters = str(sys.argv[-1]).lower()
 else:
-    print('Invalid argument!')
+    print("Invalid argument!")
     exit()
 
 results = []
+
 
 def binary_search(word, array, start=0, end=None):
 
@@ -36,9 +37,10 @@ def binary_search(word, array, start=0, end=None):
         elif word < array[middle]:
             return binary_search(word, array, start, middle - 1)
 
+
 for i in range(len(letters) + 1):
     for j in itertools.permutations(letters, i):
-        j = ''.join(j)
+        j = "".join(j)
         if binary_search(j, wordlist) != None:
             if not j in results:
                 print(j)

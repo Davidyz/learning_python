@@ -3,7 +3,7 @@ import time
 
 window = turtle.Screen()
 
-window.setup(900,600)
+window.setup(900, 600)
 
 evin = turtle.Turtle()
 
@@ -21,10 +21,10 @@ evin.pendown()
 evin.circle(100)
 
 evin.penup()
-evin.goto(0,0)
+evin.goto(0, 0)
 evin.hideturtle()
 
-#codes of evin end here
+# codes of evin end here
 
 david = turtle.Turtle()
 

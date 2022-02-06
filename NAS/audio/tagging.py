@@ -1,8 +1,8 @@
 import music, UnixIO, sys, os
 
-if '-s' in sys.argv:
+if "-s" in sys.argv:
     strict = True
-    sys.argv.remove('-s')
+    sys.argv.remove("-s")
 else:
     strict = False
 
@@ -26,4 +26,4 @@ elif path:
             print(song)
             song.set_tag()
         except (music.mutagen.flac.error, AttributeError) as error:
-            print('Failed to convert ' + str(song))
+            print("Failed to convert " + str(song))

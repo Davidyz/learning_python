@@ -4,6 +4,7 @@ Currently support python3 only.
 """
 from __future__ import division
 import math, cmath, copy, random, integration
+from typing import Tuple
 
 pi = math.pi
 e = math.e
@@ -15,21 +16,28 @@ acos = math.acos
 atan = math.atan
 lg = math.log10
 
-class Fraction():
-    def __init__(self, numerator, denominator = 1):
-        if isinstance(numerator, str) and numerator.count('/') == 1 and denominator == 1:
-            self.__numerator = float(numerator.strip().split('/')[0])
-            self.__denominator = float(numerator.strip().split('/')[1])
+
+class Fraction:
+    def __init__(self, numerator, denominator=1):
+        if (
+            isinstance(numerator, str)
+            and numerator.count("/") == 1
+            and denominator == 1
+        ):
+            self.__numerator = float(numerator.strip().split("/")[0])
+            self.__denominator = float(numerator.strip().split("/")[1])
 
         else:
             if isinstance(denominator, Fraction):
                 numerator *= denominator.denominator()
                 denominator = denominator.numerator()
 
-            if isinstance(numerator, Fraction) and isinstance(denominator, (int, float)):
+            if isinstance(numerator, Fraction) and isinstance(
+                denominator, (int, float)
+            ):
                 self.__denominator = numerator.denominator()
                 self.__numerator = numerator.numerator() / denominator
-        
+
             else:
                 self.__denominator = denominator
                 self.__numerator = numerator
@@ -63,17 +71,20 @@ class Fraction():
     def __add__(self, other):
         if isinstance(other, Fraction):
             new_denominator = self.denominator() * other.denominator()
-            new_numerator = self.numerator() * other.denominator() + self.denominator() * other.numerator()
+            new_numerator = (
+                self.numerator() * other.denominator()
+                + self.denominator() * other.numerator()
+            )
             if new_numerator == 0:
                 return 0
-            factor = gcd(new_numerator, new_denominator)
+            factor = euclidean(new_numerator, new_denominator)
             return Fraction(new_numerator / factor, new_denominator / factor)
         else:
             return Fraction(other) + self
 
     def __radd__(self, other):
         return self + other
-    
+
     def __sub__(self, other):
         return self + (-other)
 
@@ -84,8 +95,11 @@ class Fraction():
         if not isinstance(other, Fraction):
             other = Fraction(other)
 
-        return Fraction(self.numerator() * other.numerator(), self.denominator() * other.denominator())
-    
+        return Fraction(
+            self.numerator() * other.numerator(),
+            self.denominator() * other.denominator(),
+        )
+
     def __rmul__(self, other):
         return self * other
 
@@ -113,39 +127,51 @@ class Fraction():
         if not isinstance(other, Fraction):
             other = Fraction(other)
         return other % self
-    
+
     def __neg__(self):
         return Fraction(-self.numerator(), self.denominator())
-    
+
     def __abs__(self):
         return Fraction(abs(self.numerator()), abs(self.denominator()))
-    
+
     def __pow__(self, other):
         if other % 1 == 0:
-            return Fraction(intpow(self.numerator(), int(other)), intpow(self.denominator(), int(other)))
+            return Fraction(
+                intpow(self.numerator(), int(other)),
+                intpow(self.denominator(), int(other)),
+            )
         else:
             if not isinstance(other, Fraction):
                 other = Fraction(other)
-            return Fraction(root(self.numerator() ** other.numerator(), other.denominator()), root(self.denominator() ** other.numerator(), other.denominator()))
+            return Fraction(
+                root(self.numerator() ** other.numerator(), other.denominator()),
+                root(self.denominator() ** other.numerator(), other.denominator()),
+            )
 
     def __rpow__(self, other):
         if not isinstance(other, Fraction):
             other = Fraction(other)
-        return other ** self
+        return other**self
 
     def __eq__(self, other):
         if not isinstance(other, Fraction):
             other = Fraction(other)
-        
+
         self.simplify()
         other.simplify()
-        return self.numerator() == other.numerator() and self.denominator() == other.denominator()
-    
+        return (
+            self.numerator() == other.numerator()
+            and self.denominator() == other.denominator()
+        )
+
     def __gt__(self, other):
         if not isinstance(other, Fraction):
             other = Fraction(other)
-        
-        return self.numerator() * other.denominator() > self.denominator() * other.numerator()
+
+        return (
+            self.numerator() * other.denominator()
+            > self.denominator() * other.numerator()
+        )
 
     def __ge__(self, other):
         if not isinstance(other, Fraction):
@@ -161,14 +187,14 @@ class Fraction():
     def __le__(self, other):
         if not isinstance(other, Fraction):
             other = Fraction(other)
-  
+
         return not self > other
 
     def __ne__(self, other):
         if not isinstance(other, Fraction):
             other = Fraction(other)
         return not self == other
-        
+
     def reciprocal(self):
         return Fraction(self.denominator(), self.numerator())
 
@@ -182,21 +208,23 @@ class Fraction():
             self.__numerator.simplify()
             self.denominator *= self.__numerator.denominator()
             self.__numerator = self.__numerator.numerator()
-            
+
         if self.__numerator * self.__denominator > 0:
-            self.__numerator, self.__denominator = abs(self.__numerator), abs(self.__denominator)
+            self.__numerator, self.__denominator = abs(self.__numerator), abs(
+                self.__denominator
+            )
 
         elif self.__numerator == 0 and self.__denominator != 0:
             return self
 
         elif self.__denominator == 0:
             raise ZeroDivisionError("Denominator cannot be zero.")
-        
-        while (self.__numerator % 1 or self.__denominator % 1):
+
+        while self.__numerator % 1 or self.__denominator % 1:
             self.__numerator *= 10
             self.__denominator *= 10
-        
-        factor = gcd(self.numerator(), self.denominator())
+
+        factor = euclidean(self.numerator(), self.denominator())
         self.__numerator //= factor
         self.__denominator //= factor
         return self
@@ -207,7 +235,8 @@ class Fraction():
     def numerator(self):
         return int(self.__numerator)
 
-def gcd(a, b):
+
+def euclidean(a, b):
     if a * b > 0:
         a = abs(a)
         b = abs(b)
@@ -221,20 +250,23 @@ def gcd(a, b):
             return int(a)
         else:
             return 0
-    
+
     elif a * b < 0:
-        return gcd(abs(a), abs(-b))
-    
+        return euclidean(abs(a), abs(-b))
+
     elif a * b == 0 and a + b != 0:
         return False
 
     return 0
 
+
 def lcm(a, b):
-    return a * b / gcd(a, b)
+    return a * b / euclidean(a, b)
+
 
 def ln(x):
     return math.log1p(x - 1)
+
 
 def sum(array):
     s = 0
@@ -247,8 +279,10 @@ def sum(array):
             s += sum_dict(array.pop(0))
     return s
 
+
 def sum_dict(dictionary):
     return sum([dictionary[i] for i in dictionary])
+
 
 def factorial(n):
     """
@@ -264,16 +298,21 @@ def factorial(n):
     while n >= 1:
         result *= n
         n -= 1
-    
+
     return result
+
 
 def isnumber(n):
     return isinstance(n, int) or isinstance(n, float) or isinstance(n, Fraction)
 
+
 def isprime(n):
     return n in gen_prime(int(math.sqrt(n)) + 1)
 
+
 __validated_prime = [2]
+
+
 def gen_prime(n):
     if __validated_prime[-1] >= n:
         return __validated_prime
@@ -288,9 +327,10 @@ def gen_prime(n):
             __validated_prime.append(number)
     return __validated_prime
 
+
 def factorise(n: int) -> dict[int, int]:
     if n == 1:
-        return {1:1}
+        return {1: 1}
     primes = gen_prime(n)
     factors = {}
     original = n
@@ -308,6 +348,7 @@ def factorise(n: int) -> dict[int, int]:
 
     return factors
 
+
 def choose(n, r):
     """
     The formula used in combination.
@@ -318,12 +359,13 @@ def choose(n, r):
         return 1
     elif r == 0:
         return 1
-    
+
     res = factorial(n) / (factorial(r) * factorial(n - r))
     if int(res) == res:
         return int(res)
     else:
         return
+
 
 def intpow(n, p):
     """
@@ -349,6 +391,7 @@ def intpow(n, p):
 
     return cache[p]
 
+
 def fibonacci(n):
     """
     Return the nth number in the fibonacci sequence.
@@ -360,10 +403,14 @@ def fibonacci(n):
         n -= 1
     return a
 
-def fibonacci_1(n):
-    return (intpow((0.5 + math.sqrt(5) / 2), n) - intpow((0.5 - math.sqrt(5) / 2), n)) / math.sqrt(5)
 
-def binomial(n, p, start, end = None):
+def fibonacci_1(n):
+    return (
+        intpow((0.5 + math.sqrt(5) / 2), n) - intpow((0.5 - math.sqrt(5) / 2), n)
+    ) / math.sqrt(5)
+
+
+def binomial(n, p, start, end=None):
     """
     prob = probability.
     suc = number of successful event.
@@ -373,43 +420,52 @@ def binomial(n, p, start, end = None):
         end = start
     result = 0
     while end >= start:
-        result += choose(n, end) * (p ** end) * ((1 - p) ** (n - end))
+        result += choose(n, end) * (p**end) * ((1 - p) ** (n - end))
         end -= 1
     return round(result, 10)
 
-def normal(mean, var, start = None, end = None):
+
+def normal(mean, var, start=None, end=None):
     from math import pi, e
-    sd = var ** 0.5
-    f = lambda x: 1 / ((2 * pi * (sd ** 2)) ** 0.5) * e ** (-((x - mean) ** 2) / (2 * (sd ** 2)))
-    
+
+    sd = var**0.5
+    f = (
+        lambda x: 1
+        / ((2 * pi * (sd**2)) ** 0.5)
+        * e ** (-((x - mean) ** 2) / (2 * (sd**2)))
+    )
+
     if end == None:
         end = start
         start = mean - 5 * sd
     return round(integration.simpson(f, start, end, 1000000), 5)
 
-def root(m, power = 2):
-    '''
+
+def root(m, power=2):
+    """
     Try to find the nth(2 by default) root(+ve) for a real number m.
-    '''
-    f = lambda x:x ** power - m
-    df = lambda x:power * (x ** (power - 1))
+    """
+    f = lambda x: x**power - m
+    df = lambda x: power * (x ** (power - 1))
     x = 1
     y0 = 0
     y1 = f(x)
     while abs(y1 - y0) > 10 ** (-13):
-        x = x - y1/df(x)
+        x = x - y1 / df(x)
         y0 = y1
         y1 = f(x)
     return x
 
-def differentiate(f, x, accu = 3):
+
+def differentiate(f, x, accu=3):
     """
     Find the gradient of the curve f at the point (x, f(x))
     """
     step = 10 ** (-accu)
     return (f(x + step) - f(x)) / step
 
-def newton_method(f, derivative = differentiate, x = 1, accuracy=14):
+
+def newton_method(f, derivative=differentiate, x=1, accuracy=14):
     """
     Find one of the roots of equation f using Newton's method.
     f is the function of the equation.
@@ -419,27 +475,29 @@ def newton_method(f, derivative = differentiate, x = 1, accuracy=14):
     """
     y = f(x)
     while abs(y) >= pow(10, -14):
-        if derivative.__name__ == 'differentiate':
+        if derivative.__name__ == "differentiate":
             m = derivative(f, x, accuracy)
         else:
             m = derivative(x)
         x = x - y / m
         y1 = y
         y = f(x)
-        if abs(m) < pow(10, -14) and abs(y) > pow(10,0):
+        if abs(m) < pow(10, -14) and abs(y) > pow(10, 0):
             return False
         if abs(y - y1) <= pow(10, -accuracy):
             return x
     return x
 
+
 def summation(f, a, b=None):
     if b == None:
         b = a
         a = 1
-    s = 0 
+    s = 0
     for x in range(a, b + 1):
         s += f(x)
     return s
+
 
 # Codes for statistics.
 def mean(array):
@@ -458,6 +516,7 @@ def mean(array):
             tf += 1
     return tx / tf
 
+
 def moment(array, n=1):
     s = 0
     if isinstance(array[0], (list, tuple)):
@@ -466,17 +525,20 @@ def moment(array, n=1):
         tf = len(array)
 
     for i in array:
-        
+
         if isinstance(i, list) or isinstance(i, tuple):
             s += i[1] * (i[0] ** n)
         else:
-            s += i ** n
+            s += i**n
     return s / tf
+
 
 def StandardDeviation(array):
     return math.sqrt(moment(array, 2) - mean(array) ** 2)
 
+
 # For complex number since here.
+
 
 def arg(z):
     """
@@ -497,13 +559,15 @@ def arg(z):
         angle -= pi
     return angle
 
+
 def modulus(z):
     """
     Return the modulus of a complex number.
     """
-    return math.sqrt(pow(z.imag,2) + pow(z.real,2))
+    return math.sqrt(pow(z.imag, 2) + pow(z.real, 2))
 
-def cpow(z, n, polar = False):
+
+def cpow(z, n, polar=False):
     """
     Return the nth power of complex number z(Cartesian form by default).
     """
@@ -518,14 +582,17 @@ def cpow(z, n, polar = False):
     else:
         return mod * (cos(angle) + 1j * sin(angle))
 
+
 # Codes for matrix. Temporarily without numpy.
 class DimensionError(Exception):
-   pass
+    pass
 
-class Vector():
+
+class Vector:
     """
     Reinventing wheels to practice coding and make tools to cheat in maths homework.
     """
+
     def __init__(self, data):
         if isinstance(data, list):
             self.__vec = data
@@ -535,11 +602,13 @@ class Vector():
             else:
                 self.__vec = data.column(0)
         else:
-            raise ValueError('Please check the input. Only lists and matrix() are supported.')
-    
+            raise ValueError(
+                "Please check the input. Only lists and matrix() are supported."
+            )
+
     def __len__(self):
         return len(self.__vec)
-    
+
     def __getitem__(self, n):
         return self.__vec[n]
 
@@ -551,7 +620,7 @@ class Vector():
             return [self[i] + other[i] for i in range(len(self))]
 
     def __abs__(self):
-        return math.sqrt(sum([i ** 2 for i in self.__vec]))
+        return math.sqrt(sum([i**2 for i in self.__vec]))
 
     def __mod__(self, other):
         if isinstance(other, Matrix) and min(other.dimension()) == 1:
@@ -565,7 +634,7 @@ class Vector():
                 else:
                     ratio = self[i] / other[i]
                     break
-            
+
             for i in range(len(self)):
                 if other[i] * ratio != self[i]:
                     return False
@@ -585,41 +654,49 @@ class Vector():
             for i in range(len(self)):
                 new_vec.append(self[i] * other)
             return Vector(new_vec)
-        
+
         if isinstance(other, Vector):
             if len(self) == len(other):
                 return sum((self[i] * other[i] for i in range(len(self))))
-    
+
     def __repr__(self):
-        return 'Vector(' + ', '.join(str(i) for i in self.__vec) + ')'
+        return "Vector(" + ", ".join(str(i) for i in self.__vec) + ")"
 
     def normalised(self):
-        '''
+        """
         Return the unit vector parallel to self.
-        '''
-        return self * (1 /abs(self))
+        """
+        return self * (1 / abs(self))
 
     def show(self):
         print(self.__vec)
 
+
 def angle(vec1, vec2):
     return acos(vec1 * vec2 / abs(vec1) / abs(vec2))
 
-def CrossProduct(vec1, vec2):
-    if len(vec1) == len(vec2) == 3: # only works for 3D vector now.
-        return Vector([vec1[1] * vec2[2] - vec1[2] * vec2[1],
-                       vec1[2] * vec2[0] - vec1[0] * vec2[2],
-                       vec1[0] * vec2[1] - vec1[1] * vec2[0]])
 
-class Matrix():
+def CrossProduct(vec1, vec2):
+    if len(vec1) == len(vec2) == 3:  # only works for 3D vector now.
+        return Vector(
+            [
+                vec1[1] * vec2[2] - vec1[2] * vec2[1],
+                vec1[2] * vec2[0] - vec1[0] * vec2[2],
+                vec1[0] * vec2[1] - vec1[1] * vec2[0],
+            ]
+        )
+
+
+class Matrix:
     """
     To assist maths homework and practice coding.
     """
-    def __init__(self, mat, constant = False):
+
+    def __init__(self, mat, constant=False):
         for i in range(len(mat)):
             if len(mat[i]) != len(mat[0]):
-                raise ValueError('Not a valid matrix!')
-        
+                raise ValueError("Not a valid matrix!")
+
         if constant:
             for i in range(len(mat)):
                 mat[i] = tuple(mat[i])
@@ -633,7 +710,7 @@ class Matrix():
         self.__iterater = 0
         self.__CurrentRow = self.__mat[0]
         self.__columns = []
-    
+
     def __eq__(self, other):
         if isinstance(other, Matrix) and other.dimension() == self.dimension():
             for i in range(self.dimension()[0]):
@@ -651,14 +728,17 @@ class Matrix():
 
     def __iter__(self):
         return iter(self.__mat)
-    
+
     def __mul__(self, other):
-        '''
+        """
         Self post-multiplied by other.
-        '''
+        """
         if isinstance(other, Matrix):
             if self.dimension()[1] == other.dimension()[0]:
-                result = [[0 for j in range(other.dimension()[1])] for i in range(self.dimension()[0])]
+                result = [
+                    [0 for j in range(other.dimension()[1])]
+                    for i in range(self.dimension()[0])
+                ]
                 row, column = len(result), len(result[0])
 
                 for i in range(row):
@@ -667,7 +747,7 @@ class Matrix():
                 return Matrix(result)
 
             else:
-                raise DimensionError('The matrices are not conformable!')
+                raise DimensionError("The matrices are not conformable!")
 
         elif isnumber(other):
             newmat = copy.deepcopy(self.__mat)
@@ -686,34 +766,36 @@ class Matrix():
             for i in range(self.dimension()[0]):
                 newmat.append(list(Vector(self.__mat[i]) + Vector(n.row(i))))
             return Matrix(newmat)
-        
+
         else:
-            raise DimensionError('The matrices are not conformable!')
-    
+            raise DimensionError("The matrices are not conformable!")
+
     def __sub__(self, other):
         return self + other * (-1)
-    
+
     def __pow__(self, other):
-        '''
+        """
         The recursive method works here and provides a higher efficiency than looping from 1 to n.
-        '''
+        """
         if int(other) == other and self.dimension()[0] == self.dimension()[1]:
             return intpow(self, int(other))
         else:
-            raise ValueError('Check your input! the power has to be int and the matrix has to be squaral.')
+            raise ValueError(
+                "Check your input! the power has to be int and the matrix has to be squaral."
+            )
 
     def __neg__(self):
         return self * (-1)
-    
+
     def __getitem__(self, x):
         return Vector(self.__mat[x])
-    
+
     def __setitem__(self, x, y, value):
         if not self.__const:
             self.__mat[x][y] = value
         else:
-            raise ValueError('This is a constant matrix!')
-    
+            raise ValueError("This is a constant matrix!")
+
     def __mod__(self, other):
         if isinstance(other, Matrix) and self.dimension() == other.dimension():
             if not self[0] % other[0]:
@@ -730,7 +812,7 @@ class Matrix():
         return False
 
     def __repr__(self):
-        return '\n'.join(',\t'.join(str(j) for j in i) for i in self.__mat)
+        return "\n".join(",\t".join(str(j) for j in i) for i in self.__mat)
 
     def isConst(self):
         return self.__const
@@ -743,19 +825,19 @@ class Matrix():
                 i.pop(column)
 
         return Matrix(min_matrix)
-    
+
     def determinant(self):
         if self.__dimension[0] != self.__dimension[1]:
-            raise DimensionError('This is not a square matrix and have no determinant.')
+            raise DimensionError("This is not a square matrix and have no determinant.")
         if len(self) == 1:
             return self.row(0)[0]
-        
+
         det = 0
         for i in range(self.__dimension[0]):
             det += self.__mat[0][i] * self.minor(0, i).determinant() * (-1) ** i
-        
+
         return det
-    
+
     def transpose(self):
         return Matrix(self.columns())
 
@@ -767,16 +849,23 @@ class Matrix():
 
     def inverse(self):
         if self.__dimension[0] != self.__dimension[1]:
-            raise DimensionError('This is not a square matrix and have no inverse.')
+            raise DimensionError("This is not a square matrix and have no inverse.")
 
         det = self.determinant()
         if det == 0:
             return None
         else:
-            inverse = [[0 for j in range(self.__dimension[0])] for i in range(self.__dimension[0])]
+            inverse = [
+                [0 for j in range(self.__dimension[0])]
+                for i in range(self.__dimension[0])
+            ]
             for row in range(self.__dimension[0]):
                 for column in range(self.__dimension[1]):
-                    inverse[column][row] = self.minor(row, column).determinant() * (-1) ** (row + column) / det
+                    inverse[column][row] = (
+                        self.minor(row, column).determinant()
+                        * (-1) ** (row + column)
+                        / det
+                    )
             return Matrix(inverse)
 
     def column(self, n):
@@ -791,7 +880,7 @@ class Matrix():
     def show(self):
         for i in self.__mat:
             print(i)
-        print('\n')
+        print("\n")
 
     def PopRow(self, n):
         if self.__dimension[0] > n:
@@ -803,11 +892,11 @@ class Matrix():
             self.dimension()[1] -= 1
             self.__columns = []
             return [i.pop(n) for i in self.__mat]
-    
+
     def SetMinor(self, x, y, new_minor):
-        '''
+        """
         Set the minor of the (x, y)th element to be the new_minor.
-        '''
+        """
         new_minor = copy.deepcopy(list(new_minor))
         new_minor.insert(x, self.__mat[x])
 
@@ -828,7 +917,7 @@ class Matrix():
             return Matrix(new_mat)
 
         else:
-            raise DimensionError('Matrix and row must have the same number of columns.')
+            raise DimensionError("Matrix and row must have the same number of columns.")
 
     def InsertColumn(self, column, n=None):
         if len(column) == self.dimension()[0]:
@@ -840,8 +929,8 @@ class Matrix():
                 new_mat[i].append(column[i])
             return Matrix(new_mat)
         else:
-            raise DimensionError('Matrix and column must have the same number of rows.')
-    
+            raise DimensionError("Matrix and column must have the same number of rows.")
+
     def SetRow(self, row, n):
         self.PopRow(n)
         self.InsertRow(row, n)
@@ -849,41 +938,50 @@ class Matrix():
     def SetColumn(self, column, n):
         self.PopColumn(n)
         self.InsertColumn(column, n)
-    
+
     def IsEigen(self, other):
-        '''
+        """
         Check whether 'other' is an eigenvalue or eigenvector of self.
         If other is an eigenvector of self, the corresponding eigenvalue is returned.
-        '''
+        """
         if isnumber(other):
             return (self - identity(self.dimension()[0]) * other).determinant() == 0
         elif isinstance(other, Vector) or isinstance(other, Matrix):
             return Vector(self * other) % other
 
+
 def zeros(row, column):
     return Matrix([[0 for i in range(column)] for j in range(row)])
 
+
 def identity(n):
-    '''
+    """
     List comprehension was not fully applied because it appeaared to be much slower than an additional for loop.
-    '''
+    """
     mat = [[0 for i in range(n)] for j in range(n)]
     for i in range(n):
         mat[i][i] = 1
     return Matrix(mat)
 
+
 def randmat(row, column, bits=7, const=False):
-    return Matrix([[random.getrandbits(bits) for i in range(column)] for j in range(row)], const)
+    return Matrix(
+        [[random.getrandbits(bits) for i in range(column)] for j in range(row)], const
+    )
+
 
 def randvec(dim):
     return Vector(randmat(1, dim))
 
+
 def rotate2(coordinates, angle):
-    '''
+    """
     Rotate the coordinates anticlockwise by the angle measured in radian.
-    '''
+    """
     return Matrix([[cos(angle), -sin(angle)], [sin(angle), cos(angle)]]) * coordinates
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     import sys
+
     print(isprime(101))

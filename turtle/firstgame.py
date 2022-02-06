@@ -15,8 +15,8 @@ while gameover == 0:
     n = n + 1
     if gameover == 1:
         break
-    
-    time.sleep(random.randint(3,7))
+
+    time.sleep(random.randint(3, 7))
 
     start_time = time.time()
 
@@ -26,12 +26,12 @@ while gameover == 0:
 
     reaction_time = end_time - start_time
 
-    print("Your reaction time was", round(reaction_time,3), "seconds.")
-    
+    print("Your reaction time was", round(reaction_time, 3), "seconds.")
+
     total = total + reaction_time
-    ave = round(total / n,3)
-    
-    print("Your average score is", ave, "seconds in", n,"times.")
+    ave = round(total / n, 3)
+
+    print("Your average score is", ave, "seconds in", n, "times.")
 
     if best == 0:
         best = reaction_time
@@ -43,16 +43,16 @@ while gameover == 0:
         elif reaction_time < best:
             best = reaction_time
 
-    print("Your best score is",round(best,3) ,"seconds.")
+    print("Your best score is", round(best, 3), "seconds.")
 
-    a = (input("do you want to play again?(y/n)"))
+    a = input("do you want to play again?(y/n)")
 
     if a == "n":
         gameover = 1
 
     elif a == "y":
-        gameover = 0   
-    
+        gameover = 0
+
     else:
         print("Invalid input!")
         break

@@ -3,22 +3,24 @@ contains = {}
 true = set()
 false = set()
 
+
 def get_bags(string):
-    if string == 'no other bag':
+    if string == "no other bag":
         return []
 
-    stuffing = string.split(',')
+    stuffing = string.split(",")
     bags = []
     for i in stuffing:
-        info = [j for j in i.split(' ') if not j == '']
+        info = [j for j in i.split(" ") if not j == ""]
         try:
             number = int(info[0])
-            name = ' '.join(info[1:])
+            name = " ".join(info[1:])
             bags += [name] * number
         except:
             print(info)
 
     return bags
+
 
 def search_1(bag):
     if bag in true:
@@ -26,7 +28,7 @@ def search_1(bag):
     elif bag in false:
         return False
 
-    if 'shiny gold bag' in contains[bag]:
+    if "shiny gold bag" in contains[bag]:
         true.add(bag)
         return True
     if not contains[bag]:
@@ -40,6 +42,7 @@ def search_1(bag):
     false.add(bag)
     return False
 
+
 def search_2(bag):
     count = 0
     if contains[bag]:
@@ -49,11 +52,12 @@ def search_2(bag):
     else:
         return 0
 
-with open('input.txt') as fin:
-    content = [i.replace('\n', '') for i in fin.readlines()]
+
+with open("input.txt") as fin:
+    content = [i.replace("\n", "") for i in fin.readlines()]
 
 for i in range(len(content)):
-    content[i] = content[i].split(' contain ')
+    content[i] = content[i].split(" contain ")
     bags.add(content[i][0])
     contains[content[i][0]] = get_bags(content[i][1])
 
@@ -61,4 +65,4 @@ count1 = 0
 for i in bags:
     count1 += search_1(i)
 
-print(count1, search_2('shiny gold bag'))
+print(count1, search_2("shiny gold bag"))

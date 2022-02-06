@@ -1,23 +1,28 @@
 #!/usr/bin/python3
 from math import *
+
 """
 Try to compute the volume of a doughnut-shaped object. (a circle rotated around x-axis)
 """
-radius = float(input('Enter the radius: '))
-y_cor = float(input('Enter the y cordinate: '))
+radius = float(input("Enter the radius: "))
+y_cor = float(input("Enter the y cordinate: "))
+
 
 def f(x):
     global radius, y_cor
-    return (sqrt(radius ** 2 - x ** 2) + y_cor) ** 2
+    return (sqrt(radius**2 - x**2) + y_cor) ** 2
+
 
 def g(x):
     global radius, y_cor
-    return (-sqrt(radius ** 2 - x ** 2) + y_cor) ** 2
+    return (-sqrt(radius**2 - x**2) + y_cor) ** 2
 
-num = int(radius) * 100000 
+
+num = int(radius) * 100000
 start_point = -radius
 end_point = radius
-r = radius * 2            # range between the start and end point.
+r = radius * 2  # range between the start and end point.
+
 
 def mid_point(f):
     """
@@ -25,6 +30,7 @@ def mid_point(f):
     """
     global num, start_point, end_point, r
     total_area = 0
+
     def xcor(n):
         """
         return the x cordinate of the nth rectangle.
@@ -41,8 +47,9 @@ def mid_point(f):
 
     for i in range(1, num + 1):
         total_area += area(i)
-    
+
     return total_area
 
-if __name__ == '__main__':
-    print(round(mid_point(f) - mid_point(g), 3), 'pi')
+
+if __name__ == "__main__":
+    print(round(mid_point(f) - mid_point(g), 3), "pi")
