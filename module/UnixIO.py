@@ -1,5 +1,7 @@
 import os
-from typing import Iterator, List
+import subprocess
+import json
+from typing import Iterator, List, Dict
 
 
 def listdir(path: str = ".") -> Iterator[str]:
@@ -42,3 +44,11 @@ def cp(x, y):
 
 def rm(fin):
     os.system('rm "{}"'.format(fin))
+
+
+def ffprobe(song: str) -> Dict:
+    command = 'ffprobe -v quiet -hide_banner -print_format json -show_format -show_streams "{}"'.format(
+        song
+    )
+    output = subprocess.check_output(command, shell=True)
+    return json.loads(output.decode("utf-8"))
